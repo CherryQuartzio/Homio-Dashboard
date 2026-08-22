@@ -1,5 +1,10 @@
 # Homio Dashboard - Minimal Working Example
-# Replace the placeholder entities below with your own entities to customize
+# Replace the placeholder entities below with your own entities to customize.
+# Portable fixes from Homio Fixed are in dashboards/templates/ (null sensor defaults,
+# layout-card navigation, 100dvh). Site-specific rooms: examples/homio-fixed/dashboard.json
+
+kiosk_mode:
+  hide_header: true
 
 button_card_templates: !include_dir_merge_named ../dashboards/templates/button_cards
 views:
@@ -15,40 +20,49 @@ views:
           show_humid: false
           show_temp: false
           show_motion: false
+          motion_sensor: null
+          temp_sensor: null
+          humid_sensor: null
         template:
           - homio_room
         name: Welcome to Homio
-      - type: custom:layout-card
-        layout_type: custom:grid-layout
-        layout: !include ../dashboards/templates/includes/homio_entity_layout.yaml
-        cards:
-          - type: custom:button-card
-            template:
-              - homio_default
-            name: "Setup Instructions"
-            styles:
-              card:
-                - background: "rgba(255, 255, 255, 0.1)"
-                - border-radius: "12px"
-                - padding: "20px"
-                - height: "auto"
-              name:
-                - font-size: "18px"
-                - font-weight: "700"
-                - text-align: "left"
-                - white-space: "pre-line"
-            custom_fields:
-              info: |
-                [[[
-                  return `<div style="font-size: 14px; line-height: 1.6; color: var(--primary-text-color); text-align: left;">
-                    <p><strong>Welcome to Homio Dashboard!</strong></p>
-                    <p>To customize this dashboard:</p>
-                    <ol style="padding-left: 20px;">
-                      <li>Edit: custom_components/homio_dashboard/lovelace/homio.yaml</li>
-                      <li>Add your entities (lights, sensors, etc.)</li>
-                      <li>Add room images to: www/images/Homio/rooms/</li>
-                    </ol>
-                    <p>All helper entities and sensors are loaded!</p>
-                  </div>`;
-                ]]]
-            card_size: 3
+        # Nest entities inside the room card so they do not inflate view scroll height.
+        custom_fields:
+          entities:
+            card:
+              type: custom:layout-card
+              layout_type: custom:grid-layout
+              layout: !include ../dashboards/templates/includes/homio_entity_layout.yaml
+              cards:
+                - type: custom:button-card
+                  template:
+                    - homio_default
+                  name: "Setup Instructions"
+                  styles:
+                    card:
+                      - background: "rgba(255, 255, 255, 0.1)"
+                      - border-radius: "12px"
+                      - padding: "20px"
+                      - height: "auto"
+                      - pointer-events: all
+                    name:
+                      - font-size: "18px"
+                      - font-weight: "700"
+                      - text-align: "left"
+                      - white-space: "pre-line"
+                  custom_fields:
+                    info: |
+                      [[[
+                        return `<div style="font-size: 14px; line-height: 1.6; color: var(--primary-text-color); text-align: left;">
+                          <p><strong>Welcome to Homio Dashboard!</strong></p>
+                          <p>To customize this dashboard:</p>
+                          <ol style="padding-left: 20px;">
+                            <li>Edit: custom_components/homio_dashboard/lovelace/homio.yaml</li>
+                            <li>Add your entities (lights, sensors, etc.)</li>
+                            <li>Add room images to: www/images/Homio/rooms/</li>
+                            <li>See FORK_NOTES.md and examples/homio-fixed/ for Homio Fixed ports</li>
+                          </ol>
+                          <p>All helper entities and sensors are loaded!</p>
+                        </div>`;
+                      ]]]
+                  card_size: 3

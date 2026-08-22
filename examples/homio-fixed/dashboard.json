@@ -1,0 +1,1453 @@
+{
+  "button_card_templates": {
+    "homio_default": {
+      "styles": {
+        "card": [
+          {
+            "--mdc-ripple-color": "transparent"
+          },
+          {
+            "-webkit-tap-highlight-color": "transparent"
+          },
+          {
+            "position": "relative"
+          },
+          {
+            "border": "none"
+          },
+          {
+            "border-radius": 0
+          },
+          {
+            "padding": 0
+          },
+          {
+            "margin": 0
+          },
+          {
+            "animation": "fadeIn 0.3s ease-in forwards"
+          }
+        ]
+      },
+      "extra_styles": "@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }\n"
+    },
+    "homio_logo": {
+      "template": [
+        "homio_default"
+      ],
+      "tap_action": {
+        "action": "navigate",
+        "navigation_path": "/homio-fixed/living"
+      },
+      "name": "Homio.",
+      "styles": {
+        "name": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "letter-spacing": "2px"
+          },
+          {
+            "font-size": "18px"
+          },
+          {
+            "font-weight": 700
+          },
+          {
+            "text-transform": "uppercase"
+          },
+          {
+            "justify-self": "start"
+          }
+        ],
+        "card": [
+          {
+            "background": "transparent"
+          },
+          {
+            "pointer-events": "all"
+          }
+        ]
+      }
+    },
+    "homio_menu_icon": {
+      "show_entity_picture": true,
+      "entity_picture": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"/homio_dashboard/images/Homio/icons/close.svg\" : \"/homio_dashboard/images/Homio/icons/menu.svg\";\n]]]\n",
+      "tap_action": {
+        "action": "call-service",
+        "service": "input_boolean.toggle",
+        "service_data": {
+          "entity_id": "input_boolean.homio_mobile_navigation"
+        }
+      },
+      "styles": {
+        "card": [
+          {
+            "background": "transparent"
+          },
+          {
+            "display": "none"
+          },
+          {
+            "pointer-events": "all"
+          },
+          {
+            "cursor": "pointer"
+          }
+        ],
+        "img_cell": [
+          {
+            "width": "25px"
+          }
+        ],
+        "icon": [
+          {
+            "width": "100%"
+          },
+          {
+            "height": "100%"
+          }
+        ]
+      },
+      "extra_styles": "@media (max-width: 1249px) { .button-card-main { display: block !important; } }\n"
+    },
+    "homio_mobile_logo": {
+      "name": "Homio.",
+      "tap_action": {
+        "action": "navigate",
+        "navigation_path": "/homio-fixed/living"
+      },
+      "styles": {
+        "name": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "letter-spacing": "2px"
+          },
+          {
+            "font-size": "18px"
+          },
+          {
+            "font-weight": 700
+          },
+          {
+            "text-transform": "uppercase"
+          },
+          {
+            "justify-self": "start"
+          }
+        ],
+        "card": [
+          {
+            "background": "transparent"
+          },
+          {
+            "pointer-events": "all"
+          }
+        ]
+      }
+    },
+    "homio_nav_button": {
+      "template": [
+        "homio_default"
+      ],
+      "tap_action": {
+        "action": "navigate",
+        "navigation_path": "[[[ return variables.path || '/homio-fixed/living' ]]]"
+      },
+      "styles": {
+        "name": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "font-size": "15px"
+          },
+          {
+            "font-weight": 700
+          },
+          {
+            "border-bottom": "[[[ return (variables.path && variables.path === window.location.pathname) ? '2px solid white' : 'none' ]]]"
+          },
+          {
+            "justify-self": "start"
+          },
+          {
+            "white-space": "nowrap"
+          }
+        ],
+        "card": [
+          {
+            "background": "transparent"
+          },
+          {
+            "pointer-events": "all"
+          }
+        ]
+      }
+    },
+    "homio_time": {
+      "template": [
+        "homio_default"
+      ],
+      "name": "[[[\n  const t = states['sensor.homio_current_time'];\n  return t ? t.state : '';\n]]]\n",
+      "styles": {
+        "name": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "letter-spacing": "1px"
+          },
+          {
+            "font-size": "16px"
+          },
+          {
+            "text-transform": "uppercase"
+          },
+          {
+            "font-weight": 700
+          },
+          {
+            "justify-self": "start"
+          }
+        ],
+        "card": [
+          {
+            "background": "transparent"
+          },
+          {
+            "pointer-events": "all"
+          }
+        ]
+      }
+    },
+    "homio_entity": {
+      "template": [
+        "homio_default"
+      ],
+      "show_state": true,
+      "show_entity_picture": true,
+      "entity_picture": "[[[\n  const icon = variables.icon || \"lamp\";\n  return \"/homio_dashboard/images/Homio/icons/\" + icon + \".svg\";\n]]]\n",
+      "state": [
+        {
+          "value": "on",
+          "styles": {
+            "card": [
+              {
+                "background": "rgba(255,255,255,0.4)"
+              }
+            ]
+          }
+        },
+        {
+          "value": "playing",
+          "styles": {
+            "card": [
+              {
+                "background": "rgba(255,255,255,0.4)"
+              }
+            ]
+          }
+        },
+        {
+          "value": "open",
+          "styles": {
+            "card": [
+              {
+                "background": "rgba(255,255,255,0.4)"
+              }
+            ]
+          }
+        },
+        {
+          "value": "cool",
+          "styles": {
+            "card": [
+              {
+                "background": "rgba(255,255,255,0.4)"
+              }
+            ]
+          }
+        },
+        {
+          "value": "heat",
+          "styles": {
+            "card": [
+              {
+                "background": "rgba(255,255,255,0.4)"
+              }
+            ]
+          }
+        }
+      ],
+      "styles": {
+        "card": [
+          {
+            "background": "rgba(255,255,255,0.1)"
+          },
+          {
+            "backdrop-filter": "blur(12px)"
+          },
+          {
+            "height": "170px"
+          },
+          {
+            "padding-left": "40px"
+          },
+          {
+            "padding-right": "40px"
+          },
+          {
+            "scroll-snap-align": "start"
+          },
+          {
+            "display": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"none\" : \"block\";\n]]]\n"
+          },
+          {
+            "pointer-events": "all"
+          }
+        ],
+        "name": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "font-size": "16px"
+          },
+          {
+            "font-weight": 600
+          },
+          {
+            "justify-self": "start"
+          },
+          {
+            "margin-bottom": "5px"
+          }
+        ],
+        "state": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "font-size": "14px"
+          },
+          {
+            "justify-self": "start"
+          },
+          {
+            "font-weight": 700
+          },
+          {
+            "opacity": 0.8
+          }
+        ],
+        "grid": [
+          {
+            "grid-template-columns": "1fr min-content"
+          },
+          {
+            "grid-column-gap": "20px"
+          },
+          {
+            "grid-template-rows": "min-content"
+          },
+          {
+            "grid-template-areas": "\"n i\" \"s i\""
+          },
+          {
+            "place-content": "center"
+          }
+        ],
+        "img_cell": [
+          {
+            "width": "30px"
+          },
+          {
+            "height": "30px"
+          },
+          {
+            "background": "transparent"
+          }
+        ],
+        "icon": [
+          {
+            "width": "100%"
+          },
+          {
+            "height": "100%"
+          }
+        ]
+      }
+    },
+    "homio_light": {
+      "template": [
+        "homio_entity"
+      ],
+      "tap_action": {
+        "action": "toggle"
+      },
+      "hold_action": {
+        "action": "more-info"
+      },
+      "state_display": "[[[\n  if (!entity) return '';\n  if (entity.state === 'on' && entity.attributes && entity.attributes.brightness != null) {\n    return 'Brightness - ' + Math.round((entity.attributes.brightness / 255) * 100) + '%';\n  }\n  return entity.state === 'on' ? 'On' : 'Off';\n]]]\n"
+    },
+    "homio_room": {
+      "variables": {
+        "show_motion": false,
+        "motion_sensor": null,
+        "show_temp": false,
+        "temp_sensor": null,
+        "show_humid": false,
+        "humid_sensor": null
+      },
+      "template": [
+        "homio_default"
+      ],
+      "tap_action": {
+        "action": "call-service",
+        "service": "input_boolean.toggle",
+        "service_data": {
+          "entity_id": "input_boolean.homio_mobile_navigation"
+        }
+      },
+      "extra_styles": "@media only screen and (max-width: 1249px) { .button-card-main { position: fixed !important; } }\n@media (min-width: 1250px) {\n  #mobile_logo { display: none !important; }\n}\n",
+      "styles": {
+        "card": [
+          {
+            "height": "100dvh"
+          },
+          {
+            "padding-left": "8vw"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "pointer-events": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"all\" : \"none\";\n]]]\n"
+          },
+          {
+            "background": "[[[\n  const img = variables.image || \"lounge\";\n  const pos = variables.image_position || \"center center\";\n  return \"linear-gradient(to bottom, rgba(51,51,51,0.7)0%, rgba(51,51,51,0.7)50%, rgba(51,51,51,0.5)100%), \"\n    + \"url(/homio_dashboard/images/Homio/rooms/\" + img + \".jpg) \" + pos + \" / cover no-repeat\";\n]]]\n"
+          },
+          {
+            "box-sizing": "border-box"
+          },
+          {
+            "max-height": "100dvh"
+          }
+        ],
+        "name": [
+          {
+            "color": "var(--primary-text-color)"
+          },
+          {
+            "opacity": 0.9
+          },
+          {
+            "font-size": "clamp(40px, 6.897vw + 17.931px, 80px)"
+          },
+          {
+            "letter-spacing": "-2px"
+          },
+          {
+            "font-weight": 700
+          },
+          {
+            "justify-self": "start"
+          }
+        ],
+        "grid": [
+          {
+            "grid-template-columns": "1fr"
+          },
+          {
+            "grid-template-rows": "min-content"
+          },
+          {
+            "grid-template-areas": "\"temperature\" \"n\" \"humidity\""
+          },
+          {
+            "place-content": "center"
+          }
+        ],
+        "custom_fields": {
+          "mobile_logo": [
+            {
+              "position": "absolute"
+            },
+            {
+              "top": "60px"
+            },
+            {
+              "left": "8vw"
+            },
+            {
+              "z-index": 999
+            },
+            {
+              "display": "[[[\n  if (window.innerWidth >= 1250) return 'none';\n  const nav = states['input_boolean.homio_mobile_navigation'];\n  return (nav && nav.state === 'on') ? 'none' : 'block';\n]]]\n"
+            }
+          ],
+          "mobile_menu_icon": [
+            {
+              "position": "absolute"
+            },
+            {
+              "top": "60px"
+            },
+            {
+              "right": "8vw"
+            },
+            {
+              "z-index": 999
+            }
+          ],
+          "navigation": [
+            {
+              "position": "absolute"
+            },
+            {
+              "inset": "0"
+            },
+            {
+              "z-index": 20
+            },
+            {
+              "pointer-events": "none"
+            }
+          ],
+          "temperature": [
+            {
+              "display": "[[[\n  return (variables.show_temp && variables.temp_sensor && states[variables.temp_sensor])\n    ? 'block' : 'none';\n]]]\n"
+            },
+            {
+              "color": "var(--primary-text-color)"
+            },
+            {
+              "font-size": "15px"
+            },
+            {
+              "font-weight": 600
+            },
+            {
+              "opacity": 0.9
+            },
+            {
+              "justify-self": "start"
+            },
+            {
+              "letter-spacing": "1px"
+            },
+            {
+              "text-transform": "uppercase"
+            }
+          ],
+          "humidity": [
+            {
+              "display": "[[[\n  return (variables.show_humid && variables.humid_sensor && states[variables.humid_sensor])\n    ? 'block' : 'none';\n]]]\n"
+            },
+            {
+              "font-size": "clamp(16px, 1.75vw, 19px)"
+            },
+            {
+              "justify-self": "start"
+            },
+            {
+              "font-weight": 500
+            },
+            {
+              "margin-top": "10px"
+            },
+            {
+              "margin-left": "5px"
+            },
+            {
+              "color": "var(--primary-text-color)"
+            },
+            {
+              "opacity": 0.9
+            }
+          ],
+          "motion_detection": [
+            {
+              "display": "[[[\n  return (variables.show_motion && variables.motion_sensor) ? 'block' : 'none';\n]]]\n"
+            },
+            {
+              "position": "fixed"
+            },
+            {
+              "right": 0
+            },
+            {
+              "left": 0
+            },
+            {
+              "bottom": 0
+            },
+            {
+              "transform": "[[[\n  if (!variables.show_motion || !variables.motion_sensor || !states[variables.motion_sensor]) return 'translateY(100%)';\n  return states[variables.motion_sensor].state === 'on' ? 'translateY(0)' : 'translateY(100%)';\n]]]\n"
+            },
+            {
+              "transition": "transform 0.5s"
+            },
+            {
+              "padding": "20px"
+            },
+            {
+              "color": "white"
+            },
+            {
+              "font-size": "13px"
+            },
+            {
+              "text-transform": "uppercase"
+            },
+            {
+              "letter-spacing": "2px"
+            },
+            {
+              "font-weight": 700
+            },
+            {
+              "background": "rgba(255,255,255,0.1)"
+            },
+            {
+              "backdrop-filter": "blur(12px)"
+            },
+            {
+              "z-index": 999
+            }
+          ],
+          "entities": [
+            {
+              "position": "absolute"
+            },
+            {
+              "inset": "0"
+            },
+            {
+              "pointer-events": "none"
+            },
+            {
+              "z-index": 5
+            }
+          ]
+        }
+      },
+      "custom_fields": {
+        "mobile_logo": {
+          "card": {
+            "type": "custom:button-card",
+            "template": [
+              "homio_default",
+              "homio_mobile_logo"
+            ]
+          }
+        },
+        "mobile_menu_icon": {
+          "card": {
+            "type": "custom:button-card",
+            "template": [
+              "homio_default",
+              "homio_menu_icon"
+            ]
+          }
+        },
+        "navigation": {
+          "card": {
+            "type": "custom:layout-card",
+            "layout_type": "custom:grid-layout",
+            "layout": {
+              "grid-template-columns": "1fr",
+              "margin": 0,
+              "padding": 0
+            },
+            "cards": [
+              {
+                "type": "conditional",
+                "conditions": [
+                  {
+                    "condition": "screen",
+                    "media_query": "(min-width: 1250px)"
+                  }
+                ],
+                "card": {
+                  "type": "custom:layout-card",
+                  "layout_type": "custom:grid-layout",
+                  "layout": {
+                    "grid-template-columns": "max-content 1fr max-content",
+                    "margin": "0 8vw 0 8vw",
+                    "position": "absolute",
+                    "inset": "60px 0 auto 0",
+                    "padding": 0
+                  },
+                  "cards": [
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_logo"
+                      ]
+                    },
+                    {
+                      "type": "custom:layout-card",
+                      "layout_type": "custom:grid-layout",
+                      "layout": {
+                        "grid-auto-flow": "column",
+                        "place-content": "center",
+                        "grid-column-gap": "36px",
+                        "margin": 0,
+                        "padding": 0
+                      },
+                      "cards": [
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Living",
+                          "variables": {
+                            "path": "/homio-fixed/living"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Dining",
+                          "variables": {
+                            "path": "/homio-fixed/dining"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Kitchen",
+                          "variables": {
+                            "path": "/homio-fixed/kitchen"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Office",
+                          "variables": {
+                            "path": "/homio-fixed/office"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Master Bedroom",
+                          "variables": {
+                            "path": "/homio-fixed/master-bedroom"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_time"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "conditional",
+                "conditions": [
+                  {
+                    "condition": "screen",
+                    "media_query": "(min-width: 0px) and (max-width: 1249px)"
+                  },
+                  {
+                    "condition": "state",
+                    "entity": "input_boolean.homio_mobile_navigation",
+                    "state": "on"
+                  }
+                ],
+                "card": {
+                  "type": "custom:layout-card",
+                  "layout_type": "custom:grid-layout",
+                  "layout": {
+                    "grid-template-columns": "1fr",
+                    "place-content": "space-around",
+                    "height": "100vh",
+                    "inset": "0 auto auto 0",
+                    "margin": 0,
+                    "padding": "0 0 0 60px",
+                    "width": "280px",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdrop-filter": "blur(15px)",
+                    "position": "absolute"
+                  },
+                  "cards": [
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_logo"
+                      ]
+                    },
+                    {
+                      "type": "custom:layout-card",
+                      "layout_type": "custom:grid-layout",
+                      "layout": {
+                        "grid-template-columns": "1fr",
+                        "grid-auto-flow": "row",
+                        "grid-row-gap": "24px"
+                      },
+                      "cards": [
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Living",
+                          "variables": {
+                            "path": "/homio-fixed/living"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Dining",
+                          "variables": {
+                            "path": "/homio-fixed/dining"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Kitchen",
+                          "variables": {
+                            "path": "/homio-fixed/kitchen"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Office",
+                          "variables": {
+                            "path": "/homio-fixed/office"
+                          }
+                        },
+                        {
+                          "type": "custom:button-card",
+                          "template": [
+                            "homio_nav_button"
+                          ],
+                          "name": "Master Bedroom",
+                          "variables": {
+                            "path": "/homio-fixed/master-bedroom"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_time"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "temperature": "[[[\n  if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return '';\n  const st = states[variables.temp_sensor];\n  const temperatureValue = parseFloat(st.state);\n  if (isNaN(temperatureValue)) return '';\n  const unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';\n  const temperature = temperatureValue.toFixed(1);\n  const isF = String(unit).indexOf('F') !== -1;\n  let label = '';\n  if (isF) {\n    if (temperatureValue <= 60) label = 'Very Cold';\n    else if (temperatureValue <= 67) label = 'Cool';\n    else if (temperatureValue <= 74) label = 'Comfortable';\n    else label = 'Very Hot';\n  } else {\n    if (temperatureValue <= 15.99) label = 'Very Cold';\n    else if (temperatureValue <= 17.99) label = 'Cool';\n    else if (temperatureValue <= 20.99) label = 'Comfortable';\n    else label = 'Very Hot';\n  }\n  return temperature + unit + ' - ' + label;\n]]]\n",
+        "humidity": "[[[\n  if (!variables.show_humid || !variables.humid_sensor || !states[variables.humid_sensor]) return '';\n  const humidityValue = parseFloat(states[variables.humid_sensor].state);\n  if (isNaN(humidityValue)) return '';\n  const humidity = humidityValue.toFixed(0);\n  if (humidityValue <= 29.99) return 'Humidity is very dry at ' + humidity + '%';\n  if (humidityValue <= 60.99) return 'Humidity is good at ' + humidity + '%';\n  return 'Humidity is high at ' + humidity + '%';\n]]]\n",
+        "motion_detection": "Motion detected"
+      },
+      "triggers_update": "all"
+    }
+  },
+  "views": [
+    {
+      "type": "custom:grid-layout",
+      "title": "Living",
+      "path": "living",
+      "layout": {
+        "grid-template-columns": "1fr",
+        "grid-column-gap": "0px",
+        "margin": 0,
+        "padding": 0,
+        "height": "100dvh",
+        "position": "relative",
+        "overflow": "hidden",
+        "max-height": "100dvh"
+      },
+      "cards": [
+        {
+          "type": "custom:button-card",
+          "template": [
+            "homio_room"
+          ],
+          "name": "Living",
+          "variables": {
+            "image": "lounge",
+            "image_position": "center center",
+            "show_humid": true,
+            "show_temp": true,
+            "show_motion": false,
+            "motion_sensor": null,
+            "temp_sensor": "sensor.thermostat_temperature",
+            "humid_sensor": "sensor.thermostat_humidity"
+          },
+          "custom_fields": {
+            "entities": {
+              "card": {
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "position": "absolute",
+                  "grid-auto-columns": "260px",
+                  "grid-auto-flow": "column",
+                  "grid-column-gap": "5px",
+                  "margin": "0 0 0 8vw",
+                  "padding": 0,
+                  "inset": "auto 0 85px 0",
+                  "scroll-snap-type": "x mandatory",
+                  "overflow-y": "hidden",
+                  "overflow": "hidden"
+                },
+                "cards": [
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.living_room",
+                    "name": "Living Room Light",
+                    "variables": {
+                      "icon": "pendent"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "media_player.family_room_tv_remote",
+                    "name": "Family Room TV",
+                    "variables": {
+                      "icon": "apple_tv"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "climate.thermostat",
+                    "name": "Home HVAC",
+                    "variables": {
+                      "icon": "heating"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "scene.tv_night",
+                    "name": "TV Time",
+                    "variables": {
+                      "icon": "console"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "styles": {
+            "custom_fields": {
+              "entities": [
+                {
+                  "position": "absolute"
+                },
+                {
+                  "inset": "0"
+                },
+                {
+                  "pointer-events": "none"
+                },
+                {
+                  "z-index": 5
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "custom:grid-layout",
+      "title": "Dining",
+      "path": "dining",
+      "layout": {
+        "grid-template-columns": "1fr",
+        "grid-column-gap": "0px",
+        "margin": 0,
+        "padding": 0,
+        "height": "100dvh",
+        "position": "relative",
+        "overflow": "hidden",
+        "max-height": "100dvh"
+      },
+      "cards": [
+        {
+          "type": "custom:button-card",
+          "template": [
+            "homio_room"
+          ],
+          "name": "Dining",
+          "variables": {
+            "image": "dining",
+            "image_position": "center center",
+            "show_humid": false,
+            "show_temp": false,
+            "show_motion": false,
+            "motion_sensor": null,
+            "temp_sensor": null,
+            "humid_sensor": null
+          },
+          "custom_fields": {
+            "entities": {
+              "card": {
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "position": "absolute",
+                  "grid-auto-columns": "260px",
+                  "grid-auto-flow": "column",
+                  "grid-column-gap": "5px",
+                  "margin": "0 0 0 8vw",
+                  "padding": 0,
+                  "inset": "auto 0 85px 0",
+                  "scroll-snap-type": "x mandatory",
+                  "overflow-y": "hidden",
+                  "overflow": "hidden"
+                },
+                "cards": [
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.main_meeting_dinning_light",
+                    "name": "Dining Light",
+                    "variables": {
+                      "icon": "pendent"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "cover.dining",
+                    "name": "Dining Curtain",
+                    "variables": {
+                      "icon": "door"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "styles": {
+            "custom_fields": {
+              "entities": [
+                {
+                  "position": "absolute"
+                },
+                {
+                  "inset": "0"
+                },
+                {
+                  "pointer-events": "none"
+                },
+                {
+                  "z-index": 5
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "custom:grid-layout",
+      "title": "Kitchen",
+      "path": "kitchen",
+      "layout": {
+        "grid-template-columns": "1fr",
+        "grid-column-gap": "0px",
+        "margin": 0,
+        "padding": 0,
+        "height": "100dvh",
+        "position": "relative",
+        "overflow": "hidden",
+        "max-height": "100dvh"
+      },
+      "cards": [
+        {
+          "type": "custom:button-card",
+          "template": [
+            "homio_room"
+          ],
+          "name": "Kitchen",
+          "variables": {
+            "image": "kitchen",
+            "image_position": "center center",
+            "show_humid": false,
+            "show_temp": false,
+            "show_motion": false,
+            "motion_sensor": null,
+            "temp_sensor": null,
+            "humid_sensor": null
+          },
+          "custom_fields": {
+            "entities": {
+              "card": {
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "position": "absolute",
+                  "grid-auto-columns": "260px",
+                  "grid-auto-flow": "column",
+                  "grid-column-gap": "5px",
+                  "margin": "0 0 0 8vw",
+                  "padding": 0,
+                  "inset": "auto 0 85px 0",
+                  "scroll-snap-type": "x mandatory",
+                  "overflow-y": "hidden",
+                  "overflow": "hidden"
+                },
+                "cards": [
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.kitchen",
+                    "name": "Kitchen Light",
+                    "variables": {
+                      "icon": "pendent"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.nook",
+                    "name": "Nook Light",
+                    "variables": {
+                      "icon": "lamp"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.kitchen_hallway_light",
+                    "name": "Kitchen Hallway",
+                    "variables": {
+                      "icon": "lamp"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "scene.night_walk",
+                    "name": "Night Walk",
+                    "variables": {
+                      "icon": "electric"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "styles": {
+            "custom_fields": {
+              "entities": [
+                {
+                  "position": "absolute"
+                },
+                {
+                  "inset": "0"
+                },
+                {
+                  "pointer-events": "none"
+                },
+                {
+                  "z-index": 5
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "custom:grid-layout",
+      "title": "Office",
+      "path": "office",
+      "layout": {
+        "grid-template-columns": "1fr",
+        "grid-column-gap": "0px",
+        "margin": 0,
+        "padding": 0,
+        "height": "100dvh",
+        "position": "relative",
+        "overflow": "hidden",
+        "max-height": "100dvh"
+      },
+      "cards": [
+        {
+          "type": "custom:button-card",
+          "template": [
+            "homio_room"
+          ],
+          "name": "Office",
+          "variables": {
+            "image": "office",
+            "image_position": "center center",
+            "show_humid": false,
+            "show_temp": false,
+            "show_motion": false,
+            "motion_sensor": null,
+            "temp_sensor": null,
+            "humid_sensor": null
+          },
+          "custom_fields": {
+            "entities": {
+              "card": {
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "position": "absolute",
+                  "grid-auto-columns": "260px",
+                  "grid-auto-flow": "column",
+                  "grid-column-gap": "5px",
+                  "margin": "0 0 0 8vw",
+                  "padding": 0,
+                  "inset": "auto 0 85px 0",
+                  "scroll-snap-type": "x mandatory",
+                  "overflow-y": "hidden",
+                  "overflow": "hidden"
+                },
+                "cards": [
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.office_closet",
+                    "name": "Closet Light",
+                    "variables": {
+                      "icon": "lamp"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.signify_netherlands_b_v_lwa025",
+                    "name": "Desk Lamp",
+                    "variables": {
+                      "icon": "lamp"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.office_ceiling_fan",
+                    "name": "Office Light",
+                    "variables": {
+                      "icon": "pendent"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "fan.office_ceiling_fan",
+                    "name": "Office Fan",
+                    "variables": {
+                      "icon": "access_point"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "cover.office",
+                    "name": "Office Curtain",
+                    "variables": {
+                      "icon": "door"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "styles": {
+            "custom_fields": {
+              "entities": [
+                {
+                  "position": "absolute"
+                },
+                {
+                  "inset": "0"
+                },
+                {
+                  "pointer-events": "none"
+                },
+                {
+                  "z-index": 5
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "custom:grid-layout",
+      "title": "Master Bedroom",
+      "path": "master-bedroom",
+      "layout": {
+        "grid-template-columns": "1fr",
+        "grid-column-gap": "0px",
+        "margin": 0,
+        "padding": 0,
+        "height": "100dvh",
+        "position": "relative",
+        "overflow": "hidden",
+        "max-height": "100dvh"
+      },
+      "cards": [
+        {
+          "type": "custom:button-card",
+          "template": [
+            "homio_room"
+          ],
+          "name": "Master Bedroom",
+          "variables": {
+            "image": "bedroom",
+            "image_position": "center center",
+            "show_humid": false,
+            "show_temp": false,
+            "show_motion": false,
+            "motion_sensor": null,
+            "temp_sensor": null,
+            "humid_sensor": null
+          },
+          "custom_fields": {
+            "entities": {
+              "card": {
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "position": "absolute",
+                  "grid-auto-columns": "260px",
+                  "grid-auto-flow": "column",
+                  "grid-column-gap": "5px",
+                  "margin": "0 0 0 8vw",
+                  "padding": 0,
+                  "inset": "auto 0 85px 0",
+                  "scroll-snap-type": "x mandatory",
+                  "overflow-y": "hidden",
+                  "overflow": "hidden"
+                },
+                "cards": [
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.master_bedroom_ceiling_fan_main_light",
+                    "name": "Bedroom Light",
+                    "variables": {
+                      "icon": "pendent"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "fan.master_bedroom_ceiling_fan_main_fan",
+                    "name": "Ceiling Fan",
+                    "variables": {
+                      "icon": "access_point"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_entity"
+                    ],
+                    "entity": "media_player.google_tv_streamer_cast",
+                    "name": "Google TV",
+                    "variables": {
+                      "icon": "apple_tv"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "styles": {
+            "custom_fields": {
+              "entities": [
+                {
+                  "position": "absolute"
+                },
+                {
+                  "inset": "0"
+                },
+                {
+                  "pointer-events": "none"
+                },
+                {
+                  "z-index": 5
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "kiosk_mode": {
+    "hide_header": true
+  }
+}

@@ -3,16 +3,17 @@ homio_nav_button:
     - homio_default
   tap_action:
     action: navigate
-    navigation_path: "[[[ return variables.path ]]]"
+    navigation_path: "[[[ return variables.path || '/homio_dashboard/home' ]]]"
   styles:
     name:
       - color: var(--primary-text-color)
-      - font-size: 16px
+      - font-size: 15px
       - font-weight: 700
       - border-bottom: >
-          [[[ if(variables.path === window.location.pathname) {return "2px solid
-          white"} else {return "none"} ]]]
+          [[[ return (variables.path && variables.path === window.location.pathname)
+            ? '2px solid white' : 'none' ]]]
       - justify-self: start
+      - white-space: nowrap
     card:
       - background: transparent
       - pointer-events: all

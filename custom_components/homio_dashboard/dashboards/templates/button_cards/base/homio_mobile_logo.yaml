@@ -2,7 +2,7 @@ homio_mobile_logo:
   name: Homio.
   tap_action:
     action: navigate
-    navigation_path: /homio_dashboard/lounge
+    navigation_path: /homio_dashboard/home
   styles:
     name:
       - color: var(--primary-text-color)

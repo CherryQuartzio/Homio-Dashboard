@@ -1,13 +1,12 @@
 homio_room:
-  triggers_update:
-    - '[[[ return variables.motion_sensor ]]]'
+  triggers_update: all
   variables:
     show_motion: false
-    motion_sensor: variables.motion_sensor
+    motion_sensor: null
     show_temp: false
-    temp_sensor: variables.temp_sensor
+    temp_sensor: null
     show_humid: false
-    humid_sensor: variables.humid_sensor
+    humid_sensor: null
   template:
     - homio_default
   tap_action:
@@ -16,33 +15,35 @@ homio_room:
     service_data:
       entity_id: input_boolean.homio_mobile_navigation
   extra_styles: |
-    @media only screen and (max-width: 1249px)  {
+    @media only screen and (max-width: 1249px) {
       .button-card-main {
         position: fixed !important;
       }
     }
+    @media (min-width: 1250px) {
+      #mobile_logo { display: none !important; }
+    }
   styles:
     card:
-      - height: 100vh
+      - height: 100dvh
       - padding-left: 8vw
-      - padding-bottom: 40px
       - overflow: hidden
+      - box-sizing: border-box
+      - max-height: 100dvh
       - pointer-events: |
           [[[
-            if (states['input_boolean.homio_mobile_navigation'].state === 'on')
-              return "all";
-            else
-              return "none";
+            const nav = states['input_boolean.homio_mobile_navigation'];
+            return (nav && nav.state === 'on') ? 'all' : 'none';
           ]]]
       - background: |
           [[[
-            return `linear-gradient(to bottom, rgba(51,51,51,0.7)0%, rgba(51,51,51,0.7)50%, rgba(51,51,51,0.5)100%), 
-            url('/homio_dashboard/images/Homio/rooms/${variables.image}.jpg') ${variables.image_position || 'center center'} / cover no-repeat`;
+            const img = variables.image || 'lounge';
+            const pos = variables.image_position || 'center center';
+            return `linear-gradient(to bottom, rgba(51,51,51,0.7)0%, rgba(51,51,51,0.7)50%, rgba(51,51,51,0.5)100%), url('/homio_dashboard/images/Homio/rooms/${img}.jpg') ${pos} / cover no-repeat`;
           ]]]
     name:
       - color: var(--primary-text-color)
       - opacity: 0.9
-      - font-size: 80px
       - font-size: "clamp(40px, 6.897vw + 17.931px, 80px)"
       - letter-spacing: "-2px"
       - font-weight: 700
@@ -56,28 +57,20 @@ homio_room:
       motion_detection:
         - display: |
             [[[
-              if (!variables.motion_sensor) {
-                return 'none';
-              }
-              else {
-                return 'block'
-              }
-            ]]]      
+              return (variables.show_motion && variables.motion_sensor) ? 'block' : 'none';
+            ]]]
         - position: fixed
         - right: 0
         - left: 0
         - bottom: 0
         - transform: |
             [[[
-              if (!variables.motion_sensor) {
-                return '';
+              if (!variables.show_motion || !variables.motion_sensor || !states[variables.motion_sensor]) {
+                return 'translateY(100%)';
               }
-              else {
-                return states[variables.motion_sensor].state === "on"
-                ? "translateY(0)"
-                : "translateY(100%)";
-              }            
-
+              return states[variables.motion_sensor].state === 'on'
+                ? 'translateY(0)'
+                : 'translateY(100%)';
             ]]]
         - transition: transform 0.5s
         - padding: 20px
@@ -93,8 +86,8 @@ homio_room:
         - display: |
             [[[
               return (variables.show_temp && variables.temp_sensor && states[variables.temp_sensor])
-                ? "block"
-                : "none";
+                ? 'block'
+                : 'none';
             ]]]
         - color: var(--primary-text-color)
         - font-size: 15px
@@ -107,8 +100,8 @@ homio_room:
         - display: |
             [[[
               return (variables.show_humid && variables.humid_sensor && states[variables.humid_sensor])
-                ? "block"
-                : "none";
+                ? 'block'
+                : 'none';
             ]]]
         - font-size: "clamp(16px, 1.75vw, 19px)"
         - justify-self: start
@@ -124,11 +117,9 @@ homio_room:
         - z-index: 999
         - display: |
             [[[
-              if (states["input_boolean.homio_mobile_navigation"].state === "on") {
-                return "none";
-              } else {
-                return "block";
-              }
+              if (window.innerWidth >= 1250) return 'none';
+              const nav = states['input_boolean.homio_mobile_navigation'];
+              return (nav && nav.state === 'on') ? 'none' : 'block';
             ]]]
       mobile_menu_icon:
         - position: absolute
@@ -137,10 +128,14 @@ homio_room:
         - z-index: 999
       navigation:
         - position: absolute
-        - top: 0
-        - left: 0
-        - right: 0
-        # - overflow: visible
+        - inset: 0
+        - z-index: 20
+        - pointer-events: none
+      entities:
+        - position: absolute
+        - inset: 0
+        - pointer-events: none
+        - z-index: 5
   custom_fields:
     mobile_logo:
       card:
@@ -158,28 +153,38 @@ homio_room:
       card: !include ../../includes/homio_navigation.yaml
     temperature: |
       [[[
-        if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return;
-
-        const temperatureValue = parseFloat(states[variables.temp_sensor].state);
+        if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return '';
+        const st = states[variables.temp_sensor];
+        const temperatureValue = parseFloat(st.state);
+        if (isNaN(temperatureValue)) return '';
+        const unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';
         const temperature = temperatureValue.toFixed(1);
-
-        if (temperatureValue <= 15.99) return `${temperature}° - Very Cold`;
-        if (temperatureValue >= 16 && temperatureValue <= 17.99) return `${temperature}° - Cool`;
-        if (temperatureValue >= 18 && temperatureValue <= 20.99) return `${temperature}° - Comfortable`;
-        if (temperatureValue >= 21) return `${temperature}° - Very Hot`;
+        const isF = String(unit).indexOf('F') !== -1;
+        let label = '';
+        if (isF) {
+          if (temperatureValue <= 60) label = 'Very Cold';
+          else if (temperatureValue <= 67) label = 'Cool';
+          else if (temperatureValue <= 74) label = 'Comfortable';
+          else label = 'Very Hot';
+        } else {
+          if (temperatureValue <= 15.99) label = 'Very Cold';
+          else if (temperatureValue <= 17.99) label = 'Cool';
+          else if (temperatureValue <= 20.99) label = 'Comfortable';
+          else label = 'Very Hot';
+        }
+        return temperature + unit + ' - ' + label;
       ]]]
     humidity: |
       [[[
-        if (!variables.show_humid || !variables.humid_sensor || !states[variables.humid_sensor]) return;
-
+        if (!variables.show_humid || !variables.humid_sensor || !states[variables.humid_sensor]) return '';
         const humidityValue = parseFloat(states[variables.humid_sensor].state);
+        if (isNaN(humidityValue)) return '';
         const humidity = humidityValue.toFixed(0);
-
-        if (humidityValue <= 29.99) return `Humidity is very dry at ${humidity}%`;
-        if (humidityValue >= 30 && humidityValue <= 60.99) return `Humidity is good at ${humidity}%`;
-        if (humidityValue >= 61) return `Humidity is high at ${humidity}%`;
+        if (humidityValue <= 29.99) return 'Humidity is very dry at ' + humidity + '%';
+        if (humidityValue <= 60.99) return 'Humidity is good at ' + humidity + '%';
+        return 'Humidity is high at ' + humidity + '%';
       ]]]
     motion_detection: |
       [[[
-        return "Motion detected"
+        return 'Motion detected';
       ]]]

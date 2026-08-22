@@ -1,4 +1,11 @@
-type: vertical-stack
+# Outer wrapper must be layout-card (not vertical-stack).
+# button-card cannot create built-in stack cards — that caused a red banner and missing desktop nav/clock.
+type: custom:layout-card
+layout_type: custom:grid-layout
+layout:
+  grid-template-columns: 1fr
+  margin: 0
+  padding: 0
 cards:
   - type: conditional
     conditions:
@@ -22,7 +29,7 @@ cards:
           layout:
             grid-auto-flow: column
             place-content: center
-            grid-column-gap: 50px
+            grid-column-gap: 36px
             margin: 0
             padding: 0
           cards: !include homio_navigation_list.yaml
@@ -41,15 +48,15 @@ cards:
       layout_type: custom:grid-layout
       layout:
         grid-template-columns: 1fr
-        grid-column-gap: 0px
         place-content: space-around
         height: 100vh
         inset: 0 auto auto 0
         margin: 0
         padding: 0 0 0 60px
-        width: 250px
+        width: 280px
         background: rgba(255,255,255,0.1)
         backdrop-filter: blur(15px)
+        position: absolute
       cards:
         - type: custom:button-card
           template:
@@ -59,9 +66,8 @@ cards:
           layout:
             grid-template-columns: 1fr
             grid-auto-flow: row
-            grid-column-gap: 0px
-            grid-row-gap: 30px
-          cards: !include ../includes/homio_navigation_list.yaml
+            grid-row-gap: 24px
+          cards: !include homio_navigation_list.yaml
         - type: custom:button-card
           template:
             - homio_time

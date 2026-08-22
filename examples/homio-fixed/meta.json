@@ -1,0 +1,7 @@
+{
+  "source": "HA storage dashboard",
+  "url_path": "homio-fixed",
+  "config_hash": "a6d1f86b99a9c0d0",
+  "exported": "2026-08-22",
+  "note": "Full Lovelace config is in dashboard.json (same hash). Keep using Homio Fixed on HA until fork is installed."
+}

@@ -3,7 +3,8 @@ homio_time:
     - homio_default
   name: |
     [[[
-        return states["sensor.homio_current_time"].state
+      const t = states['sensor.homio_current_time'];
+      return t ? t.state : '';
     ]]]
   styles:
     name:
@@ -15,3 +16,4 @@ homio_time:
       - justify-self: start
     card:
       - background: transparent
+      - pointer-events: all
