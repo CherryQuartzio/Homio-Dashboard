@@ -3,23 +3,23 @@ homio_light:
     - homio_entity
   show_last_changed: false
   state_display: |
-    [[[ if (entity.state === "on" && entity.attributes.brightness) 
-      {return "Brightness - " + Math.round((entity.attributes.brightness / 255) * 100) +
-      "%"} else return "Off"
+    [[[
+      if (entity.state === "on" && entity.attributes.brightness) {
+        return "Brightness - " + Math.round((entity.attributes.brightness / 255) * 100) + "%";
+      }
+      return "Off";
     ]]]
   tap_action:
     action: |
       [[[
-        if(entity.state === "off") 
-        return "toggle"
-        else return "none"
+        if (entity.state === "off") return "toggle";
+        return "none";
       ]]]
   hold_action:
     action: |
       [[[
-        if(entity.state === "on") 
-        return "toggle"
-        else return "none"
+        if (entity.state === "on") return "toggle";
+        return "none";
       ]]]
   styles:
     label:
@@ -40,19 +40,19 @@ homio_light:
         - right: 0
         - left: 0
         - padding: 0 40px
+        - pointer-events: all
+        - z-index: 6
         - transition: |
             [[[
-              if(entity.state === "off" || entity.state === "unavailable")
-              return "transform 0s"
-              else
-              return "transform 0.6s"
+              if (entity.state === "off" || entity.state === "unavailable")
+                return "transform 0s";
+              return "transform 0.6s";
             ]]]
         - transform: |
             [[[
-              if(entity.state === "off" || entity.state === "unavailable")
-              return "translateY(45px)"
-              else
-              return "translateY(0)"
+              if (entity.state === "off" || entity.state === "unavailable")
+                return "translateY(45px)";
+              return "translateY(0)";
             ]]]
   custom_fields:
     light-slider:

@@ -4,6 +4,24 @@
       "styles": {
         "card": [
           {
+            "--ha-ripple-pressed-opacity": 0
+          },
+          {
+            "--ha-ripple-hover-opacity": 0
+          },
+          {
+            "--ha-ripple-color": "transparent"
+          },
+          {
+            "--mdc-ripple-fg-opacity": 0
+          },
+          {
+            "--mdc-ripple-press-opacity": 0
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0
+          },
+          {
             "--mdc-ripple-color": "transparent"
           },
           {
@@ -39,7 +57,7 @@
         "action": "navigate",
         "navigation_path": "/homio-fixed/living"
       },
-      "name": "Homio.",
+      "name": "Daylor",
       "styles": {
         "name": [
           {
@@ -67,6 +85,27 @@
           },
           {
             "pointer-events": "all"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "--ha-ripple-hover-opacity": 0.08
+          },
+          {
+            "--ha-ripple-pressed-opacity": 0.12
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0.04
+          },
+          {
+            "--mdc-ripple-press-opacity": 0.12
+          },
+          {
+            "--ha-ripple-color": "rgba(255,255,255,0.25)"
+          },
+          {
+            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
           }
         ]
       }
@@ -94,6 +133,27 @@
           },
           {
             "cursor": "pointer"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "--ha-ripple-hover-opacity": 0.08
+          },
+          {
+            "--ha-ripple-pressed-opacity": 0.12
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0.04
+          },
+          {
+            "--mdc-ripple-press-opacity": 0.12
+          },
+          {
+            "--ha-ripple-color": "rgba(255,255,255,0.25)"
+          },
+          {
+            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
           }
         ],
         "img_cell": [
@@ -145,6 +205,27 @@
           },
           {
             "pointer-events": "all"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "--ha-ripple-hover-opacity": 0.08
+          },
+          {
+            "--ha-ripple-pressed-opacity": 0.12
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0.04
+          },
+          {
+            "--mdc-ripple-press-opacity": 0.12
+          },
+          {
+            "--ha-ripple-color": "rgba(255,255,255,0.25)"
+          },
+          {
+            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
           }
         ]
       }
@@ -184,6 +265,27 @@
           },
           {
             "pointer-events": "all"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "--ha-ripple-hover-opacity": 0.08
+          },
+          {
+            "--ha-ripple-pressed-opacity": 0.12
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0.04
+          },
+          {
+            "--mdc-ripple-press-opacity": 0.12
+          },
+          {
+            "--ha-ripple-color": "rgba(255,255,255,0.25)"
+          },
+          {
+            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
           }
         ]
       }
@@ -220,6 +322,9 @@
           },
           {
             "pointer-events": "all"
+          },
+          {
+            "overflow": "hidden"
           }
         ]
       }
@@ -308,6 +413,27 @@
           },
           {
             "pointer-events": "all"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "--ha-ripple-hover-opacity": 0.08
+          },
+          {
+            "--ha-ripple-pressed-opacity": 0.12
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0.04
+          },
+          {
+            "--mdc-ripple-press-opacity": 0.12
+          },
+          {
+            "--ha-ripple-color": "rgba(255,255,255,0.35)"
+          },
+          {
+            "--mdc-ripple-color": "rgba(255,255,255,0.35)"
           }
         ],
         "name": [
@@ -386,13 +512,158 @@
       "template": [
         "homio_entity"
       ],
+      "show_last_changed": false,
+      "state_display": "[[[ if (entity.state === 'on' && entity.attributes.brightness) { return 'Brightness - ' + Math.round((entity.attributes.brightness / 255) * 100) + '%'; } return 'Off'; ]]]",
       "tap_action": {
-        "action": "toggle"
+        "action": "[[[ if (entity.state === 'off') return 'toggle'; return 'none'; ]]]"
       },
       "hold_action": {
-        "action": "more-info"
+        "action": "[[[ if (entity.state === 'on') return 'toggle'; return 'none'; ]]]"
       },
-      "state_display": "[[[\n  if (!entity) return '';\n  if (entity.state === 'on' && entity.attributes && entity.attributes.brightness != null) {\n    return 'Brightness - ' + Math.round((entity.attributes.brightness / 255) * 100) + '%';\n  }\n  return entity.state === 'on' ? 'On' : 'Off';\n]]]\n"
+      "styles": {
+        "label": [
+          {
+            "position": "absolute"
+          },
+          {
+            "bottom": "25px"
+          },
+          {
+            "font-size": "10px"
+          },
+          {
+            "text-transform": "uppercase"
+          },
+          {
+            "color": "white"
+          },
+          {
+            "letter-spacing": "2px"
+          },
+          {
+            "font-weight": 600
+          },
+          {
+            "opacity": 1
+          },
+          {
+            "justify-self": "start"
+          }
+        ],
+        "custom_fields": {
+          "light-slider": [
+            {
+              "position": "absolute"
+            },
+            {
+              "bottom": "30px"
+            },
+            {
+              "height": "8px"
+            },
+            {
+              "right": 0
+            },
+            {
+              "left": 0
+            },
+            {
+              "padding": "0 40px"
+            },
+            {
+              "pointer-events": "all"
+            },
+            {
+              "z-index": 6
+            },
+            {
+              "transition": "[[[ if (entity.state === 'off' || entity.state === 'unavailable') return 'transform 0s'; return 'transform 0.6s'; ]]]"
+            },
+            {
+              "transform": "[[[ if (entity.state === 'off' || entity.state === 'unavailable') return 'translateY(45px)'; return 'translateY(0)'; ]]]"
+            }
+          ]
+        }
+      },
+      "custom_fields": {
+        "light-slider": {
+          "card": {
+            "type": "custom:my-slider-v2",
+            "entity": "[[[ return entity.entity_id; ]]]",
+            "allowTapping": false,
+            "allowSliding": true,
+            "styles": {
+              "card": [
+                {
+                  "height": "100%"
+                },
+                {
+                  "margin": 0
+                },
+                {
+                  "border-radius": "0px"
+                },
+                {
+                  "border": "none"
+                },
+                {
+                  "background": "transparent"
+                }
+              ],
+              "track": [
+                {
+                  "background": "hsl(0 0% 98%)"
+                },
+                {
+                  "border-radius": "20px"
+                }
+              ],
+              "container": [
+                {
+                  "border-radius": 0
+                },
+                {
+                  "overflow": "visible"
+                }
+              ],
+              "progress": [
+                {
+                  "background": "hsl(0 0% 75%)"
+                },
+                {
+                  "border-top-left-radius": "20px"
+                },
+                {
+                  "border-bottom-left-radius": "20px"
+                }
+              ],
+              "thumb": [
+                {
+                  "display": "block"
+                },
+                {
+                  "width": "16px"
+                },
+                {
+                  "height": "16px"
+                },
+                {
+                  "border-radius": "50%"
+                },
+                {
+                  "background": "white"
+                },
+                {
+                  "transform": "translateY(-4px)"
+                },
+                {
+                  "box-shadow": "2px 0 8px 2px rgba(0, 0, 0, 0.15)"
+                }
+              ]
+            }
+          }
+        }
+      }
     },
     "homio_room": {
       "variables": {
@@ -413,9 +684,30 @@
           "entity_id": "input_boolean.homio_mobile_navigation"
         }
       },
-      "extra_styles": "@media only screen and (max-width: 1249px) { .button-card-main { position: fixed !important; } }\n@media (min-width: 1250px) {\n  #mobile_logo { display: none !important; }\n}\n",
+      "extra_styles": "@media only screen and (max-width: 1249px) { .button-card-main { position: fixed !important; } }\n@media (min-width: 1250px) {\n  #mobile_logo { display: none !important; }\n}\nha-ripple,\n.mdc-ripple-surface::before,\n.mdc-ripple-surface::after {\n  display: none !important;\n  opacity: 0 !important;\n  background: transparent !important;\n}\nha-card:hover,\nha-card:active,\nha-card:focus {\n  filter: none !important;\n  box-shadow: none !important;\n  outline: none !important;\n}\n",
       "styles": {
         "card": [
+          {
+            "filter": "none"
+          },
+          {
+            "--ha-ripple-pressed-opacity": 0
+          },
+          {
+            "--ha-ripple-hover-opacity": 0
+          },
+          {
+            "--ha-ripple-color": "transparent"
+          },
+          {
+            "--mdc-ripple-press-opacity": 0
+          },
+          {
+            "--mdc-ripple-hover-opacity": 0
+          },
+          {
+            "--mdc-ripple-color": "transparent"
+          },
           {
             "height": "100dvh"
           },
@@ -429,7 +721,7 @@
             "pointer-events": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"all\" : \"none\";\n]]]\n"
           },
           {
-            "background": "[[[\n  const img = variables.image || \"lounge\";\n  const pos = variables.image_position || \"center center\";\n  return \"linear-gradient(to bottom, rgba(51,51,51,0.7)0%, rgba(51,51,51,0.7)50%, rgba(51,51,51,0.5)100%), \"\n    + \"url(/homio_dashboard/images/Homio/rooms/\" + img + \".jpg) \" + pos + \" / cover no-repeat\";\n]]]\n"
+            "background": "[[[\n  const img = variables.image || \"lounge\";\n  const pos = variables.image_position || \"center center\";\n  return \"linear-gradient(to bottom, rgba(51,51,51,0.7) 0%, rgba(51,51,51,0.7) 50%, rgba(51,51,51,0.5) 100%), \"\n    + \"url('/homio_dashboard/images/Homio/rooms/\" + img + \".jpg') \" + pos + \" / cover no-repeat\";\n]]]\n"
           },
           {
             "box-sizing": "border-box"
@@ -746,7 +1038,7 @@
                           "template": [
                             "homio_nav_button"
                           ],
-                          "name": "Master Bedroom",
+                          "name": "Master",
                           "variables": {
                             "path": "/homio-fixed/master-bedroom"
                           }
@@ -851,7 +1143,7 @@
                           "template": [
                             "homio_nav_button"
                           ],
-                          "name": "Master Bedroom",
+                          "name": "Master",
                           "variables": {
                             "path": "/homio-fixed/master-bedroom"
                           }
@@ -870,11 +1162,487 @@
             ]
           }
         },
-        "temperature": "[[[\n  if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return '';\n  const st = states[variables.temp_sensor];\n  const temperatureValue = parseFloat(st.state);\n  if (isNaN(temperatureValue)) return '';\n  const unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';\n  const temperature = temperatureValue.toFixed(1);\n  const isF = String(unit).indexOf('F') !== -1;\n  let label = '';\n  if (isF) {\n    if (temperatureValue <= 60) label = 'Very Cold';\n    else if (temperatureValue <= 67) label = 'Cool';\n    else if (temperatureValue <= 74) label = 'Comfortable';\n    else label = 'Very Hot';\n  } else {\n    if (temperatureValue <= 15.99) label = 'Very Cold';\n    else if (temperatureValue <= 17.99) label = 'Cool';\n    else if (temperatureValue <= 20.99) label = 'Comfortable';\n    else label = 'Very Hot';\n  }\n  return temperature + unit + ' - ' + label;\n]]]\n",
+        "temperature": "[[[\n  if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return '';\n  const eid = variables.temp_sensor;\n  const st = states[eid];\n  const isClimate = String(eid).indexOf('climate.') === 0;\n  let temperatureValue;\n  let unit;\n  if (isClimate) {\n    temperatureValue = parseFloat(st.attributes && st.attributes.current_temperature);\n    unit = '°C';\n  } else {\n    temperatureValue = parseFloat(st.state);\n    unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';\n  }\n  if (isNaN(temperatureValue)) return '';\n  const temperature = temperatureValue.toFixed(1);\n  const isF = String(unit).indexOf('F') !== -1;\n  let label = '';\n  if (isF) {\n    if (temperatureValue <= 60) label = 'Very Cold';\n    else if (temperatureValue <= 67) label = 'Cool';\n    else if (temperatureValue <= 74) label = 'Comfortable';\n    else label = 'Very Hot';\n  } else {\n    if (temperatureValue <= 15.99) label = 'Very Cold';\n    else if (temperatureValue <= 17.99) label = 'Cool';\n    else if (temperatureValue <= 20.99) label = 'Comfortable';\n    else label = 'Very Hot';\n  }\n  return temperature + unit + ' - ' + label;\n]]]\n",
         "humidity": "[[[\n  if (!variables.show_humid || !variables.humid_sensor || !states[variables.humid_sensor]) return '';\n  const humidityValue = parseFloat(states[variables.humid_sensor].state);\n  if (isNaN(humidityValue)) return '';\n  const humidity = humidityValue.toFixed(0);\n  if (humidityValue <= 29.99) return 'Humidity is very dry at ' + humidity + '%';\n  if (humidityValue <= 60.99) return 'Humidity is good at ' + humidity + '%';\n  return 'Humidity is high at ' + humidity + '%';\n]]]\n",
         "motion_detection": "Motion detected"
       },
       "triggers_update": "all"
+    },
+    "homio_thermostat": {
+      "template": [
+        "homio_entity"
+      ],
+      "show_entity_picture": false,
+      "show_icon": false,
+      "show_label": true,
+      "label": "[[[ if (!entity || !entity.attributes) return ''; const t = entity.attributes.current_temperature; return (t == null) ? '' : ('Actual ' + t + '°'); ]]]",
+      "state_display": "[[[ if (!entity) return ''; const tgt = entity.attributes && entity.attributes.temperature; if (entity.state === 'heat') return 'Heating to ' + tgt + '°'; if (entity.state === 'cool') return 'Cooling to ' + tgt + '°'; if (entity.state === 'heat_cool') return 'Auto ' + tgt + '°'; return 'Off'; ]]]",
+      "tap_action": {
+        "action": "call-service",
+        "service": "input_boolean.toggle",
+        "service_data": {
+          "entity_id": "input_boolean.homio_heating_control"
+        }
+      },
+      "styles": {
+        "name": [
+          {
+            "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '0' : '1' ]]]"
+          },
+          {
+            "transition": "opacity 0.3s"
+          }
+        ],
+        "state": [
+          {
+            "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '0' : '0.8' ]]]"
+          },
+          {
+            "transition": "opacity 0.3s"
+          }
+        ],
+        "label": [
+          {
+            "position": "absolute"
+          },
+          {
+            "bottom": "25px"
+          },
+          {
+            "font-size": "10px"
+          },
+          {
+            "text-transform": "uppercase"
+          },
+          {
+            "color": "white"
+          },
+          {
+            "letter-spacing": "2px"
+          },
+          {
+            "font-weight": 600
+          },
+          {
+            "opacity": 1
+          },
+          {
+            "justify-self": "start"
+          }
+        ],
+        "custom_fields": {
+          "heating_modes": [
+            {
+              "position": "absolute"
+            },
+            {
+              "right": 0
+            },
+            {
+              "top": 0
+            },
+            {
+              "transition": "all 0.3s"
+            },
+            {
+              "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '0' : '1' ]]]"
+            },
+            {
+              "pointer-events": "all"
+            }
+          ],
+          "target_temperature": [
+            {
+              "position": "absolute"
+            },
+            {
+              "top": 0
+            },
+            {
+              "left": 0
+            },
+            {
+              "width": "100%"
+            },
+            {
+              "height": "100%"
+            },
+            {
+              "transition": "all 0.3s"
+            },
+            {
+              "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '1' : '0' ]]]"
+            },
+            {
+              "pointer-events": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? 'all' : 'none' ]]]"
+            }
+          ]
+        }
+      },
+      "custom_fields": {
+        "heating_modes": {
+          "card": {
+            "type": "custom:layout-card",
+            "layout_type": "custom:grid-layout",
+            "layout": {
+              "grid-template-columns": "60px",
+              "grid-auto-rows": "1fr",
+              "margin": 0,
+              "height": "170px",
+              "padding": 0
+            },
+            "cards": [
+              {
+                "type": "custom:button-card",
+                "template": [
+                  "homio_default"
+                ],
+                "show_entity_picture": true,
+                "entity_picture": "/homio_dashboard/images/Homio/icons/power_off.svg",
+                "tap_action": {
+                  "action": "call-service",
+                  "service": "climate.set_hvac_mode",
+                  "data": {
+                    "entity_id": "climate.thermostat",
+                    "hvac_mode": "off"
+                  }
+                },
+                "styles": {
+                  "card": [
+                    {
+                      "height": "100%"
+                    },
+                    {
+                      "animation": "none"
+                    },
+                    {
+                      "z-index": 2
+                    },
+                    {
+                      "background": "[[[ return entity.state === 'off' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)' ]]]"
+                    },
+                    {
+                      "pointer-events": "all"
+                    }
+                  ],
+                  "img_cell": [
+                    {
+                      "width": "19px"
+                    }
+                  ],
+                  "icon": [
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "height": "100%"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "custom:button-card",
+                "template": [
+                  "homio_default"
+                ],
+                "show_entity_picture": true,
+                "entity_picture": "/homio_dashboard/images/Homio/icons/dehumidifier.svg",
+                "tap_action": {
+                  "action": "call-service",
+                  "service": "climate.set_hvac_mode",
+                  "data": {
+                    "entity_id": "climate.thermostat",
+                    "hvac_mode": "cool"
+                  }
+                },
+                "styles": {
+                  "card": [
+                    {
+                      "height": "100%"
+                    },
+                    {
+                      "animation": "none"
+                    },
+                    {
+                      "z-index": 2
+                    },
+                    {
+                      "background": "[[[ return entity.state === 'cool' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)' ]]]"
+                    },
+                    {
+                      "pointer-events": "all"
+                    }
+                  ],
+                  "img_cell": [
+                    {
+                      "width": "19px"
+                    }
+                  ],
+                  "icon": [
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "height": "100%"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "custom:button-card",
+                "template": [
+                  "homio_default"
+                ],
+                "show_entity_picture": true,
+                "entity_picture": "/homio_dashboard/images/Homio/icons/heating.svg",
+                "tap_action": {
+                  "action": "call-service",
+                  "service": "climate.set_hvac_mode",
+                  "data": {
+                    "entity_id": "climate.thermostat",
+                    "hvac_mode": "heat"
+                  }
+                },
+                "styles": {
+                  "card": [
+                    {
+                      "height": "100%"
+                    },
+                    {
+                      "animation": "none"
+                    },
+                    {
+                      "z-index": 2
+                    },
+                    {
+                      "background": "[[[ return entity.state === 'heat' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)' ]]]"
+                    },
+                    {
+                      "pointer-events": "all"
+                    }
+                  ],
+                  "img_cell": [
+                    {
+                      "width": "19px"
+                    }
+                  ],
+                  "icon": [
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "height": "100%"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "target_temperature": {
+          "card": {
+            "type": "custom:button-card",
+            "template": [
+              "homio_entity"
+            ],
+            "show_entity_picture": false,
+            "show_icon": false,
+            "name": "Target Temp",
+            "state_display": "[[[ return states['input_number.homio_thermostat_target_temperature'].state + '°' ]]]",
+            "tap_action": {
+              "action": "call-service",
+              "service": "input_boolean.toggle",
+              "service_data": {
+                "entity_id": "input_boolean.homio_heating_control"
+              }
+            },
+            "styles": {
+              "card": [
+                {
+                  "background": "transparent"
+                },
+                {
+                  "backdrop-filter": "none"
+                },
+                {
+                  "animation": "none"
+                },
+                {
+                  "pointer-events": "all"
+                }
+              ],
+              "custom_fields": {
+                "temperature_controls": [
+                  {
+                    "position": "absolute"
+                  },
+                  {
+                    "top": 0
+                  },
+                  {
+                    "right": 0
+                  }
+                ]
+              }
+            },
+            "custom_fields": {
+              "temperature_controls": {
+                "card": {
+                  "type": "custom:layout-card",
+                  "layout_type": "custom:grid-layout",
+                  "layout": {
+                    "grid-template-columns": "60px",
+                    "grid-template-rows": "repeat(3,1fr)",
+                    "height": "170px",
+                    "margin": 0,
+                    "padding": 0,
+                    "position": "absolute",
+                    "inset": "auto 0 auto auto"
+                  },
+                  "cards": [
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_default"
+                      ],
+                      "show_entity_picture": true,
+                      "entity_picture": "/homio_dashboard/images/Homio/icons/increase.svg",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "input_number.increment",
+                        "service_data": {
+                          "entity_id": "input_number.homio_thermostat_target_temperature"
+                        }
+                      },
+                      "styles": {
+                        "card": [
+                          {
+                            "height": "100%"
+                          },
+                          {
+                            "background": "rgba(255,255,255,0.1)"
+                          },
+                          {
+                            "animation": "none"
+                          },
+                          {
+                            "pointer-events": "all"
+                          }
+                        ],
+                        "img_cell": [
+                          {
+                            "width": "30%"
+                          }
+                        ],
+                        "icon": [
+                          {
+                            "transform": "rotate(-90deg)"
+                          }
+                        ]
+                      },
+                      "extra_styles": ".button-card-main:active { background: rgba(255,255,255,0.4) !important; }\n"
+                    },
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_default"
+                      ],
+                      "name": "Set",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "climate.set_temperature",
+                        "service_data": {
+                          "entity_id": "climate.thermostat",
+                          "temperature": "[[[ return parseFloat(states['input_number.homio_thermostat_target_temperature'].state) ]]]"
+                        }
+                      },
+                      "styles": {
+                        "card": [
+                          {
+                            "height": "100%"
+                          },
+                          {
+                            "background": "rgba(255,255,255,0.1)"
+                          },
+                          {
+                            "animation": "none"
+                          },
+                          {
+                            "border-top": "0.5px solid rgba(255,255,255,0.2)"
+                          },
+                          {
+                            "border-bottom": "0.5px solid rgba(255,255,255,0.2)"
+                          },
+                          {
+                            "pointer-events": "all"
+                          }
+                        ],
+                        "name": [
+                          {
+                            "font-size": "10px"
+                          },
+                          {
+                            "letter-spacing": "2px"
+                          },
+                          {
+                            "text-transform": "uppercase"
+                          },
+                          {
+                            "font-weight": 600
+                          }
+                        ]
+                      },
+                      "extra_styles": ".button-card-main:active { background: rgba(255,255,255,0.4) !important; }\n"
+                    },
+                    {
+                      "type": "custom:button-card",
+                      "template": [
+                        "homio_default"
+                      ],
+                      "show_entity_picture": true,
+                      "entity_picture": "/homio_dashboard/images/Homio/icons/decrease.svg",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "input_number.decrement",
+                        "service_data": {
+                          "entity_id": "input_number.homio_thermostat_target_temperature"
+                        }
+                      },
+                      "styles": {
+                        "card": [
+                          {
+                            "height": "100%"
+                          },
+                          {
+                            "background": "rgba(255,255,255,0.1)"
+                          },
+                          {
+                            "animation": "none"
+                          },
+                          {
+                            "pointer-events": "all"
+                          }
+                        ],
+                        "img_cell": [
+                          {
+                            "width": "30%"
+                          }
+                        ],
+                        "icon": [
+                          {
+                            "transform": "rotate(-90deg)"
+                          }
+                        ]
+                      },
+                      "extra_styles": ".button-card-main:active { background: rgba(255,255,255,0.4) !important; }\n"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "views": [
@@ -898,7 +1666,7 @@
           "template": [
             "homio_room"
           ],
-          "name": "Living",
+          "name": "Living Room",
           "variables": {
             "image": "lounge",
             "image_position": "center center",
@@ -906,7 +1674,7 @@
             "show_temp": true,
             "show_motion": false,
             "motion_sensor": null,
-            "temp_sensor": "sensor.thermostat_temperature",
+            "temp_sensor": "climate.thermostat",
             "humid_sensor": "sensor.thermostat_humidity"
           },
           "custom_fields": {
@@ -933,7 +1701,29 @@
                       "homio_light"
                     ],
                     "entity": "light.living_room",
-                    "name": "Living Room Light",
+                    "name": "Main Room Light",
+                    "variables": {
+                      "icon": "light"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.great_room_main",
+                    "name": "Great Room Light",
+                    "variables": {
+                      "icon": "light"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.foyer_chandelier",
+                    "name": "Foyer Chandelier",
                     "variables": {
                       "icon": "pendent"
                     }
@@ -941,34 +1731,20 @@
                   {
                     "type": "custom:button-card",
                     "template": [
+                      "homio_thermostat"
+                    ],
+                    "entity": "climate.thermostat",
+                    "name": "Climate"
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
                       "homio_entity"
                     ],
                     "entity": "media_player.family_room_tv_remote",
-                    "name": "Family Room TV",
+                    "name": "TV",
                     "variables": {
-                      "icon": "apple_tv"
-                    }
-                  },
-                  {
-                    "type": "custom:button-card",
-                    "template": [
-                      "homio_entity"
-                    ],
-                    "entity": "climate.thermostat",
-                    "name": "Home HVAC",
-                    "variables": {
-                      "icon": "heating"
-                    }
-                  },
-                  {
-                    "type": "custom:button-card",
-                    "template": [
-                      "homio_entity"
-                    ],
-                    "entity": "scene.tv_night",
-                    "name": "TV Time",
-                    "variables": {
-                      "icon": "console"
+                      "icon": "google_tv"
                     }
                   }
                 ]
@@ -994,7 +1770,8 @@
             }
           }
         }
-      ]
+      ],
+      "theme": "homio"
     },
     {
       "type": "custom:grid-layout",
@@ -1020,12 +1797,13 @@
           "variables": {
             "image": "dining",
             "image_position": "center center",
-            "show_humid": false,
-            "show_temp": false,
+            "show_humid": true,
+            "show_temp": true,
             "show_motion": false,
             "motion_sensor": null,
-            "temp_sensor": null,
-            "humid_sensor": null
+            "temp_sensor": "climate.thermostat",
+            "humid_sensor": "sensor.thermostat_humidity",
+            "image_note": "fallback-to-lounge-until-dining.jpg-uploaded"
           },
           "custom_fields": {
             "entities": {
@@ -1051,9 +1829,20 @@
                       "homio_light"
                     ],
                     "entity": "light.main_meeting_dinning_light",
-                    "name": "Dining Light",
+                    "name": "Chandelier",
                     "variables": {
                       "icon": "pendent"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
+                    "entity": "light.kitchen_hallway_light",
+                    "name": "Hallway Light",
+                    "variables": {
+                      "icon": "light"
                     }
                   },
                   {
@@ -1062,9 +1851,9 @@
                       "homio_entity"
                     ],
                     "entity": "cover.dining",
-                    "name": "Dining Curtain",
+                    "name": "Curtains",
                     "variables": {
-                      "icon": "door"
+                      "icon": "shades"
                     }
                   }
                 ]
@@ -1090,7 +1879,8 @@
             }
           }
         }
-      ]
+      ],
+      "theme": "homio"
     },
     {
       "type": "custom:grid-layout",
@@ -1116,12 +1906,12 @@
           "variables": {
             "image": "kitchen",
             "image_position": "center center",
-            "show_humid": false,
-            "show_temp": false,
+            "show_humid": true,
+            "show_temp": true,
             "show_motion": false,
             "motion_sensor": null,
-            "temp_sensor": null,
-            "humid_sensor": null
+            "temp_sensor": "climate.thermostat",
+            "humid_sensor": "sensor.thermostat_humidity"
           },
           "custom_fields": {
             "entities": {
@@ -1147,9 +1937,9 @@
                       "homio_light"
                     ],
                     "entity": "light.kitchen",
-                    "name": "Kitchen Light",
+                    "name": "Room Light",
                     "variables": {
-                      "icon": "pendent"
+                      "icon": "light"
                     }
                   },
                   {
@@ -1160,7 +1950,7 @@
                     "entity": "light.nook",
                     "name": "Nook Light",
                     "variables": {
-                      "icon": "lamp"
+                      "icon": "pendent"
                     }
                   },
                   {
@@ -1169,20 +1959,9 @@
                       "homio_light"
                     ],
                     "entity": "light.kitchen_hallway_light",
-                    "name": "Kitchen Hallway",
+                    "name": "Hallway Light",
                     "variables": {
-                      "icon": "lamp"
-                    }
-                  },
-                  {
-                    "type": "custom:button-card",
-                    "template": [
-                      "homio_entity"
-                    ],
-                    "entity": "scene.night_walk",
-                    "name": "Night Walk",
-                    "variables": {
-                      "icon": "electric"
+                      "icon": "light"
                     }
                   }
                 ]
@@ -1208,7 +1987,8 @@
             }
           }
         }
-      ]
+      ],
+      "theme": "homio"
     },
     {
       "type": "custom:grid-layout",
@@ -1234,12 +2014,12 @@
           "variables": {
             "image": "office",
             "image_position": "center center",
-            "show_humid": false,
-            "show_temp": false,
+            "show_humid": true,
+            "show_temp": true,
             "show_motion": false,
             "motion_sensor": null,
-            "temp_sensor": null,
-            "humid_sensor": null
+            "temp_sensor": "sensor.hallway_hallway_smoke_co_detector_temperature",
+            "humid_sensor": "sensor.hallway_hallway_smoke_co_detector_humidity"
           },
           "custom_fields": {
             "entities": {
@@ -1264,10 +2044,21 @@
                     "template": [
                       "homio_light"
                     ],
+                    "entity": "light.office_ceiling_fan",
+                    "name": "Room Light",
+                    "variables": {
+                      "icon": "light"
+                    }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_light"
+                    ],
                     "entity": "light.office_closet",
                     "name": "Closet Light",
                     "variables": {
-                      "icon": "lamp"
+                      "icon": "lightstrip"
                     }
                   },
                   {
@@ -1276,20 +2067,9 @@
                       "homio_light"
                     ],
                     "entity": "light.signify_netherlands_b_v_lwa025",
-                    "name": "Desk Lamp",
+                    "name": "Floor Lamp",
                     "variables": {
-                      "icon": "lamp"
-                    }
-                  },
-                  {
-                    "type": "custom:button-card",
-                    "template": [
-                      "homio_light"
-                    ],
-                    "entity": "light.office_ceiling_fan",
-                    "name": "Office Light",
-                    "variables": {
-                      "icon": "pendent"
+                      "icon": "floor_lamp"
                     }
                   },
                   {
@@ -1298,9 +2078,9 @@
                       "homio_entity"
                     ],
                     "entity": "fan.office_ceiling_fan",
-                    "name": "Office Fan",
+                    "name": "Ceiling Fan",
                     "variables": {
-                      "icon": "access_point"
+                      "icon": "fan"
                     }
                   },
                   {
@@ -1309,9 +2089,9 @@
                       "homio_entity"
                     ],
                     "entity": "cover.office",
-                    "name": "Office Curtain",
+                    "name": "Curtains",
                     "variables": {
-                      "icon": "door"
+                      "icon": "shades"
                     }
                   }
                 ]
@@ -1337,11 +2117,12 @@
             }
           }
         }
-      ]
+      ],
+      "theme": "homio"
     },
     {
       "type": "custom:grid-layout",
-      "title": "Master Bedroom",
+      "title": "Master",
       "path": "master-bedroom",
       "layout": {
         "grid-template-columns": "1fr",
@@ -1363,12 +2144,13 @@
           "variables": {
             "image": "bedroom",
             "image_position": "center center",
-            "show_humid": false,
-            "show_temp": false,
+            "show_humid": true,
+            "show_temp": true,
             "show_motion": false,
             "motion_sensor": null,
-            "temp_sensor": null,
-            "humid_sensor": null
+            "temp_sensor": "sensor.rear_bedroom_mario_smoke_co_detector_temperature",
+            "humid_sensor": "sensor.rear_bedroom_mario_smoke_co_detector_humidity",
+            "image_note": "fallback-to-lounge-until-bedroom.jpg-uploaded"
           },
           "custom_fields": {
             "entities": {
@@ -1407,7 +2189,7 @@
                     "entity": "fan.master_bedroom_ceiling_fan_main_fan",
                     "name": "Ceiling Fan",
                     "variables": {
-                      "icon": "access_point"
+                      "icon": "fan"
                     }
                   },
                   {
@@ -1418,7 +2200,7 @@
                     "entity": "media_player.google_tv_streamer_cast",
                     "name": "Google TV",
                     "variables": {
-                      "icon": "apple_tv"
+                      "icon": "google_tv"
                     }
                   }
                 ]
@@ -1444,7 +2226,8 @@
             }
           }
         }
-      ]
+      ],
+      "theme": "homio"
     }
   ],
   "kiosk_mode": {

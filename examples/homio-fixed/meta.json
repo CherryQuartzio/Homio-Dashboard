@@ -1,7 +1,7 @@
 {
-  "source": "HA storage dashboard",
   "url_path": "homio-fixed",
-  "config_hash": "a6d1f86b99a9c0d0",
-  "exported": "2026-08-22",
-  "note": "Full Lovelace config is in dashboard.json (same hash). Keep using Homio Fixed on HA until fork is installed."
+  "config_hash": "f12bfa33f415d5a3",
+  "exported_at": "2026-08-22",
+  "ha_version": "2026.8.3",
+  "notes": "Snapshot of working Homio Fixed daily driver after thermostat + light slider ports."
 }

@@ -1,6 +1,7 @@
 homio:
   # ----- Fonts ----- #
-  primary-font-family: "Hanken Grotesk"
+  # Requires Lovelace CSS resource (Google Fonts Hanken Grotesk) — see FORK_NOTES.md
+  primary-font-family: "Hanken Grotesk, sans-serif"
   ha-font-family-body: var(--primary-font-family)
   ha-card-header-font-family: var(--primary-font-family)
   # ----- Font Colors ----- #
@@ -26,6 +27,8 @@ homio:
   paper-listbox-background-color: var(--primary-background-color)
   ha-card-header-color: var(--primary-text-color)
   ha-card-border-radius: 0px
+  ha-card-border-width: 0px
+  ha-card-border-color: transparent
   ha-card-background: rgba(10, 10, 10, 0.4)
   paper-card-background-color: var(--ha-card-background)
   stack-card-gap: "0px"

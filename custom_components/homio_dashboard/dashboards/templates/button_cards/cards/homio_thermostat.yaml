@@ -6,13 +6,18 @@ homio_thermostat:
   show_label: true
   label: |
     [[[
-      return "Actual " + entity.attributes.current_temperature +"°"
+      if (!entity || !entity.attributes) return '';
+      const t = entity.attributes.current_temperature;
+      return (t == null) ? '' : ('Actual ' + t + '°');
     ]]]
   state_display: |
     [[[
-      return entity.state === 'heat'
-        ? "Heating to " + entity.attributes.temperature + "°"
-        : "Off";
+      if (!entity) return '';
+      const tgt = entity.attributes && entity.attributes.temperature;
+      if (entity.state === 'heat') return 'Heating to ' + tgt + '°';
+      if (entity.state === 'cool') return 'Cooling to ' + tgt + '°';
+      if (entity.state === 'heat_cool') return 'Auto ' + tgt + '°';
+      return 'Off';
     ]]]
   tap_action:
     action: call-service
@@ -44,6 +49,7 @@ homio_thermostat:
         - right: 0
         - top: 0
         - transition: all 0.3s
+        - pointer-events: all
         - opacity: |
             [[[ return states["input_boolean.homio_heating_control"].state === "on" ? "0" : "1" ]]]
       target_temperature:
@@ -55,6 +61,8 @@ homio_thermostat:
         - transition: all 0.3s
         - opacity: |
             [[[ return states["input_boolean.homio_heating_control"].state === "on" ? "1" : "0" ]]]
+        - pointer-events: |
+            [[[ return states["input_boolean.homio_heating_control"].state === "on" ? "all" : "none" ]]]
   custom_fields:
     heating_modes:
       card:
@@ -86,8 +94,36 @@ homio_thermostat:
                 - height: 100%
                 - animation: none
                 - z-index: 2
+                - pointer-events: all
                 - background: |
                     [[[ return entity.state === 'off' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'; ]]]
+              img_cell:
+                - width: 19px
+              icon:
+                - width: 100%
+                - height: 100%
+          - type: custom:button-card
+            template:
+              - homio_default
+            show_entity_picture: true
+            entity_picture: /homio_dashboard/images/Homio/icons/dehumidifier.svg
+            tap_action:
+              action: call-service
+              service: climate.set_hvac_mode
+              data:
+                entity_id: |
+                  [[[
+                    return entity.entity_id;
+                  ]]]
+                hvac_mode: "cool"
+            styles:
+              card:
+                - height: 100%
+                - animation: none
+                - z-index: 2
+                - pointer-events: all
+                - background: |
+                    [[[ return entity.state === 'cool' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'; ]]]
               img_cell:
                 - width: 19px
               icon:
@@ -112,6 +148,7 @@ homio_thermostat:
                 - height: 100%
                 - animation: none
                 - z-index: 2
+                - pointer-events: all
                 - background: |
                     [[[ return entity.state === 'heat' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'; ]]]
               img_cell:

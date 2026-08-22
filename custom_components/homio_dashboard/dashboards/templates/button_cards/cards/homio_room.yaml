@@ -23,8 +23,29 @@ homio_room:
     @media (min-width: 1250px) {
       #mobile_logo { display: none !important; }
     }
+    ha-ripple,
+    .mdc-ripple-surface::before,
+    .mdc-ripple-surface::after {
+      display: none !important;
+      opacity: 0 !important;
+      background: transparent !important;
+    }
+    ha-card:hover,
+    ha-card:active,
+    ha-card:focus {
+      filter: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
   styles:
     card:
+      - filter: none
+      - --ha-ripple-pressed-opacity: 0
+      - --ha-ripple-hover-opacity: 0
+      - --ha-ripple-color: transparent
+      - --mdc-ripple-press-opacity: 0
+      - --mdc-ripple-hover-opacity: 0
+      - --mdc-ripple-color: transparent
       - height: 100dvh
       - padding-left: 8vw
       - overflow: hidden
@@ -35,11 +56,12 @@ homio_room:
             const nav = states['input_boolean.homio_mobile_navigation'];
             return (nav && nav.state === 'on') ? 'all' : 'none';
           ]]]
+      # Spaces after rgba(...) required — Chromium rejects )0% color-stops and drops the whole background.
       - background: |
           [[[
             const img = variables.image || 'lounge';
             const pos = variables.image_position || 'center center';
-            return `linear-gradient(to bottom, rgba(51,51,51,0.7)0%, rgba(51,51,51,0.7)50%, rgba(51,51,51,0.5)100%), url('/homio_dashboard/images/Homio/rooms/${img}.jpg') ${pos} / cover no-repeat`;
+            return `linear-gradient(to bottom, rgba(51,51,51,0.7) 0%, rgba(51,51,51,0.7) 50%, rgba(51,51,51,0.5) 100%), url('/homio_dashboard/images/Homio/rooms/${img}.jpg') ${pos} / cover no-repeat`;
           ]]]
     name:
       - color: var(--primary-text-color)
@@ -154,10 +176,19 @@ homio_room:
     temperature: |
       [[[
         if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return '';
-        const st = states[variables.temp_sensor];
-        const temperatureValue = parseFloat(st.state);
+        const eid = variables.temp_sensor;
+        const st = states[eid];
+        const isClimate = String(eid).indexOf('climate.') === 0;
+        let temperatureValue;
+        let unit;
+        if (isClimate) {
+          temperatureValue = parseFloat(st.attributes && st.attributes.current_temperature);
+          unit = '°C';
+        } else {
+          temperatureValue = parseFloat(st.state);
+          unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';
+        }
         if (isNaN(temperatureValue)) return '';
-        const unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';
         const temperature = temperatureValue.toFixed(1);
         const isF = String(unit).indexOf('F') !== -1;
         let label = '';
