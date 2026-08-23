@@ -3,7 +3,7 @@ homio_logo:
     - homio_default
   tap_action:
     action: navigate
-    navigation_path: /homio_dashboard/home
+    navigation_path: /homio_dashboard/living
   # Keep in sync with homio_mobile_logo (collapsed hamburger header).
   name: Daylor
   styles:

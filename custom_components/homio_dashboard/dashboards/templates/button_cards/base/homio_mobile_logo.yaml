@@ -3,7 +3,7 @@ homio_mobile_logo:
   name: Daylor
   tap_action:
     action: navigate
-    navigation_path: /homio_dashboard/home
+    navigation_path: /homio_dashboard/living
   styles:
     name:
       - color: var(--primary-text-color)

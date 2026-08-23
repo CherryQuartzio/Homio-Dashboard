@@ -5,7 +5,7 @@ homio_nav_button:
   show_state: false
   tap_action:
     action: navigate
-    navigation_path: "[[[ return variables.path || '/homio_dashboard/home' ]]]"
+    navigation_path: "[[[ return variables.path || '/homio_dashboard/living' ]]]"
   styles:
     grid:
       - grid-template-areas: '"n"'

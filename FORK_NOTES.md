@@ -9,14 +9,17 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.1** (`const.VERSION` — bump when changing registered JS).
+Integration version: **1.0.2** (`const.VERSION` — bump when changing registered JS or YAML panel).
 
 ## Status
 
-- **Daily driver on HA:** Homio Fixed (`url_path=homio-fixed`). Keep it until the YAML Homio panel matches Fixed end-to-end.
+- **Daily driver on HA:** Homio Fixed (`url_path=homio-fixed`). Keep it until the YAML Homio panel matches Fixed end-to-end (Phase 4).
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
-- **Latest live snapshot:** `examples/homio-fixed/` — `config_hash=b8556503e641f00f` (exported 2026-08-23 Phase 1).
+- **HACS install:** `CherryQuartzio/Homio-Dashboard` — Phase 2 tag **`v1.0.1-homio-fixed`**; Phase 3 target **`v1.0.2-homio-yaml`**. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
+- **Latest live Fixed snapshot:** `examples/homio-fixed/` — `config_hash=b8556503e641f00f` (exported 2026-08-23 Phase 1; Fixed left untouched in Phase 3).
 - **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`); edits backup `dashboard.homio-fixed.20260823_111154.yaml`. See `examples/homio-fixed/resources.json`.
+- **After Phase 2:** room JPGs under `www/images/Homio/rooms/` were wiped by the HACS folder replace (404). Restore from snapshot `edf057f9` or re-upload into `custom_components/homio_dashboard/www/images/Homio/rooms/`.
+- **Phase 3 (YAML parity):** `lovelace/homio.yaml` has the five Daylor rooms (living / dining / kitchen / office / master-bedroom) with Fixed entity IDs; nav + logo defaults point at `/homio_dashboard/...`. Templates remain `!include`s.
 
 ## Changelog (session work ported here)
 
@@ -117,3 +120,10 @@ Integration version: **1.0.1** (`const.VERSION` — bump when changing registere
 `input_boolean.homio_mobile_navigation` (legacy only), heating/hot-water controls,  
 `input_number.homio_thermostat_target_temperature` (10–32).  
 Sensors: `sensor.homio_current_time`, `sensor.homio_current_time_2`, `sensor.homio_current_date`.
+
+## Phase 3 — YAML panel Daylor rooms
+
+- `lovelace/homio.yaml`: five views matching Homio Fixed (`living`, `dining`, `kitchen`, `office`, `master-bedroom`) with site entity IDs; screen/entity layouts via `!include`.
+- `homio_navigation_list.yaml` + logo/nav fallbacks: `/homio_dashboard/<room>` (not placeholders / not `/homio-fixed`).
+- Homio Fixed storage dashboard left untouched; cutover remains Phase 4.
+- Release tag: **`v1.0.2-homio-yaml`** (integration **1.0.2**).
