@@ -15,7 +15,7 @@ Integration version: **1.0.2** (`const.VERSION` — bump when changing registere
 
 - **Daily driver on HA:** Homio Fixed (`url_path=homio-fixed`). Keep it until the YAML Homio panel matches Fixed end-to-end (Phase 4).
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
-- **HACS install:** `CherryQuartzio/Homio-Dashboard` — Phase 2 tag **`v1.0.1-homio-fixed`**; Phase 3 target **`v1.0.2-homio-yaml`**. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
+- **HACS install:** `CherryQuartzio/Homio-Dashboard` **`v1.0.2-homio-yaml`** (Phase 3). Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ` state **loaded**.
 - **Latest live Fixed snapshot:** `examples/homio-fixed/` — `config_hash=b8556503e641f00f` (exported 2026-08-23 Phase 1; Fixed left untouched in Phase 3).
 - **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`); edits backup `dashboard.homio-fixed.20260823_111154.yaml`. See `examples/homio-fixed/resources.json`.
 - **After Phase 2:** room JPGs under `www/images/Homio/rooms/` were wiped by the HACS folder replace (404). Restore from snapshot `edf057f9` or re-upload into `custom_components/homio_dashboard/www/images/Homio/rooms/`.
