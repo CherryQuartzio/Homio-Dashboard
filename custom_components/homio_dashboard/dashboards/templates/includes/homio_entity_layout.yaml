@@ -2,12 +2,15 @@ position: absolute
 grid-auto-columns: 260px
 grid-auto-flow: column
 grid-column-gap: 5px
-margin: 0 0 0 8vw
-padding: 0
+# Full-bleed scrollport; 8vw inset via padding (allowlisted by layout-card).
+# scroll-padding is applied by www/homio-entity-strip.js (!important) because
+# layout-card's style allowlist historically omits scroll-padding*.
+margin: 0
+padding: 0 8vw
 inset: auto 0 85px 0
 scroll-snap-type: x mandatory
+overflow-x: auto
 overflow-y: hidden
-overflow: hidden
 mediaquery:
   # FOR VERTICAL MOBILE SCROLLING UNCOMMENT ALL LINES
   # "(min-width: 769px) and (max-width: 1249px)":

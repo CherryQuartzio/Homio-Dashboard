@@ -5,9 +5,13 @@ input_boolean:
   homio_hot_water_control:
     name: Hot Water Control
     initial: off
+  # Deprecated for Homio Fixed: menu open/close is client-local via
+  # www/homio-menu-nav.js (CSS vars). Kept so older dashboards still load.
   homio_mobile_navigation:
     name: Mobile Navigation
     initial: off
+  # Header compact/full is client-local (CSS vars from homio-header-fit.js).
+  # Do not add a shared input_boolean for that — it syncs every dashboard client.
 input_number:
   homio_thermostat_target_temperature:
     name: Homio Thermostat Target Temperature

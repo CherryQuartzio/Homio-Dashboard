@@ -3,10 +3,16 @@ homio_entity:
     - homio_default
   show_state: true
   show_entity_picture: true
+  # Prevent button-card from using HA light state amber as ripple/icon color
+  # (--button-card-ripple-color ← stateColorCss). Homio feedback stays white glass.
+  color: "#ffffff"
+  # Hold any device card for HA more-info (lights/thermostat may override tap).
+  hold_action:
+    action: more-info
   entity_picture: |
     [[[
-      const icon = variables.icon
-      return `/homio_dashboard/images/Homio/icons/${icon}.svg`
+      const icon = variables.icon || "lamp";
+      return `/homio_dashboard/images/Homio/icons/${icon}.svg`;
     ]]]
   state:
     - value: "on"
@@ -17,44 +23,231 @@ homio_entity:
       styles:
         card:
           - background: "rgba(255,255,255,0.4)"
+    - value: open
+      styles:
+        card:
+          - background: "rgba(255,255,255,0.4)"
+    # Climate: highlight only while actively heating/cooling (not idle mode).
+    - value: cool
+      styles:
+        card:
+          - background: |
+              [[[
+                const a = entity.attributes && entity.attributes.hvac_action;
+                return a === "cooling" ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)";
+              ]]]
+    - value: heat
+      styles:
+        card:
+          - background: |
+              [[[
+                const a = entity.attributes && entity.attributes.hvac_action;
+                return a === "heating" ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)";
+              ]]]
+    - value: heat_cool
+      styles:
+        card:
+          - background: |
+              [[[
+                const a = entity.attributes && entity.attributes.hvac_action;
+                return (a === "heating" || a === "cooling")
+                  ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)";
+              ]]]
+    - value: auto
+      styles:
+        card:
+          - background: |
+              [[[
+                const a = entity.attributes && entity.attributes.hvac_action;
+                return (a === "heating" || a === "cooling")
+                  ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)";
+              ]]]
   styles:
     card:
       - background: "rgba(255,255,255,0.1)"
       - backdrop-filter: blur(12px)
       - height: 170px
-      - padding-left: 40px
-      - padding-right: 40px
+      # Match horizontal inset; icon optical nudge stays on img_cell translateX.
+      - padding-left: 28px
+      - padding-right: 28px
       - scroll-snap-align: start
-      - display: |
-          [[[
-            if (states["input_boolean.homio_mobile_navigation"].state === "on") {
-              return "none";
-            } else {
-              return "block";
-            }
-          ]]]
+      - touch-action: pan-x
+      # Hidden while this browser's menu drawer is open (homio-menu-nav.js).
+      - display: var(--homio-entity-when-menu, block)
+      - pointer-events: all
+      - overflow: hidden
+      - --ha-ripple-hover-opacity: 0.08
+      - --ha-ripple-pressed-opacity: 0.12
+      - --mdc-ripple-hover-opacity: 0.04
+      - --mdc-ripple-press-opacity: 0.12
+      # button-card maps --ha-ripple-color ← --button-card-ripple-color (light amber).
+      - --button-card-ripple-color: rgba(255,255,255,0.45)
+      - --button-card-ripple-hover-color: rgba(255,255,255,0.45)
+      - --button-card-ripple-pressed-color: rgba(255,255,255,0.45)
+      - --ha-ripple-color: rgba(255,255,255,0.45)
+      - --ha-ripple-hover-color: rgba(255,255,255,0.45)
+      - --ha-ripple-pressed-color: rgba(255,255,255,0.45)
+      - --mdc-ripple-color: rgba(255,255,255,0.45)
+      - filter: none
     name:
       - color: var(--primary-text-color)
       - font-size: 16px
       - font-weight: 600
       - justify-self: start
+      - text-align: left
+      - justify-content: start
       - margin-bottom: 5px
+      # Full 1fr column for ellipsis; text-align left (button-card defaults to center).
+      - width: 100%
+      - max-width: 100%
+      - min-width: 0
+      - overflow: hidden
+      - text-overflow: ellipsis
+      - white-space: nowrap
     state:
       - color: var(--primary-text-color)
       - font-size: 14px
       - justify-self: start
+      - text-align: left
+      - justify-content: start
       - font-weight: 700
       - opacity: 0.8
+      - width: 100%
+      - max-width: 100%
+      - min-width: 0
+      - overflow: hidden
+      - text-overflow: ellipsis
+      - white-space: nowrap
     grid:
-      - grid-template-columns: 1fr min-content
-      - grid-column-gap: 20px
+      - grid-template-columns: minmax(0, 1fr) min-content
+      - grid-column-gap: 8px
       - grid-template-rows: min-content
       - grid-template-areas: '"n i" "s i"'
       - place-content: center
     img_cell:
-      - width: 30px
-      - height: 30px
+      # Fixed box — height:100% + aspect-ratio + stretch grew/shifted the icon
+      # whenever the grid reflowed (slider show, state text). 48px matches the
+      # Material Symbols asset; optical nudge stays on translateX.
+      - width: 48px
+      - height: 48px
+      - min-width: 48px
+      - max-width: 48px
+      - max-height: 48px
+      - align-self: center
+      - justify-self: end
       - background: transparent
+      - margin-right: "-4px"
+      - transform: translateX(6px)
     icon:
-      - width: 100%
-      - height: 100%
+      - width: 48px
+      - height: 48px
+      - object-fit: contain
+  # Snap target is the button-card host (layout #root child), not ha-card.
+  # Hover styles only on real hover pointers — touch sticky-hover was stealing
+  # the next strip swipe as a tap/toggle (see also www/homio-entity-strip.js).
+  extra_styles: |
+    :host {
+      scroll-margin-inline: 8vw;
+      /* Beat button-card inline --button-card-ripple-color (HA light amber). */
+      --button-card-ripple-color: rgba(255,255,255,0.45) !important;
+      --button-card-ripple-hover-color: rgba(255,255,255,0.45) !important;
+      --button-card-ripple-pressed-color: rgba(255,255,255,0.45) !important;
+      --button-card-light-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-hover-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-pressed-color: rgba(255,255,255,0.45) !important;
+    }
+    /* button-card defaults name/state to centered text; keep left once width is 100%. */
+    #name, #state, #label {
+      text-align: left !important;
+      justify-content: start !important;
+      justify-self: start !important;
+    }
+    ha-card {
+      --ha-ripple-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-hover-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-pressed-color: rgba(255,255,255,0.45) !important;
+      --button-card-ripple-color: rgba(255,255,255,0.45) !important;
+      filter: none !important;
+      -webkit-filter: none !important;
+    }
+    /* Sticky :hover after slider/hold — kill filter cast on all pointers. */
+    ha-card:hover,
+    ha-card:active,
+    ha-card:focus {
+      filter: none !important;
+      -webkit-filter: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      --ha-ripple-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-hover-color: rgba(255,255,255,0.45) !important;
+      --ha-ripple-pressed-color: rgba(255,255,255,0.45) !important;
+      --button-card-ripple-color: rgba(255,255,255,0.45) !important;
+    }
+    :host([data-homio-chrome-drag]) ha-card,
+    :host([data-homio-chrome-drag]) ha-card:hover,
+    :host([data-homio-chrome-drag]) ha-card:active {
+      filter: none !important;
+      -webkit-filter: none !important;
+      box-shadow: none !important;
+      --ha-ripple-hover-opacity: 0 !important;
+      --ha-ripple-pressed-opacity: 0 !important;
+      --mdc-ripple-hover-opacity: 0 !important;
+      --mdc-ripple-press-opacity: 0 !important;
+    }
+    :host([data-homio-chrome-drag]) ha-card > ha-ripple {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    /* Nested chrome: suppress parent ripple while nested controls are pressed.
+       #temperature_controls is inside a nested button-card shadow tree, so parent
+       must key off #target_temperature. Hover suppress is desktop-only — iOS
+       sticky :hover would otherwise leave the parent dead after a nested tap.
+       Touch: data-homio-nested-press is set by www/homio-entity-strip.js because
+       :active does not cross nested button-card shadows on iOS. */
+    :host([data-homio-nested-press]) ha-card {
+      --ha-ripple-hover-opacity: 0 !important;
+      --ha-ripple-pressed-opacity: 0 !important;
+      --mdc-ripple-hover-opacity: 0 !important;
+      --mdc-ripple-press-opacity: 0 !important;
+      filter: none !important;
+      box-shadow: none !important;
+    }
+    :host([data-homio-nested-press]) ha-card > ha-ripple {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    ha-card:has(#light-slider:active),
+    ha-card:has(#heating_modes:active),
+    ha-card:has(#target_temperature:active) {
+      --ha-ripple-hover-opacity: 0 !important;
+      --ha-ripple-pressed-opacity: 0 !important;
+      --mdc-ripple-hover-opacity: 0 !important;
+      --mdc-ripple-press-opacity: 0 !important;
+      filter: none !important;
+      box-shadow: none !important;
+    }
+    ha-card:has(#light-slider:active) > ha-ripple,
+    ha-card:has(#heating_modes:active) > ha-ripple,
+    ha-card:has(#target_temperature:active) > ha-ripple {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    @media (hover: hover) {
+      ha-card:has(#light-slider:hover),
+      ha-card:has(#heating_modes:hover),
+      ha-card:has(#target_temperature:hover) {
+        --ha-ripple-hover-opacity: 0 !important;
+        --ha-ripple-pressed-opacity: 0 !important;
+        --mdc-ripple-hover-opacity: 0 !important;
+        --mdc-ripple-press-opacity: 0 !important;
+        filter: none !important;
+        box-shadow: none !important;
+      }
+      ha-card:has(#light-slider:hover) > ha-ripple,
+      ha-card:has(#heating_modes:hover) > ha-ripple,
+      ha-card:has(#target_temperature:hover) > ha-ripple {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }

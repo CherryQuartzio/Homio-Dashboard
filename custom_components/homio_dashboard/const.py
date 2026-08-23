@@ -1,4 +1,4 @@
 """Constants for the Homio Dashboard integration."""
 
 DOMAIN = "homio_dashboard"
-VERSION = "1.0.0"
+VERSION = "1.0.1"

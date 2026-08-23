@@ -1,12 +1,25 @@
 homio_time:
   template:
     - homio_default
+  show_icon: false
+  show_state: false
+  # Durable template helper (Homio's ephemeral async_set sensor does not persist).
+  entity: sensor.homio_current_time_2
+  triggers_update: all
   name: |
     [[[
-      const t = states['sensor.homio_current_time'];
-      return t ? t.state : '';
+      const t = states['sensor.homio_current_time_2'] || states['sensor.homio_current_time'];
+      if (t && t.state && t.state !== 'unknown' && t.state !== 'unavailable') {
+        return t.state;
+      }
+      const d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
     ]]]
   styles:
+    grid:
+      - grid-template-areas: '"n"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: min-content
     name:
       - color: var(--primary-text-color)
       - letter-spacing: 1px
@@ -15,5 +28,14 @@ homio_time:
       - font-weight: 700
       - justify-self: start
     card:
-      - background: transparent
+      - "--ha-card-background": transparent
+      - background: none
+      - background-color: transparent
+      - box-shadow: none
+      - border: none
       - pointer-events: all
+      - height: auto
+      - min-height: 0
+      - width: auto
+      - padding: 0
+      - margin: 0

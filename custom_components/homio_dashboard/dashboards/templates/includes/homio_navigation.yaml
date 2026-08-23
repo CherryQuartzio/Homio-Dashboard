@@ -1,5 +1,15 @@
 # Outer wrapper must be layout-card (not vertical-stack).
 # button-card cannot create built-in stack cards — that caused a red banner and missing desktop nav/clock.
+# Full vs compact is per-browser via CSS vars from homio-header-fit.js (not a shared HA entity).
+# Menu open/close is per-browser via CSS vars from homio-menu-nav.js (not input_boolean).
+#
+# Drawer layout rules (do not regress):
+# - Never set height on the mid room-list layout-card (overflows parent; clock scrolls away).
+# - Prefer inset:0 over height:100% on the drawer — layout-card sets overflow-y:auto whenever
+#   layout.height is set, which hides the clock below the fold.
+# - place-content:space-between + padding 60px pins DAYLOR/clock to collapsed margins without
+#   space-around's extra inset. Do not use grid-template-rows: … 1fr … with place-items:start
+#   (mid band never fills; rooms stick to top).
 type: custom:layout-card
 layout_type: custom:grid-layout
 layout:
@@ -7,67 +17,69 @@ layout:
   margin: 0
   padding: 0
 cards:
-  - type: conditional
-    conditions:
-      - condition: screen
-        media_query: "(min-width: 1250px)"
-    card:
-      type: custom:layout-card
-      layout_type: custom:grid-layout
-      layout:
-        grid-template-columns: max-content 1fr max-content
-        margin: 0 8vw 0 8vw
-        position: absolute
-        inset: 60px 0 auto 0
-        padding: 0
-      cards:
-        - type: custom:button-card
-          template:
-            - homio_logo
-        - type: custom:layout-card
-          layout_type: custom:grid-layout
-          layout:
-            grid-auto-flow: column
-            place-content: center
-            grid-column-gap: 36px
-            margin: 0
-            padding: 0
-          cards: !include homio_navigation_list.yaml
-        - type: custom:button-card
-          template:
-            - homio_time
-  - type: conditional
-    conditions:
-      - condition: screen
-        media_query: "(min-width: 0px) and (max-width: 1249px)"
-      - condition: state
-        entity: input_boolean.homio_mobile_navigation
-        state: "on"
-    card:
-      type: custom:layout-card
-      layout_type: custom:grid-layout
-      layout:
-        grid-template-columns: 1fr
-        place-content: space-around
-        height: 100vh
-        inset: 0 auto auto 0
-        margin: 0
-        padding: 0 0 0 60px
-        width: 280px
-        background: rgba(255,255,255,0.1)
-        backdrop-filter: blur(15px)
-        position: absolute
-      cards:
-        - type: custom:button-card
-          template:
-            - homio_logo
-        - type: custom:layout-card
-          layout_type: custom:grid-layout
-          layout:
-            grid-template-columns: 1fr
-            grid-auto-flow: row
-            grid-row-gap: 24px
-          cards: !include homio_navigation_list.yaml
-        - type: custom:button-card
-          template:
-            - homio_time
+  # Always mounted; hidden when this client is in compact mode.
+  - type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      display: var(--homio-full-header-display, grid)
+      grid-template-columns: max-content 1fr max-content
+      margin: 0 8vw 0 8vw
+      position: absolute
+      inset: 60px 0 auto 0
+      padding: 0
+    cards:
+      - type: custom:button-card
+        template:
+          - homio_logo
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-auto-flow: column
+          place-content: center
+          grid-column-gap: 36px
+          margin: 0
+          padding: 0
+        cards: !include homio_navigation_list.yaml
+      - type: custom:button-card
+        template:
+          - homio_time
+  # Drawer: always mounted; shown only when this browser has menu open + compact.
+  - type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      display: var(--homio-menu-panel-display, none)
+      grid-template-columns: 1fr
+      # Pin logo to top padding edge and clock to bottom (matches collapsed 60px).
+      place-content: space-between
+      place-items: start
+      # Match collapsed mobile_logo top (60px); same bottom for clock (+ home indicator).
+      padding: 60px 8vw calc(60px + env(safe-area-inset-bottom, 0px)) 8vw
+      # Size via inset — do NOT set height (that forces overflow-y:auto and hides the clock).
+      inset: 0
+      margin: 0
+      width: 280px
+      background: rgba(255,255,255,0.1)
+      backdrop-filter: blur(15px)
+      position: absolute
+      overflow: hidden
+      overflow-y: hidden
+    cards:
+      - type: custom:button-card
+        template:
+          - homio_logo
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 1fr
+          grid-auto-flow: row
+          grid-auto-rows: max-content
+          # Stock Homio room gap.
+          grid-row-gap: 30px
+          place-items: start
+          margin: 0
+          padding: 0
+          background: transparent
+        cards: !include homio_navigation_list.yaml
+      - type: custom:button-card
+        template:
+          - homio_time

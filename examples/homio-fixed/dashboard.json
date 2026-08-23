@@ -77,56 +77,73 @@
           },
           {
             "justify-self": "start"
+          },
+          {
+            "line-height": "18px"
           }
         ],
         "card": [
           {
-            "background": "transparent"
+            "--ha-card-background": "transparent"
+          },
+          {
+            "background": "none"
+          },
+          {
+            "background-color": "transparent"
+          },
+          {
+            "box-shadow": "none"
+          },
+          {
+            "border": "none"
           },
           {
             "pointer-events": "all"
           },
           {
-            "overflow": "hidden"
+            "height": "18px"
           },
           {
-            "--ha-ripple-hover-opacity": 0.08
+            "min-height": "0"
           },
           {
-            "--ha-ripple-pressed-opacity": 0.12
+            "padding": "0"
           },
           {
-            "--mdc-ripple-hover-opacity": 0.04
-          },
-          {
-            "--mdc-ripple-press-opacity": 0.12
-          },
-          {
-            "--ha-ripple-color": "rgba(255,255,255,0.25)"
-          },
-          {
-            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
+            "margin": "0"
           }
         ]
       }
     },
     "homio_menu_icon": {
-      "show_entity_picture": true,
-      "entity_picture": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"/homio_dashboard/images/Homio/icons/close.svg\" : \"/homio_dashboard/images/Homio/icons/menu.svg\";\n]]]\n",
+      "show_name": false,
+      "show_icon": false,
+      "show_state": false,
+      "show_entity_picture": false,
       "tap_action": {
-        "action": "call-service",
-        "service": "input_boolean.toggle",
-        "service_data": {
-          "entity_id": "input_boolean.homio_mobile_navigation"
-        }
+        "action": "fire-dom-event",
+        "homio_action": "menu_toggle"
       },
       "styles": {
         "card": [
           {
-            "background": "transparent"
+            "--ha-card-background": "transparent"
           },
           {
-            "display": "none"
+            "background": "none"
+          },
+          {
+            "background-color": "transparent"
+          },
+          {
+            "box-shadow": "none"
+          },
+          {
+            "border": "none"
+          },
+          {
+            "display": "var(--homio-compact-ui-display, none)"
           },
           {
             "pointer-events": "all"
@@ -135,45 +152,92 @@
             "cursor": "pointer"
           },
           {
-            "overflow": "hidden"
+            "padding": 0
           },
           {
-            "--ha-ripple-hover-opacity": 0.08
+            "margin": 0
           },
           {
-            "--ha-ripple-pressed-opacity": 0.12
+            "height": "23px"
           },
           {
-            "--mdc-ripple-hover-opacity": 0.04
+            "width": "28px"
           },
           {
-            "--mdc-ripple-press-opacity": 0.12
+            "min-height": 0
           },
           {
-            "--ha-ripple-color": "rgba(255,255,255,0.25)"
-          },
-          {
-            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
+            "overflow": "visible"
           }
         ],
-        "img_cell": [
+        "grid": [
           {
-            "width": "25px"
-          }
-        ],
-        "icon": [
-          {
-            "width": "100%"
+            "grid-template-areas": "\"i\""
           },
           {
-            "height": "100%"
+            "grid-template-columns": "1fr"
+          },
+          {
+            "grid-template-rows": "1fr"
+          },
+          {
+            "height": "23px"
+          },
+          {
+            "width": "28px"
           }
-        ]
+        ],
+        "custom_fields": {
+          "burger": [
+            {
+              "grid-area": "i"
+            },
+            {
+              "display": "var(--homio-menu-burger-display, block)"
+            },
+            {
+              "width": "28px"
+            },
+            {
+              "height": "23px"
+            },
+            {
+              "justify-self": "center"
+            },
+            {
+              "align-self": "center"
+            }
+          ],
+          "close": [
+            {
+              "grid-area": "i"
+            },
+            {
+              "display": "var(--homio-menu-close-display, none)"
+            },
+            {
+              "width": "22px"
+            },
+            {
+              "height": "22px"
+            },
+            {
+              "justify-self": "center"
+            },
+            {
+              "align-self": "center"
+            }
+          ]
+        }
       },
-      "extra_styles": "@media (max-width: 1249px) { .button-card-main { display: block !important; } }\n"
+      "custom_fields": {
+        "burger": "[[[\n  return `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"23\" viewBox=\"0 0 76 50\" aria-hidden=\"true\" style=\"display:block;width:28px;height:23px;\"><path fill=\"#fff\" d=\"M0 50v-2h76V50H0Zm0-24V24h76v2H0ZM0 2V0h76v2H0Z\"/></svg>`;\n]]]\n",
+        "close": "[[[\n  return `<img src=\"/homio_dashboard/images/Homio/icons/close.svg\" alt=\"\" width=\"22\" height=\"22\" style=\"width:22px;height:22px;display:block;object-fit:contain;\" />`;\n]]]\n"
+      },
+      "extra_styles": "#burger, #close {\n  grid-area: i !important;\n  justify-self: center !important;\n  align-self: center !important;\n}\n#burger {\n  display: var(--homio-menu-burger-display, block) !important;\n  width: 28px !important;\n  height: 23px !important;\n}\n#close {\n  display: var(--homio-menu-close-display, none) !important;\n  width: 22px !important;\n  height: 22px !important;\n}\n"
     },
     "homio_mobile_logo": {
-      "name": "Homio.",
+      "name": "Daylor",
       "tap_action": {
         "action": "navigate",
         "navigation_path": "/homio-fixed/living"
@@ -197,38 +261,47 @@
           },
           {
             "justify-self": "start"
+          },
+          {
+            "line-height": "18px"
           }
         ],
         "card": [
           {
-            "background": "transparent"
+            "--ha-card-background": "transparent"
+          },
+          {
+            "background": "none"
+          },
+          {
+            "background-color": "transparent"
+          },
+          {
+            "box-shadow": "none"
+          },
+          {
+            "border": "none"
           },
           {
             "pointer-events": "all"
           },
           {
-            "overflow": "hidden"
+            "height": "18px"
           },
           {
-            "--ha-ripple-hover-opacity": 0.08
+            "min-height": "0"
           },
           {
-            "--ha-ripple-pressed-opacity": 0.12
+            "padding": "0"
           },
           {
-            "--mdc-ripple-hover-opacity": 0.04
-          },
-          {
-            "--mdc-ripple-press-opacity": 0.12
-          },
-          {
-            "--ha-ripple-color": "rgba(255,255,255,0.25)"
-          },
-          {
-            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
+            "margin": "0"
           }
         ]
-      }
+      },
+      "triggers_update": [
+        "input_boolean.homio_mobile_navigation"
+      ]
     },
     "homio_nav_button": {
       "template": [
@@ -261,40 +334,56 @@
         ],
         "card": [
           {
-            "background": "transparent"
+            "--ha-card-background": "transparent"
+          },
+          {
+            "background": "none"
+          },
+          {
+            "background-color": "transparent"
+          },
+          {
+            "box-shadow": "none"
+          },
+          {
+            "border": "none"
           },
           {
             "pointer-events": "all"
           },
           {
-            "overflow": "hidden"
+            "height": "auto"
           },
           {
-            "--ha-ripple-hover-opacity": 0.08
+            "min-height": "0"
           },
           {
-            "--ha-ripple-pressed-opacity": 0.12
+            "padding": "0"
           },
           {
-            "--mdc-ripple-hover-opacity": 0.04
+            "margin": "0"
           },
           {
-            "--mdc-ripple-press-opacity": 0.12
+            "width": "auto"
           },
           {
-            "--ha-ripple-color": "rgba(255,255,255,0.25)"
-          },
-          {
-            "--mdc-ripple-color": "rgba(255,255,255,0.25)"
+            "overflow": "visible"
           }
+        ],
+        "grid": [
+          "grid-template-areas: \"n\"",
+          "grid-template-columns: 1fr",
+          "grid-template-rows: min-content"
         ]
-      }
+      },
+      "show_icon": false,
+      "show_state": false
     },
     "homio_time": {
       "template": [
         "homio_default"
       ],
-      "name": "[[[\n  const t = states['sensor.homio_current_time'];\n  return t ? t.state : '';\n]]]\n",
+      "name": "[[[ const t2 = states['sensor.homio_current_time_2']; if (t2 && t2.state && t2.state !== 'unknown' && t2.state !== 'unavailable') return t2.state; const t1 = states['sensor.homio_current_time']; if (t1 && t1.state && t1.state !== 'unknown' && t1.state !== 'unavailable') return t1.state; const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); ]]]",
       "styles": {
         "name": [
           {
@@ -318,16 +407,52 @@
         ],
         "card": [
           {
-            "background": "transparent"
+            "--ha-card-background": "transparent"
+          },
+          {
+            "background": "none"
+          },
+          {
+            "background-color": "transparent"
+          },
+          {
+            "box-shadow": "none"
+          },
+          {
+            "border": "none"
           },
           {
             "pointer-events": "all"
           },
           {
-            "overflow": "hidden"
+            "height": "auto"
+          },
+          {
+            "min-height": "0"
+          },
+          {
+            "padding": "0"
+          },
+          {
+            "margin": "0"
+          },
+          {
+            "width": "auto"
+          },
+          {
+            "overflow": "visible"
           }
+        ],
+        "grid": [
+          "grid-template-areas: \"n\"",
+          "grid-template-columns: 1fr",
+          "grid-template-rows: min-content"
         ]
-      }
+      },
+      "show_icon": false,
+      "show_state": false,
+      "triggers_update": "all",
+      "entity": "sensor.homio_current_time_2"
     },
     "homio_entity": {
       "template": [
@@ -372,7 +497,7 @@
           "styles": {
             "card": [
               {
-                "background": "rgba(255,255,255,0.4)"
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return a === \"cooling\" ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
               }
             ]
           }
@@ -382,7 +507,27 @@
           "styles": {
             "card": [
               {
-                "background": "rgba(255,255,255,0.4)"
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return a === \"heating\" ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
+              }
+            ]
+          }
+        },
+        {
+          "value": "heat_cool",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return (a === \"heating\" || a === \"cooling\") ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
+              }
+            ]
+          }
+        },
+        {
+          "value": "auto",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return (a === \"heating\" || a === \"cooling\") ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
               }
             ]
           }
@@ -400,16 +545,19 @@
             "height": "170px"
           },
           {
-            "padding-left": "40px"
+            "padding-left": "28px"
           },
           {
-            "padding-right": "40px"
+            "padding-right": "28px"
           },
           {
             "scroll-snap-align": "start"
           },
           {
-            "display": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"none\" : \"block\";\n]]]\n"
+            "touch-action": "pan-x"
+          },
+          {
+            "display": "var(--homio-entity-when-menu, block)"
           },
           {
             "pointer-events": "all"
@@ -430,10 +578,28 @@
             "--mdc-ripple-press-opacity": 0.12
           },
           {
-            "--ha-ripple-color": "rgba(255,255,255,0.35)"
+            "--button-card-ripple-color": "rgba(255,255,255,0.45)"
           },
           {
-            "--mdc-ripple-color": "rgba(255,255,255,0.35)"
+            "--button-card-ripple-hover-color": "rgba(255,255,255,0.45)"
+          },
+          {
+            "--button-card-ripple-pressed-color": "rgba(255,255,255,0.45)"
+          },
+          {
+            "--ha-ripple-color": "rgba(255,255,255,0.45)"
+          },
+          {
+            "--ha-ripple-hover-color": "rgba(255,255,255,0.45)"
+          },
+          {
+            "--ha-ripple-pressed-color": "rgba(255,255,255,0.45)"
+          },
+          {
+            "--mdc-ripple-color": "rgba(255,255,255,0.45)"
+          },
+          {
+            "filter": "none"
           }
         ],
         "name": [
@@ -450,7 +616,31 @@
             "justify-self": "start"
           },
           {
+            "text-align": "left"
+          },
+          {
+            "justify-content": "start"
+          },
+          {
             "margin-bottom": "5px"
+          },
+          {
+            "width": "100%"
+          },
+          {
+            "max-width": "100%"
+          },
+          {
+            "min-width": "0"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "text-overflow": "ellipsis"
+          },
+          {
+            "white-space": "nowrap"
           }
         ],
         "state": [
@@ -464,18 +654,42 @@
             "justify-self": "start"
           },
           {
+            "text-align": "left"
+          },
+          {
+            "justify-content": "start"
+          },
+          {
             "font-weight": 700
           },
           {
             "opacity": 0.8
+          },
+          {
+            "width": "100%"
+          },
+          {
+            "max-width": "100%"
+          },
+          {
+            "min-width": "0"
+          },
+          {
+            "overflow": "hidden"
+          },
+          {
+            "text-overflow": "ellipsis"
+          },
+          {
+            "white-space": "nowrap"
           }
         ],
         "grid": [
           {
-            "grid-template-columns": "1fr min-content"
+            "grid-template-columns": "minmax(0, 1fr) min-content"
           },
           {
-            "grid-column-gap": "20px"
+            "grid-column-gap": "8px"
           },
           {
             "grid-template-rows": "min-content"
@@ -489,24 +703,53 @@
         ],
         "img_cell": [
           {
-            "width": "30px"
+            "width": "48px"
           },
           {
-            "height": "30px"
+            "height": "48px"
+          },
+          {
+            "min-width": "48px"
+          },
+          {
+            "max-width": "48px"
+          },
+          {
+            "max-height": "48px"
+          },
+          {
+            "align-self": "center"
+          },
+          {
+            "justify-self": "end"
           },
           {
             "background": "transparent"
+          },
+          {
+            "margin-right": "-4px"
+          },
+          {
+            "transform": "translateX(6px)"
           }
         ],
         "icon": [
           {
-            "width": "100%"
+            "width": "48px"
           },
           {
-            "height": "100%"
+            "height": "48px"
+          },
+          {
+            "object-fit": "contain"
           }
         ]
-      }
+      },
+      "extra_styles": ":host {\n  scroll-margin-inline: 8vw;\n  /* Beat button-card inline --button-card-ripple-color (HA light amber). */\n  --button-card-ripple-color: rgba(255,255,255,0.45) !important;\n  --button-card-ripple-hover-color: rgba(255,255,255,0.45) !important;\n  --button-card-ripple-pressed-color: rgba(255,255,255,0.45) !important;\n  --button-card-light-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-hover-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-pressed-color: rgba(255,255,255,0.45) !important;\n}\n/* button-card defaults name/state to centered text; keep left once width is 100%. */\n#name, #state, #label {\n  text-align: left !important;\n  justify-content: start !important;\n  justify-self: start !important;\n}\nha-card {\n  --ha-ripple-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-hover-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-pressed-color: rgba(255,255,255,0.45) !important;\n  --button-card-ripple-color: rgba(255,255,255,0.45) !important;\n  filter: none !important;\n  -webkit-filter: none !important;\n}\n/* Sticky :hover after slider/hold — kill filter cast on all pointers. */\nha-card:hover,\nha-card:active,\nha-card:focus {\n  filter: none !important;\n  -webkit-filter: none !important;\n  box-shadow: none !important;\n  outline: none !important;\n  --ha-ripple-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-hover-color: rgba(255,255,255,0.45) !important;\n  --ha-ripple-pressed-color: rgba(255,255,255,0.45) !important;\n  --button-card-ripple-color: rgba(255,255,255,0.45) !important;\n}\n:host([data-homio-chrome-drag]) ha-card,\n:host([data-homio-chrome-drag]) ha-card:hover,\n:host([data-homio-chrome-drag]) ha-card:active {\n  filter: none !important;\n  -webkit-filter: none !important;\n  box-shadow: none !important;\n  --ha-ripple-hover-opacity: 0 !important;\n  --ha-ripple-pressed-opacity: 0 !important;\n  --mdc-ripple-hover-opacity: 0 !important;\n  --mdc-ripple-press-opacity: 0 !important;\n}\n:host([data-homio-chrome-drag]) ha-card > ha-ripple {\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n/* Nested chrome: suppress parent ripple while nested controls are pressed.\n   #temperature_controls is inside a nested button-card shadow tree, so parent\n   must key off #target_temperature. Hover suppress is desktop-only — iOS\n   sticky :hover would otherwise leave the parent dead after a nested tap.\n   Touch: data-homio-nested-press is set by www/homio-entity-strip.js because\n   :active does not cross nested button-card shadows on iOS. */\n:host([data-homio-nested-press]) ha-card {\n  --ha-ripple-hover-opacity: 0 !important;\n  --ha-ripple-pressed-opacity: 0 !important;\n  --mdc-ripple-hover-opacity: 0 !important;\n  --mdc-ripple-press-opacity: 0 !important;\n  filter: none !important;\n  box-shadow: none !important;\n}\n:host([data-homio-nested-press]) ha-card > ha-ripple {\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\nha-card:has(#light-slider:active),\nha-card:has(#heating_modes:active),\nha-card:has(#target_temperature:active) {\n  --ha-ripple-hover-opacity: 0 !important;\n  --ha-ripple-pressed-opacity: 0 !important;\n  --mdc-ripple-hover-opacity: 0 !important;\n  --mdc-ripple-press-opacity: 0 !important;\n  filter: none !important;\n  box-shadow: none !important;\n}\nha-card:has(#light-slider:active) > ha-ripple,\nha-card:has(#heating_modes:active) > ha-ripple,\nha-card:has(#target_temperature:active) > ha-ripple {\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n@media (hover: hover) {\n  ha-card:has(#light-slider:hover),\n  ha-card:has(#heating_modes:hover),\n  ha-card:has(#target_temperature:hover) {\n    --ha-ripple-hover-opacity: 0 !important;\n    --ha-ripple-pressed-opacity: 0 !important;\n    --mdc-ripple-hover-opacity: 0 !important;\n    --mdc-ripple-press-opacity: 0 !important;\n    filter: none !important;\n    box-shadow: none !important;\n  }\n  ha-card:has(#light-slider:hover) > ha-ripple,\n  ha-card:has(#heating_modes:hover) > ha-ripple,\n  ha-card:has(#target_temperature:hover) > ha-ripple {\n    opacity: 0 !important;\n    pointer-events: none !important;\n  }\n}\n",
+      "hold_action": {
+        "action": "more-info"
+      },
+      "color": "#ffffff"
     },
     "homio_light": {
       "template": [
@@ -515,10 +758,10 @@
       "show_last_changed": false,
       "state_display": "[[[ if (entity.state === 'on' && entity.attributes.brightness) { return 'Brightness - ' + Math.round((entity.attributes.brightness / 255) * 100) + '%'; } return 'Off'; ]]]",
       "tap_action": {
-        "action": "[[[ if (entity.state === 'off') return 'toggle'; return 'none'; ]]]"
+        "action": "toggle"
       },
       "hold_action": {
-        "action": "[[[ if (entity.state === 'on') return 'toggle'; return 'none'; ]]]"
+        "action": "more-info"
       },
       "styles": {
         "label": [
@@ -568,7 +811,7 @@
               "left": 0
             },
             {
-              "padding": "0 40px"
+              "padding": "0 28px"
             },
             {
               "pointer-events": "all"
@@ -678,13 +921,10 @@
         "homio_default"
       ],
       "tap_action": {
-        "action": "call-service",
-        "service": "input_boolean.toggle",
-        "service_data": {
-          "entity_id": "input_boolean.homio_mobile_navigation"
-        }
+        "action": "fire-dom-event",
+        "homio_action": "menu_toggle"
       },
-      "extra_styles": "@media only screen and (max-width: 1249px) { .button-card-main { position: fixed !important; } }\n@media (min-width: 1250px) {\n  #mobile_logo { display: none !important; }\n}\nha-ripple,\n.mdc-ripple-surface::before,\n.mdc-ripple-surface::after {\n  display: none !important;\n  opacity: 0 !important;\n  background: transparent !important;\n}\nha-card:hover,\nha-card:active,\nha-card:focus {\n  filter: none !important;\n  box-shadow: none !important;\n  outline: none !important;\n}\n",
+      "extra_styles": ":host {\n  display: block !important;\n  position: absolute !important;\n  inset: 0 !important;\n  width: 100% !important;\n  max-width: none !important;\n  height: 100% !important;\n  box-sizing: border-box !important;\n}\n.button-card-main {\n  width: 100% !important;\n  max-width: none !important;\n  height: 100% !important;\n  box-sizing: border-box !important;\n}\n/* Room text lift: var set on documentElement by homio-room-text-fit.js */\n#temperature,\n#name,\n#humidity {\n  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;\n  transform: translateY(calc(-1 * var(--homio-room-text-lift, 0px))) !important;\n}\nha-ripple,\n.mdc-ripple-surface::before,\n.mdc-ripple-surface::after {\n  display: none !important;\n  opacity: 0 !important;\n  background: transparent !important;\n}\nha-card:hover,\nha-card:active,\nha-card:focus {\n  filter: none !important;\n  box-shadow: none !important;\n  outline: none !important;\n}\n\n\n#mobile_logo {\n  position: absolute !important;\n  top: 60px !important;\n  left: 8vw !important;\n  z-index: 999 !important;\n}\n#mobile_menu_icon {\n  position: absolute !important;\n  top: 57.5px !important;\n  right: 8vw !important;\n  z-index: 999 !important;\n  width: 28px !important;\n  height: 23px !important;\n}\n",
       "styles": {
         "card": [
           {
@@ -709,7 +949,7 @@
             "--mdc-ripple-color": "transparent"
           },
           {
-            "height": "100dvh"
+            "height": "100%"
           },
           {
             "padding-left": "8vw"
@@ -718,7 +958,7 @@
             "overflow": "hidden"
           },
           {
-            "pointer-events": "[[[\n  const nav = states[\"input_boolean.homio_mobile_navigation\"];\n  return (nav && nav.state === \"on\") ? \"all\" : \"none\";\n]]]\n"
+            "pointer-events": "var(--homio-room-pointer-events, none)"
           },
           {
             "background": "[[[\n  const img = variables.image || \"lounge\";\n  const pos = variables.image_position || \"center center\";\n  return \"linear-gradient(to bottom, rgba(51,51,51,0.7) 0%, rgba(51,51,51,0.7) 50%, rgba(51,51,51,0.5) 100%), \"\n    + \"url('/homio_dashboard/images/Homio/rooms/\" + img + \".jpg') \" + pos + \" / cover no-repeat\";\n]]]\n"
@@ -727,7 +967,16 @@
             "box-sizing": "border-box"
           },
           {
-            "max-height": "100dvh"
+            "max-height": "100%"
+          },
+          {
+            "width": "100%"
+          },
+          {
+            "position": "relative"
+          },
+          {
+            "max-width": "none"
           }
         ],
         "name": [
@@ -748,6 +997,12 @@
           },
           {
             "justify-self": "start"
+          },
+          {
+            "margin-left": "-5px"
+          },
+          {
+            "padding-left": "0"
           }
         ],
         "grid": [
@@ -762,6 +1017,12 @@
           },
           {
             "place-content": "center"
+          },
+          {
+            "height": "100%"
+          },
+          {
+            "box-sizing": "border-box"
           }
         ],
         "custom_fields": {
@@ -779,7 +1040,7 @@
               "z-index": 999
             },
             {
-              "display": "[[[\n  if (window.innerWidth >= 1250) return 'none';\n  const nav = states['input_boolean.homio_mobile_navigation'];\n  return (nav && nav.state === 'on') ? 'none' : 'block';\n]]]\n"
+              "display": "var(--homio-mobile-logo-display, none)"
             }
           ],
           "mobile_menu_icon": [
@@ -787,13 +1048,19 @@
               "position": "absolute"
             },
             {
-              "top": "60px"
+              "top": "57.5px"
             },
             {
               "right": "8vw"
             },
             {
               "z-index": 999
+            },
+            {
+              "height": "23px"
+            },
+            {
+              "width": "28px"
             }
           ],
           "navigation": [
@@ -853,7 +1120,7 @@
               "margin-top": "10px"
             },
             {
-              "margin-left": "5px"
+              "margin-left": "0"
             },
             {
               "color": "var(--primary-text-color)"
@@ -958,206 +1225,192 @@
             },
             "cards": [
               {
-                "type": "conditional",
-                "conditions": [
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "grid-template-columns": "max-content 1fr max-content",
+                  "margin": "0 8vw 0 8vw",
+                  "position": "absolute",
+                  "inset": "60px 0 auto 0",
+                  "padding": 0,
+                  "display": "var(--homio-full-header-display, grid)"
+                },
+                "cards": [
                   {
-                    "condition": "screen",
-                    "media_query": "(min-width: 1250px)"
-                  }
-                ],
-                "card": {
-                  "type": "custom:layout-card",
-                  "layout_type": "custom:grid-layout",
-                  "layout": {
-                    "grid-template-columns": "max-content 1fr max-content",
-                    "margin": "0 8vw 0 8vw",
-                    "position": "absolute",
-                    "inset": "60px 0 auto 0",
-                    "padding": 0
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_logo"
+                    ]
                   },
-                  "cards": [
-                    {
-                      "type": "custom:button-card",
-                      "template": [
-                        "homio_logo"
-                      ]
+                  {
+                    "type": "custom:layout-card",
+                    "layout_type": "custom:grid-layout",
+                    "layout": {
+                      "grid-auto-flow": "column",
+                      "place-content": "center",
+                      "grid-column-gap": "36px",
+                      "margin": 0,
+                      "padding": 0
                     },
-                    {
-                      "type": "custom:layout-card",
-                      "layout_type": "custom:grid-layout",
-                      "layout": {
-                        "grid-auto-flow": "column",
-                        "place-content": "center",
-                        "grid-column-gap": "36px",
-                        "margin": 0,
-                        "padding": 0
-                      },
-                      "cards": [
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Living",
-                          "variables": {
-                            "path": "/homio-fixed/living"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Dining",
-                          "variables": {
-                            "path": "/homio-fixed/dining"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Kitchen",
-                          "variables": {
-                            "path": "/homio-fixed/kitchen"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Office",
-                          "variables": {
-                            "path": "/homio-fixed/office"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Master",
-                          "variables": {
-                            "path": "/homio-fixed/master-bedroom"
-                          }
+                    "cards": [
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Living",
+                        "variables": {
+                          "path": "/homio-fixed/living"
                         }
-                      ]
-                    },
-                    {
-                      "type": "custom:button-card",
-                      "template": [
-                        "homio_time"
-                      ]
-                    }
-                  ]
-                }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Dining",
+                        "variables": {
+                          "path": "/homio-fixed/dining"
+                        }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Kitchen",
+                        "variables": {
+                          "path": "/homio-fixed/kitchen"
+                        }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Office",
+                        "variables": {
+                          "path": "/homio-fixed/office"
+                        }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Master",
+                        "variables": {
+                          "path": "/homio-fixed/master-bedroom"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_time"
+                    ]
+                  }
+                ]
               },
               {
-                "type": "conditional",
-                "conditions": [
+                "type": "custom:layout-card",
+                "layout_type": "custom:grid-layout",
+                "layout": {
+                  "display": "var(--homio-menu-panel-display, none)",
+                  "grid-template-columns": "1fr",
+                  "padding": "60px 8vw calc(60px + env(safe-area-inset-bottom, 0px)) 8vw",
+                  "inset": "0",
+                  "margin": 0,
+                  "width": "280px",
+                  "background": "rgba(255,255,255,0.1)",
+                  "backdrop-filter": "blur(15px)",
+                  "position": "absolute",
+                  "place-items": "start",
+                  "place-content": "space-between",
+                  "overflow": "hidden",
+                  "overflow-y": "hidden"
+                },
+                "cards": [
                   {
-                    "condition": "screen",
-                    "media_query": "(min-width: 0px) and (max-width: 1249px)"
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_logo"
+                    ]
                   },
                   {
-                    "condition": "state",
-                    "entity": "input_boolean.homio_mobile_navigation",
-                    "state": "on"
-                  }
-                ],
-                "card": {
-                  "type": "custom:layout-card",
-                  "layout_type": "custom:grid-layout",
-                  "layout": {
-                    "grid-template-columns": "1fr",
-                    "place-content": "space-around",
-                    "height": "100vh",
-                    "inset": "0 auto auto 0",
-                    "margin": 0,
-                    "padding": "0 0 0 60px",
-                    "width": "280px",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdrop-filter": "blur(15px)",
-                    "position": "absolute"
-                  },
-                  "cards": [
-                    {
-                      "type": "custom:button-card",
-                      "template": [
-                        "homio_logo"
-                      ]
+                    "type": "custom:layout-card",
+                    "layout_type": "custom:grid-layout",
+                    "layout": {
+                      "grid-template-columns": "1fr",
+                      "grid-auto-flow": "row",
+                      "grid-row-gap": "30px",
+                      "grid-auto-rows": "max-content",
+                      "margin": 0,
+                      "padding": 0,
+                      "place-items": "start",
+                      "background": "transparent"
                     },
-                    {
-                      "type": "custom:layout-card",
-                      "layout_type": "custom:grid-layout",
-                      "layout": {
-                        "grid-template-columns": "1fr",
-                        "grid-auto-flow": "row",
-                        "grid-row-gap": "24px"
-                      },
-                      "cards": [
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Living",
-                          "variables": {
-                            "path": "/homio-fixed/living"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Dining",
-                          "variables": {
-                            "path": "/homio-fixed/dining"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Kitchen",
-                          "variables": {
-                            "path": "/homio-fixed/kitchen"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Office",
-                          "variables": {
-                            "path": "/homio-fixed/office"
-                          }
-                        },
-                        {
-                          "type": "custom:button-card",
-                          "template": [
-                            "homio_nav_button"
-                          ],
-                          "name": "Master",
-                          "variables": {
-                            "path": "/homio-fixed/master-bedroom"
-                          }
+                    "cards": [
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Living",
+                        "variables": {
+                          "path": "/homio-fixed/living"
                         }
-                      ]
-                    },
-                    {
-                      "type": "custom:button-card",
-                      "template": [
-                        "homio_time"
-                      ]
-                    }
-                  ]
-                }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Dining",
+                        "variables": {
+                          "path": "/homio-fixed/dining"
+                        }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Kitchen",
+                        "variables": {
+                          "path": "/homio-fixed/kitchen"
+                        }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Office",
+                        "variables": {
+                          "path": "/homio-fixed/office"
+                        }
+                      },
+                      {
+                        "type": "custom:button-card",
+                        "template": [
+                          "homio_nav_button"
+                        ],
+                        "name": "Master",
+                        "variables": {
+                          "path": "/homio-fixed/master-bedroom"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_time"
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -1242,13 +1495,28 @@
               "top": 0
             },
             {
+              "width": "60px"
+            },
+            {
+              "height": "170px"
+            },
+            {
+              "touch-action": "manipulation"
+            },
+            {
               "transition": "all 0.3s"
             },
             {
-              "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '0' : '1' ]]]"
+              "z-index": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '1' : '10' ]]]"
             },
             {
-              "pointer-events": "all"
+              "visibility": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? 'hidden' : 'visible' ]]]"
+            },
+            {
+              "pointer-events": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? 'none' : 'auto' ]]]"
+            },
+            {
+              "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '0' : '1' ]]]"
             }
           ],
           "target_temperature": [
@@ -1271,10 +1539,13 @@
               "transition": "all 0.3s"
             },
             {
+              "z-index": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '12' : '1' ]]]"
+            },
+            {
               "opacity": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? '1' : '0' ]]]"
             },
             {
-              "pointer-events": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? 'all' : 'none' ]]]"
+              "pointer-events": "[[[ return states['input_boolean.homio_heating_control'].state === 'on' ? 'auto' : 'none' ]]]"
             }
           ]
         }
@@ -1322,7 +1593,7 @@
                       "background": "[[[ return entity.state === 'off' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)' ]]]"
                     },
                     {
-                      "pointer-events": "all"
+                      "touch-action": "manipulation"
                     }
                   ],
                   "img_cell": [
@@ -1338,7 +1609,11 @@
                       "height": "100%"
                     }
                   ]
-                }
+                },
+                "hold_action": {
+                  "action": "none"
+                },
+                "extra_styles": ":host, ha-card, .button-card-main {\n  touch-action: manipulation !important;\n}\n@media (hover: hover) {\n  .button-card-main:hover {\n    box-shadow: inset 0 0 0 999px rgba(255,255,255,0.12);\n  }\n}\n.button-card-main:active {\n  box-shadow: none;\n  background: rgba(255,255,255,0.4) !important;\n}\n"
               },
               {
                 "type": "custom:button-card",
@@ -1370,7 +1645,7 @@
                       "background": "[[[ return entity.state === 'cool' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)' ]]]"
                     },
                     {
-                      "pointer-events": "all"
+                      "touch-action": "manipulation"
                     }
                   ],
                   "img_cell": [
@@ -1386,7 +1661,11 @@
                       "height": "100%"
                     }
                   ]
-                }
+                },
+                "hold_action": {
+                  "action": "none"
+                },
+                "extra_styles": ":host, ha-card, .button-card-main {\n  touch-action: manipulation !important;\n}\n@media (hover: hover) {\n  .button-card-main:hover {\n    box-shadow: inset 0 0 0 999px rgba(255,255,255,0.12);\n  }\n}\n.button-card-main:active {\n  box-shadow: none;\n  background: rgba(255,255,255,0.4) !important;\n}\n"
               },
               {
                 "type": "custom:button-card",
@@ -1418,7 +1697,7 @@
                       "background": "[[[ return entity.state === 'heat' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)' ]]]"
                     },
                     {
-                      "pointer-events": "all"
+                      "touch-action": "manipulation"
                     }
                   ],
                   "img_cell": [
@@ -1434,7 +1713,11 @@
                       "height": "100%"
                     }
                   ]
-                }
+                },
+                "hold_action": {
+                  "action": "none"
+                },
+                "extra_styles": ":host, ha-card, .button-card-main {\n  touch-action: manipulation !important;\n}\n@media (hover: hover) {\n  .button-card-main:hover {\n    box-shadow: inset 0 0 0 999px rgba(255,255,255,0.12);\n  }\n}\n.button-card-main:active {\n  box-shadow: none;\n  background: rgba(255,255,255,0.4) !important;\n}\n"
               }
             ]
           }
@@ -1443,7 +1726,7 @@
           "card": {
             "type": "custom:button-card",
             "template": [
-              "homio_entity"
+              "homio_default"
             ],
             "show_entity_picture": false,
             "show_icon": false,
@@ -1468,7 +1751,62 @@
                   "animation": "none"
                 },
                 {
-                  "pointer-events": "all"
+                  "height": "170px"
+                },
+                {
+                  "padding-left": "28px"
+                },
+                {
+                  "padding-right": "28px"
+                },
+                {
+                  "--ha-ripple-hover-opacity": 0.08
+                },
+                {
+                  "--ha-ripple-pressed-opacity": 0.12
+                },
+                {
+                  "--mdc-ripple-hover-opacity": 0.04
+                },
+                {
+                  "--mdc-ripple-press-opacity": 0.12
+                },
+                {
+                  "--ha-ripple-color": "rgba(255,255,255,0.35)"
+                },
+                {
+                  "--mdc-ripple-color": "rgba(255,255,255,0.35)"
+                }
+              ],
+              "name": [
+                {
+                  "justify-self": "start"
+                },
+                {
+                  "text-align": "left"
+                },
+                {
+                  "font-size": "16px"
+                },
+                {
+                  "font-weight": 600
+                }
+              ],
+              "state": [
+                {
+                  "justify-self": "start"
+                },
+                {
+                  "text-align": "left"
+                },
+                {
+                  "font-size": "14px"
+                },
+                {
+                  "font-weight": 700
+                },
+                {
+                  "opacity": 0.8
                 }
               ],
               "custom_fields": {
@@ -1481,6 +1819,30 @@
                   },
                   {
                     "right": 0
+                  },
+                  {
+                    "position": "absolute"
+                  },
+                  {
+                    "top": 0
+                  },
+                  {
+                    "right": 0
+                  },
+                  {
+                    "width": "60px"
+                  },
+                  {
+                    "height": "170px"
+                  },
+                  {
+                    "z-index": 10
+                  },
+                  {
+                    "touch-action": "manipulation"
+                  },
+                  {
+                    "pointer-events": "all"
                   }
                 ]
               }
@@ -1527,6 +1889,9 @@
                           },
                           {
                             "pointer-events": "all"
+                          },
+                          {
+                            "touch-action": "manipulation"
                           }
                         ],
                         "img_cell": [
@@ -1540,7 +1905,10 @@
                           }
                         ]
                       },
-                      "extra_styles": ".button-card-main:active { background: rgba(255,255,255,0.4) !important; }\n"
+                      "extra_styles": ":host, ha-card, .button-card-main {\n  touch-action: manipulation !important;\n}\n@media (hover: hover) {\n  .button-card-main:hover {\n    box-shadow: inset 0 0 0 999px rgba(255,255,255,0.12);\n  }\n}\n.button-card-main:active {\n  box-shadow: none;\n  background: rgba(255,255,255,0.4) !important;\n}\n",
+                      "hold_action": {
+                        "action": "none"
+                      }
                     },
                     {
                       "type": "custom:button-card",
@@ -1575,6 +1943,9 @@
                           },
                           {
                             "pointer-events": "all"
+                          },
+                          {
+                            "touch-action": "manipulation"
                           }
                         ],
                         "name": [
@@ -1592,7 +1963,10 @@
                           }
                         ]
                       },
-                      "extra_styles": ".button-card-main:active { background: rgba(255,255,255,0.4) !important; }\n"
+                      "extra_styles": ":host, ha-card, .button-card-main {\n  touch-action: manipulation !important;\n}\n@media (hover: hover) {\n  .button-card-main:hover {\n    box-shadow: inset 0 0 0 999px rgba(255,255,255,0.12);\n  }\n}\n.button-card-main:active {\n  box-shadow: none;\n  background: rgba(255,255,255,0.4) !important;\n}\n",
+                      "hold_action": {
+                        "action": "none"
+                      }
                     },
                     {
                       "type": "custom:button-card",
@@ -1621,6 +1995,9 @@
                           },
                           {
                             "pointer-events": "all"
+                          },
+                          {
+                            "touch-action": "manipulation"
                           }
                         ],
                         "img_cell": [
@@ -1634,15 +2011,74 @@
                           }
                         ]
                       },
-                      "extra_styles": ".button-card-main:active { background: rgba(255,255,255,0.4) !important; }\n"
+                      "extra_styles": ":host, ha-card, .button-card-main {\n  touch-action: manipulation !important;\n}\n@media (hover: hover) {\n  .button-card-main:hover {\n    box-shadow: inset 0 0 0 999px rgba(255,255,255,0.12);\n  }\n}\n.button-card-main:active {\n  box-shadow: none;\n  background: rgba(255,255,255,0.4) !important;\n}\n",
+                      "hold_action": {
+                        "action": "none"
+                      }
                     }
                   ]
                 }
               }
-            }
+            },
+            "entity": "[[[ return entity.entity_id; ]]]",
+            "hold_action": {
+              "action": "more-info",
+              "entity": "[[[ return entity.entity_id; ]]]"
+            },
+            "show_state": true,
+            "triggers_update": [
+              "input_number.homio_thermostat_target_temperature"
+            ],
+            "extra_styles": "ha-card:has(#temperature_controls:active) {\n  --ha-ripple-hover-opacity: 0 !important;\n  --ha-ripple-pressed-opacity: 0 !important;\n  --mdc-ripple-hover-opacity: 0 !important;\n  --mdc-ripple-press-opacity: 0 !important;\n}\nha-card:has(#temperature_controls:active) > ha-ripple {\n  opacity: 0 !important;\n  pointer-events: none !important;\n}\n@media (hover: hover) {\n  ha-card:has(#temperature_controls:hover) {\n    --ha-ripple-hover-opacity: 0 !important;\n    --ha-ripple-pressed-opacity: 0 !important;\n    --mdc-ripple-hover-opacity: 0 !important;\n    --mdc-ripple-press-opacity: 0 !important;\n  }\n  ha-card:has(#temperature_controls:hover) > ha-ripple {\n    opacity: 0 !important;\n    pointer-events: none !important;\n  }\n}\n"
           }
         }
-      }
+      },
+      "hold_action": {
+        "action": "more-info",
+        "entity": "[[[ return entity.entity_id; ]]]"
+      },
+      "state": [
+        {
+          "value": "heat",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return a === \"heating\" ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
+              }
+            ]
+          }
+        },
+        {
+          "value": "cool",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return a === \"cooling\" ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
+              }
+            ]
+          }
+        },
+        {
+          "value": "heat_cool",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return (a === \"heating\" || a === \"cooling\") ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
+              }
+            ]
+          }
+        },
+        {
+          "value": "auto",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[ const a = entity.attributes && entity.attributes.hvac_action; return (a === \"heating\" || a === \"cooling\") ? \"rgba(255,255,255,0.4)\" : \"rgba(255,255,255,0.1)\"; ]]]"
+              }
+            ]
+          }
+        }
+      ]
     }
   },
   "views": [
@@ -1687,14 +2123,22 @@
                   "grid-auto-columns": "260px",
                   "grid-auto-flow": "column",
                   "grid-column-gap": "5px",
-                  "margin": "0 0 0 8vw",
-                  "padding": 0,
+                  "margin": 0,
+                  "padding": "0 8vw",
                   "inset": "auto 0 85px 0",
                   "scroll-snap-type": "x mandatory",
                   "overflow-y": "hidden",
-                  "overflow": "hidden"
+                  "overflow-x": "auto"
                 },
                 "cards": [
+                  {
+                    "type": "custom:button-card",
+                    "template": [
+                      "homio_thermostat"
+                    ],
+                    "entity": "climate.thermostat",
+                    "name": "Climate"
+                  },
                   {
                     "type": "custom:button-card",
                     "template": [
@@ -1727,14 +2171,6 @@
                     "variables": {
                       "icon": "pendent"
                     }
-                  },
-                  {
-                    "type": "custom:button-card",
-                    "template": [
-                      "homio_thermostat"
-                    ],
-                    "entity": "climate.thermostat",
-                    "name": "Climate"
                   },
                   {
                     "type": "custom:button-card",
@@ -1793,7 +2229,7 @@
           "template": [
             "homio_room"
           ],
-          "name": "Dining",
+          "name": "Dining Room",
           "variables": {
             "image": "dining",
             "image_position": "center center",
@@ -1815,12 +2251,12 @@
                   "grid-auto-columns": "260px",
                   "grid-auto-flow": "column",
                   "grid-column-gap": "5px",
-                  "margin": "0 0 0 8vw",
-                  "padding": 0,
+                  "margin": 0,
+                  "padding": "0 8vw",
                   "inset": "auto 0 85px 0",
                   "scroll-snap-type": "x mandatory",
                   "overflow-y": "hidden",
-                  "overflow": "hidden"
+                  "overflow-x": "auto"
                 },
                 "cards": [
                   {
@@ -1923,12 +2359,12 @@
                   "grid-auto-columns": "260px",
                   "grid-auto-flow": "column",
                   "grid-column-gap": "5px",
-                  "margin": "0 0 0 8vw",
-                  "padding": 0,
+                  "margin": 0,
+                  "padding": "0 8vw",
                   "inset": "auto 0 85px 0",
                   "scroll-snap-type": "x mandatory",
                   "overflow-y": "hidden",
-                  "overflow": "hidden"
+                  "overflow-x": "auto"
                 },
                 "cards": [
                   {
@@ -2031,12 +2467,12 @@
                   "grid-auto-columns": "260px",
                   "grid-auto-flow": "column",
                   "grid-column-gap": "5px",
-                  "margin": "0 0 0 8vw",
-                  "padding": 0,
+                  "margin": 0,
+                  "padding": "0 8vw",
                   "inset": "auto 0 85px 0",
                   "scroll-snap-type": "x mandatory",
                   "overflow-y": "hidden",
-                  "overflow": "hidden"
+                  "overflow-x": "auto"
                 },
                 "cards": [
                   {
@@ -2162,12 +2598,12 @@
                   "grid-auto-columns": "260px",
                   "grid-auto-flow": "column",
                   "grid-column-gap": "5px",
-                  "margin": "0 0 0 8vw",
-                  "padding": 0,
+                  "margin": 0,
+                  "padding": "0 8vw",
                   "inset": "auto 0 85px 0",
                   "scroll-snap-type": "x mandatory",
                   "overflow-y": "hidden",
-                  "overflow": "hidden"
+                  "overflow-x": "auto"
                 },
                 "cards": [
                   {
@@ -2232,5 +2668,6 @@
   ],
   "kiosk_mode": {
     "hide_header": true
-  }
+  },
+  "title": "Homio Fixed"
 }

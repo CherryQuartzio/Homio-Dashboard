@@ -10,17 +10,9 @@ homio_light:
       return "Off";
     ]]]
   tap_action:
-    action: |
-      [[[
-        if (entity.state === "off") return "toggle";
-        return "none";
-      ]]]
+    action: toggle
   hold_action:
-    action: |
-      [[[
-        if (entity.state === "on") return "toggle";
-        return "none";
-      ]]]
+    action: more-info
   styles:
     label:
       - position: absolute
@@ -39,7 +31,8 @@ homio_light:
         - height: 8px
         - right: 0
         - left: 0
-        - padding: 0 40px
+        # Match card horizontal padding so the track spans the full content box.
+        - padding: 0 28px
         - pointer-events: all
         - z-index: 6
         - transition: |

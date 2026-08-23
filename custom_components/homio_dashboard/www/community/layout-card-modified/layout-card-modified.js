@@ -2205,7 +2205,7 @@ var ye = function() {
                         var r = P(i[n], 2),
                             o = r[0],
                             a = r[1];
-                        (o.startsWith("grid") || "grid" === o || "place-items" === o || "place-content" === o || "width"=== o|| "scroll-snap-type" === o|| "inset" === o || "position" === o|| "background" === o|| "padding" === o|| "backdrop-filter" === o|| "display" === o|| "height" === o|| "margin" === o|| "overflow-y" === o) && e.style.setProperty(o, a)
+                        (o.startsWith("grid") || o.startsWith("scroll") || "grid" === o || "place-items" === o || "place-content" === o || "width"=== o|| "inset" === o || "position" === o|| "background" === o|| "padding" === o|| "backdrop-filter" === o || "display" === o || "height" === o || "margin" === o || "overflow" === o || "overflow-x" === o || "overflow-y" === o || "box-sizing" === o) && e.style.setProperty(o, a)
                     }
                 };
                 e.style.cssText = "", this._config.layout && n(this._config.layout);

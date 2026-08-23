@@ -9,19 +9,37 @@ homio_room:
     humid_sensor: null
   template:
     - homio_default
+  # Menu open/close is per-browser (homio-menu-nav.js), not a shared HA entity.
   tap_action:
-    action: call-service
-    service: input_boolean.toggle
-    service_data:
-      entity_id: input_boolean.homio_mobile_navigation
+    action: fire-dom-event
+    homio_action: menu_toggle
   extra_styles: |
-    @media only screen and (max-width: 1249px) {
-      .button-card-main {
-        position: fixed !important;
-      }
+    /* Always fill the relative view. Do not toggle absolute only under 1249px —
+       that flashed gray at the header swap; leaving flow without fill shrink-wrapped
+       the room to ~half width. Never use position:fixed (viewport, ignores HA rail). */
+    :host {
+      display: block !important;
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
     }
-    @media (min-width: 1250px) {
-      #mobile_logo { display: none !important; }
+    .button-card-main {
+      width: 100% !important;
+      max-width: none !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+    }
+    /* Full vs compact header is per-browser via CSS vars from homio-header-fit.js
+       (never a shared input_boolean — that synced every client). */
+    /* Room text lift: var set on documentElement by homio-room-text-fit.js */
+    #temperature,
+    #name,
+    #humidity {
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+      transform: translateY(calc(-1 * var(--homio-room-text-lift, 0px))) !important;
     }
     ha-ripple,
     .mdc-ripple-surface::before,
@@ -37,6 +55,23 @@ homio_room:
       box-shadow: none !important;
       outline: none !important;
     }
+    /* Pin overlays — button-card string styles on custom_fields can fail to
+       apply; without absolute, place-content:center dumps the menu mid-screen. */
+    #mobile_logo {
+      position: absolute !important;
+      top: 60px !important;
+      left: 8vw !important;
+      z-index: 999 !important;
+    }
+    #mobile_menu_icon {
+      position: absolute !important;
+      /* 28×23 burger; centers on DAYLOR 18px @ 60px → 57.5px */
+      top: 57.5px !important;
+      right: 8vw !important;
+      z-index: 999 !important;
+      width: 28px !important;
+      height: 23px !important;
+    }
   styles:
     card:
       - filter: none
@@ -46,16 +81,14 @@ homio_room:
       - --mdc-ripple-press-opacity: 0
       - --mdc-ripple-hover-opacity: 0
       - --mdc-ripple-color: transparent
-      - height: 100dvh
+      - height: 100%
+      - width: 100%
+      - max-width: none
+      - max-height: 100%
       - padding-left: 8vw
       - overflow: hidden
       - box-sizing: border-box
-      - max-height: 100dvh
-      - pointer-events: |
-          [[[
-            const nav = states['input_boolean.homio_mobile_navigation'];
-            return (nav && nav.state === 'on') ? 'all' : 'none';
-          ]]]
+      - pointer-events: var(--homio-room-pointer-events, none)
       # Spaces after rgba(...) required — Chromium rejects )0% color-stops and drops the whole background.
       - background: |
           [[[
@@ -70,10 +103,17 @@ homio_room:
       - letter-spacing: "-2px"
       - font-weight: 700
       - justify-self: start
+      # Optical align with temperature left edge (display type side-bearings).
+      - margin-left: "-5px"
+      - padding-left: 0
     grid:
       - grid-template-columns: 1fr
       - grid-template-rows: min-content
       - grid-template-areas: '"temperature" "n" "humidity"'
+      - height: 100%
+      - box-sizing: border-box
+      # Stay vertically centered; homio-room-text-fit.js lifts #temperature/#name/#humidity
+      # only when they would collide with the entity strip (smooth, per-browser).
       - place-content: center
     custom_fields:
       motion_detection:
@@ -129,7 +169,8 @@ homio_room:
         - justify-self: start
         - font-weight: 500
         - margin-top: 10px
-        - margin-left: 5px
+        # Was 5px — sat right of the temperature left edge.
+        - margin-left: 0
         - color: var(--primary-text-color)
         - opacity: 0.9
       mobile_logo:
@@ -137,27 +178,30 @@ homio_room:
         - top: 60px
         - left: 8vw
         - z-index: 999
-        - display: |
-            [[[
-              if (window.innerWidth >= 1250) return 'none';
-              const nav = states['input_boolean.homio_mobile_navigation'];
-              return (nav && nav.state === 'on') ? 'none' : 'block';
-            ]]]
+        # Compact + menu-closed only (homio-menu-nav.js).
+        - display: var(--homio-mobile-logo-display, none)
       mobile_menu_icon:
         - position: absolute
-        - top: 60px
+        # 28×23 burger; top centers on DAYLOR 18px @ 60px → 57.5px.
+        - top: 57.5px
         - right: 8vw
         - z-index: 999
+        - height: 23px
+        - width: 28px
       navigation:
         - position: absolute
         - inset: 0
         - z-index: 20
         - pointer-events: none
       entities:
+        # Full-room overlay (stock Homio). Inner layout-card uses bottom inset.
+        # iOS touch-pan is enabled on layout #root by homio-entity-strip.js —
+        # do not switch this to a bottom band (button-card can pin that to top).
         - position: absolute
         - inset: 0
         - pointer-events: none
         - z-index: 5
+
   custom_fields:
     mobile_logo:
       card:
