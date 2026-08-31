@@ -134,7 +134,19 @@ Visual parity (user-confirmed): layout, nav, rooms, entities match between `/hom
 Before switching daily driver to YAML Homio:
 
 1. **Brightness slider** — `my-slider-v2` Lovelace resource `type: module` at `/homio_dashboard/community/light-slider/my-slider-v2.js?v=1.0.3`; integration **1.0.3+** must not `add_extra_js_url` the slider. Hard-refresh after update.
-2. **Room JPGs** — `lounge.jpg`, `dining.jpg`, `kitchen.jpg`, `office.jpg`, `bedroom.jpg` under `www/images/Homio/rooms/` (restore from snapshot `edf057f9` if 404).
+2. **Room JPGs** — `lounge.jpg`, `dining.jpg`, `kitchen.jpg`, `office.jpg`, `bedroom.jpg` under `custom_components/homio_dashboard/www/images/Homio/rooms/` (restore from snapshot `edf057f9` if 404). SSH terminal example:
+
+```bash
+DEST=/config/custom_components/homio_dashboard/www/images/Homio/rooms
+BACKUP=/backup/edf057f9.tar
+mkdir -p "$DEST"
+tar -tf "$BACKUP" | grep -E 'Homio/rooms/.*\.jpg$'
+# Then extract (path prefix varies by backup layout), e.g.:
+tar -xf "$BACKUP" --wildcards '*/custom_components/homio_dashboard/www/images/Homio/rooms/*.jpg' -C /tmp
+cp -n /tmp/**/Homio/rooms/*.jpg "$DEST/" 2>/dev/null || true
+```
+
+Or copy your originals via Samba/Studio Code into `$DEST`.
 3. **Side-by-side smoke** — each room: background, temp/humid, entity strip scroll, light on → slider visible + draggable, thermostat modes, mobile menu burger/X, clock.
 4. **Soak** — use `/homio_dashboard` as primary for several days; keep Homio Fixed in sidebar as rollback.
 5. **Retire Fixed** — only after soak; export final `homio-fixed` snapshot before hiding/removing.
