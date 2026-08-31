@@ -233,15 +233,14 @@ async def _register_static_resources(hass: HomeAssistant) -> None:
     )
     _LOGGER.info(f"Registered static path: /{DOMAIN} -> {www_dir}")
 
-    # JavaScript files to load as frontend resources.
-    # Bundled button-card is registered for the YAML panel; HACS installs should
-    # keep using HACS button-card and avoid dual-loading (see FORK_NOTES.md).
-    # Homio Fixed helper scripts are IIFEs — required for per-browser menu,
-    # entity strip, header/room text fit, nested-ripple kill, scroll/theme.
+    # JavaScript files loaded globally via add_extra_js_url (classic script tags).
+    # - layout-card-modified: IIFE — also register as Lovelace type `js`.
+    # - homio-*.js: IIFEs for Fixed + YAML panels (or inline Lovelace resources).
+  # Do NOT add here:
+    # - community/light-slider/my-slider-v2.js (ES module — Lovelace resource type `module` only)
+    # - button-card/button-card.js (dual-load with HACS button-card breaks cards)
     js_files = [
-        "button-card/button-card.js",
         "community/layout-card-modified/layout-card-modified.js",
-        "community/light-slider/my-slider-v2.js",
         "homio-menu-nav.js",
         "homio-header-fit.js",
         "homio-entity-strip.js",

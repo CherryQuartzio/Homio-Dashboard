@@ -9,17 +9,16 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.2** (`const.VERSION` — bump when changing registered JS or YAML panel).
+Integration version: **1.0.3** (`const.VERSION` — bump when changing registered JS or YAML panel).
 
 ## Status
 
-- **Daily driver on HA:** Homio Fixed (`url_path=homio-fixed`). Keep it until the YAML Homio panel matches Fixed end-to-end (Phase 4).
+- **Daily driver on HA:** Homio Fixed (`url_path=homio-fixed`) until YAML panel soak completes (Phase 4).
+- **YAML panel:** `/homio_dashboard` — visual parity with Fixed confirmed; brightness slider fix in **1.0.3** (stop `add_extra_js_url` dual-load of ES module).
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
-- **HACS install:** `CherryQuartzio/Homio-Dashboard` **`v1.0.2-homio-yaml`** (Phase 3). Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ` state **loaded**.
-- **Latest live Fixed snapshot:** `examples/homio-fixed/` — `config_hash=b8556503e641f00f` (exported 2026-08-23 Phase 1; Fixed left untouched in Phase 3).
-- **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`); edits backup `dashboard.homio-fixed.20260823_111154.yaml`. See `examples/homio-fixed/resources.json`.
-- **After Phase 2:** room JPGs under `www/images/Homio/rooms/` were wiped by the HACS folder replace (404). Restore from snapshot `edf057f9` or re-upload into `custom_components/homio_dashboard/www/images/Homio/rooms/`.
-- **Phase 3 (YAML parity):** `lovelace/homio.yaml` has the five Daylor rooms (living / dining / kitchen / office / master-bedroom) with Fixed entity IDs; nav + logo defaults point at `/homio_dashboard/...`. Templates remain `!include`s.
+- **HACS install:** target **`v1.0.3-homio-slider`** after release. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
+- **Latest live Fixed snapshot:** `examples/homio-fixed/` — `config_hash=b8556503e641f00f`.
+- **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `custom_components/homio_dashboard/www/images/Homio/rooms/` if 404.
 
 ## Changelog (session work ported here)
 
@@ -48,7 +47,7 @@ Integration version: **1.0.2** (`const.VERSION` — bump when changing registere
 | `homio-scroll-lock.js` | `module` (or inline) | Lightweight CSS clamp — no full shadow walks |
 | `homio-theme-fix.js` | `module` (or inline) | Path-scoped to `/homio-fixed` + `/homio_dashboard` |
 
-`__init__.py` registers the Homio helper scripts (and bundled cards) via `add_extra_js_url` with `?v={VERSION}`. Fresh installs still need HACS button-card as `module` if not using Homio’s bundled copy alone.
+`__init__.py` registers layout-card-modified + Homio helper IIFEs via `add_extra_js_url` with `?v={VERSION}`. **Do not** register `my-slider-v2` or bundled `button-card` there — my-slider-v2 is ES module (Lovelace `module` resource only); button-card must come from HACS once globally.
 
 ### Clock
 
@@ -109,7 +108,7 @@ Integration version: **1.0.2** (`const.VERSION` — bump when changing registere
 - Mid drawer list `height: 100%` → clock clips / scroll  
 - Nested `vertical-stack` inside button-card → broken  
 - Dual-load Homio + HACS button-card  
-- **`my-slider-v2` as type `js`** → SyntaxError  
+- **`my-slider-v2` via `add_extra_js_url`** or as Lovelace type `js` → SyntaxError / slider never renders  
 - Unspaced gradient stops `)0%` → Chromium drops background  
 - Shared `input_boolean` for menu open state → syncs every browser  
 - button-card custom_fields styles as bare strings when dict siblings work — prefer dicts + `extra_styles !important` for overlays  
@@ -127,3 +126,17 @@ Sensors: `sensor.homio_current_time`, `sensor.homio_current_time_2`, `sensor.hom
 - `homio_navigation_list.yaml` + logo/nav fallbacks: `/homio_dashboard/<room>` (not placeholders / not `/homio-fixed`).
 - Homio Fixed storage dashboard left untouched; cutover remains Phase 4.
 - Release tag: **`v1.0.2-homio-yaml`** (integration **1.0.2**).
+
+## Phase 4 — cutover checklist
+
+Visual parity (user-confirmed): layout, nav, rooms, entities match between `/homio-fixed` and `/homio_dashboard`.
+
+Before switching daily driver to YAML Homio:
+
+1. **Brightness slider** — `my-slider-v2` Lovelace resource `type: module` at `/homio_dashboard/community/light-slider/my-slider-v2.js?v=1.0.3`; integration **1.0.3+** must not `add_extra_js_url` the slider. Hard-refresh after update.
+2. **Room JPGs** — `lounge.jpg`, `dining.jpg`, `kitchen.jpg`, `office.jpg`, `bedroom.jpg` under `www/images/Homio/rooms/` (restore from snapshot `edf057f9` if 404).
+3. **Side-by-side smoke** — each room: background, temp/humid, entity strip scroll, light on → slider visible + draggable, thermostat modes, mobile menu burger/X, clock.
+4. **Soak** — use `/homio_dashboard` as primary for several days; keep Homio Fixed in sidebar as rollback.
+5. **Retire Fixed** — only after soak; export final `homio-fixed` snapshot before hiding/removing.
+
+Cutover: pin HACS to fork release, set sidebar default to Homio (YAML), keep `homio-fixed` url_path until step 5.
