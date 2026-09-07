@@ -13,12 +13,11 @@ Integration version: **1.0.3** (`const.VERSION` — bump when changing registere
 
 ## Status
 
-- **Daily driver on HA:** Homio Fixed (`url_path=homio-fixed`) until YAML panel soak completes (Phase 4).
-- **YAML panel:** `/homio_dashboard` — visual parity with Fixed confirmed; brightness slider fix in **1.0.3** (stop `add_extra_js_url` dual-load of ES module).
+- **Daily driver on HA:** Homio YAML panel `/homio_dashboard` (Phase 5 complete — Homio Fixed removed).
+- **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Historical copy remains in `examples/homio-fixed/`.
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
-- **HACS install:** target **`v1.0.3-homio-slider`** after release. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
-- **Latest live Fixed snapshot:** `examples/homio-fixed/` — `config_hash=b8556503e641f00f`.
-- **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `custom_components/homio_dashboard/www/images/Homio/rooms/` if 404.
+- **HACS install:** **`v1.0.3-homio-slider`**. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
+- **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `custom_components/homio_dashboard/www/images/Homio/rooms/` if still 404.
 
 ## Changelog (session work ported here)
 
@@ -152,3 +151,11 @@ Or copy your originals via Samba/Studio Code into `$DEST`.
 5. **Retire Fixed** — only after soak; export final `homio-fixed` snapshot before hiding/removing.
 
 Cutover: pin HACS to fork release, set sidebar default to Homio (YAML), keep `homio-fixed` url_path until step 5.
+
+## Phase 5 — retire Homio Fixed (done 2026-09-07)
+
+- Pre-delete edits backup: `dashboard.homio-fixed.20260907_051601.yaml` (last hash `b8556503e641f00f`).
+- Deleted storage dashboard `url_path=homio-fixed` / id `homio_fixed` via Lovelace API.
+- Remaining Homio sidebar entry: YAML panel **Homio** → `/homio_dashboard`.
+- Repo `examples/homio-fixed/` kept as historical reference only (not live).
+- Helper JS path prefixes may still list `/homio-fixed` harmlessly; daily path is `/homio_dashboard` only.
