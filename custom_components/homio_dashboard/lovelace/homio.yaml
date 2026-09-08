@@ -1,10 +1,11 @@
-# Homio Dashboard YAML panel — Daylor rooms (Homio Fixed parity).
-# Templates stay !included (portable SoT). Site-specific entities live here.
-# Homio Fixed (url_path=homio-fixed) remains the daily driver until Phase 4 cutover.
+# Homio Dashboard YAML seed — Daylor rooms (Homio Fixed parity).
+# LIVE dashboard is generated to /config/homio/layout/sections.yaml from the
+# Homio integration UI (Configure + room subentries). This file is seed/migration
+# only and is not loaded by the panel after setup.
 #
-# Paths use /homio_dashboard/<room> (not /homio-fixed/...).
-# Room JPGs must exist under /config/homio/rooms/{lounge,dining,kitchen,office,bedroom}.jpg
-# (served at /homio_assets/rooms/...). Custom icons go in /config/homio/icons/.
+# Paths use /homio_dashboard/<room>.
+# Room JPGs: /config/homio/rooms/{lounge,dining,kitchen,office,bedroom}.jpg
+# Icons: /config/homio/icons/ (served at /homio_assets/...).
 
 kiosk_mode:
   hide_header: true

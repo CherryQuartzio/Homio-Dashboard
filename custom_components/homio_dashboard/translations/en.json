@@ -3,11 +3,77 @@
     "step": {
       "user": {
         "title": "Set up Homio Dashboard",
-        "description": "Homio Dashboard will be added to your sidebar. Click Submit to continue."
+        "description": "Homio Dashboard will be added to your sidebar. After setup, configure rooms and the logo under Configure / Add room."
       }
     },
     "abort": {
       "single_instance_allowed": "Only a single instance of Homio Dashboard is allowed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Homio options",
+        "description": "Logo text, which room the logo opens, and navigation order. Manage rooms via Add room / Configure on this integration.",
+        "data": {
+          "logo_name": "Logo name",
+          "logo_home_room": "Logo home room",
+          "nav_order": "Navigation order"
+        },
+        "data_description": {
+          "logo_name": "Shown in the Homio header (default HOMIO.).",
+          "logo_home_room": "Room opened when tapping the logo. May be a room hidden from the nav list.",
+          "nav_order": "Drag to reorder rooms that appear in the header navigation."
+        }
+      }
+    }
+  },
+  "config_subentries": {
+    "room": {
+      "entry_type": "Room",
+      "title": "Homio room",
+      "step": {
+        "user": {
+          "title": "Add room",
+          "description": "Create a Homio room view. The URL path is derived from the nav name (e.g. Living → /homio_dashboard/living)."
+        },
+        "reconfigure": {
+          "title": "Configure room",
+          "description": "Update this Homio room. The URL slug stays the same after first create."
+        },
+        "room": {
+          "title": "Room details",
+          "description": "Background stem loads /homio_assets/rooms/{stem}.jpg. Pick devices in dashboard order.",
+          "data": {
+            "nav_name": "Navigation name",
+            "display_name": "Display name (optional)",
+            "show_in_navigation": "Show in navigation",
+            "image": "Background image stem",
+            "show_temp": "Show temperature",
+            "temp_sensor": "Temperature entity",
+            "show_humid": "Show humidity",
+            "humid_sensor": "Humidity sensor",
+            "show_motion": "Show motion",
+            "motion_sensor": "Motion binary sensor",
+            "devices": "Devices"
+          },
+          "data_description": {
+            "nav_name": "Short label in the header / drawer (e.g. Living).",
+            "display_name": "Large room title on the card (e.g. Living Room). Defaults to navigation name.",
+            "show_in_navigation": "If off, the room is only reachable via logo (or direct URL), not the nav list.",
+            "image": "File stem under /config/homio/rooms/ (no .jpg).",
+            "devices": "Entities shown on the room strip. Order is the card order. Card type is inferred from domain."
+          }
+        },
+        "device_icons": {
+          "title": "Device icons",
+          "description": "Icon stem for each device → /homio_assets/icons/{stem}.svg. New devices are pre-filled from a domain default; existing values are kept."
+        }
+      },
+      "abort": {
+        "reconfigure_successful": "Room updated.",
+        "already_configured": "A room with this path already exists."
+      }
     }
   }
 }

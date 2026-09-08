@@ -15,6 +15,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, STATIC_URL, USER_ASSETS_URL, VERSION
+from .dashboard_generator import generate_dashboard, migrate_rooms_from_yaml, sections_path
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,13 +50,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Persist user icons/rooms under /config/homio (survives HACS updates)
     await _prepare_user_assets(hass)
 
+    # One-time migrate rooms from bundled/legacy YAML into subentries
+    # (must run on the event loop — touches config_entries).
+    migrate_rooms_from_yaml(hass, entry)
+    entry = hass.config_entries.async_get_entry(entry.entry_id) or entry
+
+    # Generate Lovelace YAML under /config/homio/layout from UI config
+    await hass.async_add_executor_job(generate_dashboard, hass, entry)
+
     # Register static paths and resources
     await _register_static_resources(hass)
 
-    # Register the dashboard panel
+    # Register the dashboard panel (loads generated sections.yaml)
     await _setup_dashboard_panel(hass, entry)
 
+    entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
+
     return True
+
+
+async def _async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload Homio when options or room subentries change."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -339,8 +355,7 @@ async def _register_static_resources(hass: HomeAssistant) -> None:
 async def _setup_dashboard_panel(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Register the Homio Dashboard panel."""
 
-    integration_dir = Path(__file__).parent
-    dashboard_path = integration_dir / "lovelace" / "homio.yaml"
+    dashboard_path = sections_path(hass)
 
     dashboard_config = {
         "mode": "yaml",

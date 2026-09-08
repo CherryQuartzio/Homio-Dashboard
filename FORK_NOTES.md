@@ -9,16 +9,17 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.6** (`const.VERSION` — bump when changing registered JS or YAML panel).
+Integration version: **1.0.7** (`const.VERSION` — bump when changing registered JS or YAML panel).
 
 ## Status
 
 - **Daily driver on HA:** Homio YAML panel `/homio_dashboard` (Phase 5 complete — Homio Fixed removed).
+- **UI config (1.0.7):** Rooms, logo, nav order, and devices are configured via the Homio integration OptionsFlow + room Config Subentries. Generator writes `/config/homio/layout/{sections,navigation}.yaml` (+ `_generated/` templates). Bundled `lovelace/homio.yaml` is seed/migration only.
 - **Persistent assets:** icons + room JPGs live in `/config/homio/{icons,rooms}/`, served at `/homio_assets/...` (survives HACS; seeded/migrated on setup).
 - **Bundled JS:** served at `/homiofiles/...` (must not share `/homio_dashboard` or hard refresh 404s).
 - **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Historical copy remains in `examples/homio-fixed/`.
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
-- **HACS install:** **`v1.0.3-homio-slider`**. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
+- **HACS install:** pin latest release tag (see GitHub Releases).
 - **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `/config/homio/rooms/` if still 404.
 
 ## Changelog (session work ported here)

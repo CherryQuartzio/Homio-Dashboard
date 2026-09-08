@@ -67,12 +67,15 @@ Click the Homio icon (⭐+) in your sidebar to access your dashboard!
 
 ## Customization
 
-Edit the dashboard configuration at:
-```
-custom_components/homio_dashboard/lovelace/homio.yaml
-```
+Configure Homio from the integration UI (no hand-editing of Lovelace YAML):
 
-Replace example entities with your own entities.
+1. **Settings → Devices & Services → Homio → Configure** — logo name, logo home room, navigation order
+2. **Add room** / configure each room — nav name, display name, background stem, sensors, devices
+3. Device icon stems (second step) map to `/config/homio/icons/{stem}.svg` (auto-filled on first add)
+
+Room backgrounds go in `/config/homio/rooms/{stem}.jpg`. Generated dashboard files live under `/config/homio/layout/` and are overwritten on reload — do not edit them by hand.
+
+Bundled seed YAML remains at `custom_components/homio_dashboard/lovelace/homio.yaml` for first-run migration only.
 
 ## Support
 

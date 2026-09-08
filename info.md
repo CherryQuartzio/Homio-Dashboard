@@ -56,12 +56,12 @@ Add `.jpg` files matching your room names (e.g., `lounge.jpg`, `bedroom.jpg`). T
 
 ### 5. Customize Your Dashboard
 
-Edit entities in:
-```
-custom_components/homio_dashboard/lovelace/homio.yaml
-```
+Use the Homio integration UI:
 
-Replace example entities (sensor.living_room_temperature, light.hue_living_room_lamp, etc.) with your own.
+- **Configure** — logo name, which room the logo opens, nav order
+- **Add room** — rooms, sensors, devices, and icon stems
+
+Assets: `/config/homio/rooms/` (JPG stems) and `/config/homio/icons/` (SVG stems). Generated layout YAML under `/config/homio/layout/` is not hand-edited.
 
 ## Features
 
@@ -74,8 +74,7 @@ Replace example entities (sensor.living_room_temperature, light.hue_living_room_
 
 ## Customization
 
-- **Navigation Links**: Edit `custom_components/homio_dashboard/dashboards/templates/includes/homio_navigation_list.yaml`
-- **Room Cards**: Customize in `custom_components/homio_dashboard/lovelace/homio.yaml`
+- **Logo / nav order / rooms / devices**: Homio integration Configure + Add room (UI)
 - **Additional Icons**: Add SVG files to `/config/homio/icons/`
 - **Room Backgrounds**: Add JPG files to `/config/homio/rooms/`
 
