@@ -67,9 +67,9 @@ homio_menu_icon:
   custom_fields:
     burger: |
       [[[
-        return `<img src="/homio_dashboard/images/Homio/icons/menu.svg" alt="" width="28" height="23" style="width:28px;height:23px;display:block;object-fit:fill;image-rendering:crisp-edges;" />`;
+        return `<img src="/homio_assets/icons/menu.svg" alt="" width="28" height="23" style="width:28px;height:23px;display:block;object-fit:fill;image-rendering:crisp-edges;" />`;
       ]]]
     close: |
       [[[
-        return `<img src="/homio_dashboard/images/Homio/icons/close.svg" alt="" width="22" height="22" style="width:22px;height:22px;display:block;object-fit:contain;" />`;
+        return `<img src="/homio_assets/icons/close.svg" alt="" width="22" height="22" style="width:22px;height:22px;display:block;object-fit:contain;" />`;
       ]]]

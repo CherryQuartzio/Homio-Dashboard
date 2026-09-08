@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import shutil
 from pathlib import Path
 
@@ -15,11 +14,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN, VERSION
+from .const import DOMAIN, USER_ASSETS_URL, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.empty_config_schema(DOMAIN)
+
+# Bundled icons live under www/; user copies go to /config/homio (survives HACS).
+_BUNDLED_ICONS_REL = Path("images") / "Homio" / "icons"
+_BUNDLED_ROOMS_REL = Path("images") / "Homio" / "rooms"
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -42,6 +45,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Check if helper entities exist and warn if missing
     await _check_helper_entities(hass)
+
+    # Persist user icons/rooms under /config/homio (survives HACS updates)
+    await _prepare_user_assets(hass)
 
     # Register static paths and resources
     await _register_static_resources(hass)
@@ -222,21 +228,84 @@ async def _check_helper_entities(hass: HomeAssistant) -> None:
         _LOGGER.info("✅ All required helper entities found")
 
 
+def _copy_if_missing(src: Path, dest: Path) -> bool:
+    """Copy src to dest only when dest does not already exist."""
+    if not src.is_file() or dest.exists():
+        return False
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dest)
+    return True
+
+
+def _copy_dir_files_if_missing(src_dir: Path, dest_dir: Path, pattern: str) -> int:
+    """Copy matching files from src_dir into dest_dir without overwriting."""
+    if not src_dir.is_dir():
+        return 0
+    copied = 0
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for src in src_dir.glob(pattern):
+        if _copy_if_missing(src, dest_dir / src.name):
+            copied += 1
+    return copied
+
+
+async def _prepare_user_assets(hass: HomeAssistant) -> Path:
+    """Ensure /config/homio/{icons,rooms} exists; seed bundled icons; migrate old www assets."""
+    integration_dir = Path(__file__).parent
+    www_dir = integration_dir / "www"
+    data_dir = Path(hass.config.path("homio"))
+    icons_dir = data_dir / "icons"
+    rooms_dir = data_dir / "rooms"
+    bundled_icons = www_dir / _BUNDLED_ICONS_REL
+    bundled_rooms = www_dir / _BUNDLED_ROOMS_REL
+
+    def _prepare() -> tuple[int, int]:
+        icons_dir.mkdir(parents=True, exist_ok=True)
+        rooms_dir.mkdir(parents=True, exist_ok=True)
+        # Copy-if-missing from integration www: seeds bundled SVGs and migrates
+        # any user files still left under the old HACS-wiped path.
+        icon_count = _copy_dir_files_if_missing(bundled_icons, icons_dir, "*.svg")
+        room_count = _copy_dir_files_if_missing(bundled_rooms, rooms_dir, "*.jpg")
+        return icon_count, room_count
+
+    try:
+        icon_count, room_count = await hass.async_add_executor_job(_prepare)
+        _LOGGER.info(
+            "Homio user assets ready at %s (copied %s icons, %s room JPGs if missing)",
+            data_dir,
+            icon_count,
+            room_count,
+        )
+    except Exception as err:
+        _LOGGER.error("Failed to prepare Homio user assets at %s: %s", data_dir, err)
+
+    return data_dir
+
+
 async def _register_static_resources(hass: HomeAssistant) -> None:
     """Register static paths and frontend resources."""
     integration_dir = Path(__file__).parent
     www_dir = integration_dir / "www"
+    data_dir = Path(hass.config.path("homio"))
 
-    # Register the entire www directory for static file serving
-    await hass.http.async_register_static_paths(
-        [StaticPathConfig(f"/{DOMAIN}", str(www_dir), cache_headers=False)]
-    )
-    _LOGGER.info(f"Registered static path: /{DOMAIN} -> {www_dir}")
+    # /homio_dashboard -> integration www (JS + community modules)
+    # /homio_assets -> /config/homio (persistent icons + room backgrounds)
+    try:
+        await hass.http.async_register_static_paths(
+            [
+                StaticPathConfig(f"/{DOMAIN}", str(www_dir), cache_headers=False),
+                StaticPathConfig(USER_ASSETS_URL, str(data_dir), cache_headers=False),
+            ]
+        )
+        _LOGGER.info("Registered static path: /%s -> %s", DOMAIN, www_dir)
+        _LOGGER.info("Registered static path: %s -> %s", USER_ASSETS_URL, data_dir)
+    except RuntimeError:
+        _LOGGER.debug("Homio static paths already registered")
 
     # JavaScript files loaded globally via add_extra_js_url (classic script tags).
     # - layout-card-modified: IIFE — also register as Lovelace type `js`.
     # - homio-*.js: IIFEs for Fixed + YAML panels (or inline Lovelace resources).
-  # Do NOT add here:
+    # Do NOT add here:
     # - community/light-slider/my-slider-v2.js (ES module — Lovelace resource type `module` only)
     # - button-card/button-card.js (dual-load with HACS button-card breaks cards)
     js_files = [

@@ -36,7 +36,8 @@ Homio Dashboard is now a **complete Home Assistant integration** that handles EV
 4. **Select Homio Theme & Add Room Images**:
    - Click your profile (bottom left)
    - Select "Homio" from the theme dropdown
-   - Add your room background images to `custom_components/homio_dashboard/www/images/Homio/rooms/`
+   - Add your room background images to `/config/homio/rooms/`
+   - Add custom icons to `/config/homio/icons/` (bundled icons are seeded there on setup)
    - **The Homio icon (⭐+) is now in your sidebar - click it to access your dashboard!**
 
 **That's it - 100% install & go!** The integration automatically:
@@ -202,39 +203,35 @@ Everything lives under `/config` in your Home Assistant setup,
 
 ## **🖼️ Assets Setup – Images & Icons**
 
-**✅ Icons Included!** When you install via HACS, a collection of Google Material Design icons (weight 100) are automatically installed to `/www/images/Homio/icons/`. These include icons for doors, windows, lights, heating, and more.
+**✅ Icons Included!** On setup, Homio seeds bundled Material Design icons into `/config/homio/icons/` (served at `/homio_assets/icons/`). That folder survives HACS updates.
 
-**Room Images:** You'll need to add your own room background images to personalize your dashboard. These are used for the room card backgrounds.
+**Room Images:** Add your own room background JPGs to personalize the dashboard. These are used for room card backgrounds.
 
 Material design icons link (for additional icons): **https://fonts.google.com/icons?icon.query=light**
 
-📁 Folder Structure (Auto-created by HACS)
+📁 Folder Structure (created on integration setup)
 
 ```
-www/
-└── images/
-    └── Homio/
-        ├── rooms/       ← Add your room background images here
-        └── icons/       ← SVG icons (included with HACS installation)
-
+/config/homio/
+├── rooms/       ← Add your room background images here (.jpg)
+└── icons/       ← SVG icons (bundled + your custom icons)
 ```
 
 🖼️ Room Backgrounds
-Place your .jpg files in,
+Place your `.jpg` files in:
 
-**Example**
 ```
-/config/www/images/Homio/rooms/
+/config/homio/rooms/
 ```
 
-Make sure the file names match what you use in the image variable in the homio_room template (without the file extension). 
+Make sure the file names match what you use in the `image` variable in the `homio_room` template (without the file extension).
 
 **Example**:
 
 ```
 - type: 'custom:button-card'
   variables:
-    image: lounge # Will load lounge.jpg from the directory www/images/homio/room
+    image: lounge # Will load /homio_assets/rooms/lounge.jpg
     image_position: center center
     show_humid: true
     humid_sensor: sensor.living_room_sensor_humidity
@@ -245,11 +242,10 @@ Make sure the file names match what you use in the image variable in the homio_r
 ```
 
 🧩 Icons
-Put your .svg icon files here,
+Put your `.svg` icon files here:
 
-**Example**
 ```
-/config/www/images/Homio/icons/
+/config/homio/icons/
 ```
 
 These are used for visual cues like heating, doors, or lights. You can reference them with:
@@ -257,7 +253,7 @@ These are used for visual cues like heating, doors, or lights. You can reference
 ```
 - type: 'custom:button-card'
   variables:
-    icon: lamp # Will load lamp.svg from the directory www/images/homio/icons
+    icon: lamp # Will load /homio_assets/icons/lamp.svg
   template:
     - homio_light
   entity: light.hue_living_room_lamp 
@@ -561,7 +557,7 @@ homio_entity:
   show_entity_picture: true
   entity_picture: |
     [[[
-      return `/local/images/Homio/icons/${variables.icon}.svg`;
+      return `/homio_assets/icons/${variables.icon}.svg`;
     ]]]
   styles:
     card:
@@ -611,9 +607,9 @@ homio_menu_icon:
   entity_picture: |
     [[[
       if (states["input_boolean.homio_mobile_navigation"].state === "on") {
-        return "/local/images/Homio/icons/close.svg";
+        return "/homio_assets/icons/close.svg";
       } else {
-        return "/local/images/Homio/icons/menu.svg";
+        return "/homio_assets/icons/menu.svg";
       }
     ]]]
   tap_action:
@@ -747,7 +743,7 @@ Make sure to use the template named homio_room for the custom button card as per
 
 | Variable         | Default        | Description                                                                 |
 |------------------|----------------|-----------------------------------------------------------------------------|
-| `image`          | —              | Name of the background image (omit `.jpg`). Looks inside `/www/images/Homio/rooms/`. |
+| `image`          | —              | Name of the background image (omit `.jpg`). Looks inside `/config/homio/rooms/` (URL `/homio_assets/rooms/`). |
 | `image_position` | `center center`| Optional background alignment of the image.                                |
 | `show_motion`    | `false`        | Set to `true` to enable the motion detection banner.                        |
 | `motion_sensor`  | `""`           | Entity ID of the motion binary sensor. Required if `show_motion` is `true`.|
@@ -776,7 +772,7 @@ Make sure to use the template named homio_room for the custom button card as per
 
 This will display a room card titled Living Room with:
 
-Background image: /local/images/Homio/rooms/lounge.jpg
+Background image: /homio_assets/rooms/lounge.jpg
 
 Motion banner when motion is detected.
 

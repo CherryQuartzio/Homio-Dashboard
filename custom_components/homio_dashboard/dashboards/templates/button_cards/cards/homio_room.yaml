@@ -94,7 +94,7 @@ homio_room:
           [[[
             const img = variables.image || 'lounge';
             const pos = variables.image_position || 'center center';
-            return `linear-gradient(to bottom, rgba(51,51,51,0.7) 0%, rgba(51,51,51,0.7) 50%, rgba(51,51,51,0.5) 100%), url('/homio_dashboard/images/Homio/rooms/${img}.jpg') ${pos} / cover no-repeat`;
+            return `linear-gradient(to bottom, rgba(51,51,51,0.7) 0%, rgba(51,51,51,0.7) 50%, rgba(51,51,51,0.5) 100%), url('/homio_assets/rooms/${img}.jpg') ${pos} / cover no-repeat`;
           ]]]
     name:
       - color: var(--primary-text-color)

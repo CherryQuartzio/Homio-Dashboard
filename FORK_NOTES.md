@@ -9,15 +9,16 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.3** (`const.VERSION` — bump when changing registered JS or YAML panel).
+Integration version: **1.0.4** (`const.VERSION` — bump when changing registered JS or YAML panel).
 
 ## Status
 
 - **Daily driver on HA:** Homio YAML panel `/homio_dashboard` (Phase 5 complete — Homio Fixed removed).
+- **Persistent assets:** icons + room JPGs live in `/config/homio/{icons,rooms}/`, served at `/homio_assets/...` (survives HACS; seeded/migrated on setup).
 - **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Historical copy remains in `examples/homio-fixed/`.
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
 - **HACS install:** **`v1.0.3-homio-slider`**. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
-- **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `custom_components/homio_dashboard/www/images/Homio/rooms/` if still 404.
+- **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `/config/homio/rooms/` if still 404.
 
 ## Changelog (session work ported here)
 
@@ -56,7 +57,7 @@ Integration version: **1.0.3** (`const.VERSION` — bump when changing registere
 ### Chromium room backgrounds
 
 - CSS gradient color-stops **must** have a space after `rgba(...)` (e.g. `rgba(...) 0%`). Chromium rejects `)0%` and drops the whole `background`.
-- Upload matching room JPGs under `www/images/Homio/rooms/` or point rooms at an existing file.
+- Upload matching room JPGs under `/config/homio/rooms/` or point rooms at an existing file.
 
 ### Thermostat / temperature
 
@@ -133,10 +134,10 @@ Visual parity (user-confirmed): layout, nav, rooms, entities match between `/hom
 Before switching daily driver to YAML Homio:
 
 1. **Brightness slider** — `my-slider-v2` Lovelace resource `type: module` at `/homio_dashboard/community/light-slider/my-slider-v2.js?v=1.0.3`; integration **1.0.3+** must not `add_extra_js_url` the slider. Hard-refresh after update.
-2. **Room JPGs** — `lounge.jpg`, `dining.jpg`, `kitchen.jpg`, `office.jpg`, `bedroom.jpg` under `custom_components/homio_dashboard/www/images/Homio/rooms/` (restore from snapshot `edf057f9` if 404). SSH terminal example:
+2. **Room JPGs** — `lounge.jpg`, `dining.jpg`, `kitchen.jpg`, `office.jpg`, `bedroom.jpg` under `/config/homio/rooms/` (restore from snapshot `edf057f9` if 404). Setup also migrates any leftover JPGs from the old integration `www/images/Homio/rooms/` path. SSH terminal example:
 
 ```bash
-DEST=/config/custom_components/homio_dashboard/www/images/Homio/rooms
+DEST=/config/homio/rooms
 BACKUP=/backup/edf057f9.tar
 mkdir -p "$DEST"
 tar -tf "$BACKUP" | grep -E 'Homio/rooms/.*\.jpg$'

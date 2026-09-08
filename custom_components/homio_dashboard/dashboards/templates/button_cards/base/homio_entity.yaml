@@ -12,7 +12,7 @@ homio_entity:
   entity_picture: |
     [[[
       const icon = variables.icon || "lamp";
-      return `/homio_dashboard/images/Homio/icons/${icon}.svg`;
+      return `/homio_assets/icons/${icon}.svg`;
     ]]]
   state:
     - value: "on"

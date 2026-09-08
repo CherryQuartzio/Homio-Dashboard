@@ -49,10 +49,10 @@ This integration bundles EVERYTHING and configures it automatically:
 
 Add your room background images to:
 ```
-custom_components/homio_dashboard/www/images/Homio/rooms/
+/config/homio/rooms/
 ```
 
-Add .jpg files matching your room names (e.g., `lounge.jpg`, `bedroom.jpg`)
+Add `.jpg` files matching your room names (e.g., `lounge.jpg`, `bedroom.jpg`). These survive HACS updates.
 
 ### 5. Customize Your Dashboard
 
@@ -66,8 +66,8 @@ Replace example entities (sensor.living_room_temperature, light.hue_living_room_
 ## Features
 
 - **Auto-loaded Resources**: JavaScript dependencies load automatically, no manual resource configuration needed
-- **Single Install**: No need to manually copy files to www/ folder
-- **Bundled Icons**: 19 Google Material icons included
+- **Persistent assets**: Icons and room images live in `/config/homio/` (not wiped by HACS)
+- **Bundled Icons**: 19 Google Material icons seeded into `/config/homio/icons/` on setup
 - **Sidebar Integration**: Dashboard appears automatically in sidebar
 - **Theme Included**: Homio theme bundled
 - **Helpers Included**: All required input_boolean and input_number helpers
@@ -76,7 +76,8 @@ Replace example entities (sensor.living_room_temperature, light.hue_living_room_
 
 - **Navigation Links**: Edit `custom_components/homio_dashboard/dashboards/templates/includes/homio_navigation_list.yaml`
 - **Room Cards**: Customize in `custom_components/homio_dashboard/lovelace/homio.yaml`
-- **Additional Icons**: Add SVG files to `custom_components/homio_dashboard/www/images/Homio/icons/`
+- **Additional Icons**: Add SVG files to `/config/homio/icons/`
+- **Room Backgrounds**: Add JPG files to `/config/homio/rooms/`
 
 ## Support
 

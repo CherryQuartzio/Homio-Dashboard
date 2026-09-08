@@ -132,7 +132,7 @@ homio_thermostat:
             template:
               - homio_default
             show_entity_picture: true
-            entity_picture: /homio_dashboard/images/Homio/icons/power_off.svg
+            entity_picture: /homio_assets/icons/power_off.svg
             hold_action:
               action: none
             tap_action:
@@ -174,7 +174,7 @@ homio_thermostat:
             template:
               - homio_default
             show_entity_picture: true
-            entity_picture: /homio_dashboard/images/Homio/icons/dehumidifier.svg
+            entity_picture: /homio_assets/icons/dehumidifier.svg
             hold_action:
               action: none
             tap_action:
@@ -217,7 +217,7 @@ homio_thermostat:
             template:
               - homio_default
             show_entity_picture: true
-            entity_picture: /homio_dashboard/images/Homio/icons/heating.svg
+            entity_picture: /homio_assets/icons/heating.svg
             hold_action:
               action: none
             tap_action:
@@ -363,7 +363,7 @@ homio_thermostat:
                   template:
                     - homio_default
                   show_entity_picture: true
-                  entity_picture: /homio_dashboard/images/Homio/icons/increase.svg
+                  entity_picture: /homio_assets/icons/increase.svg
                   hold_action:
                     action: none
                   tap_action:
@@ -442,7 +442,7 @@ homio_thermostat:
                   template:
                     - homio_default
                   show_entity_picture: true
-                  entity_picture: /homio_dashboard/images/Homio/icons/decrease.svg
+                  entity_picture: /homio_assets/icons/decrease.svg
                   hold_action:
                     action: none
                   tap_action:

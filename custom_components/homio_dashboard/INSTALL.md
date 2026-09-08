@@ -54,12 +54,12 @@ This loads the helper entities (input_boolean, input_number) needed for navigati
 
 Add your room background images to:
 ```
-custom_components/homio_dashboard/www/images/Homio/rooms/
+/config/homio/rooms/
 ```
 
-For example: `custom_components/homio_dashboard/www/images/Homio/rooms/lounge.jpg`
+For example: `/config/homio/rooms/lounge.jpg`
 
-The integration already includes 19 icon assets that are automatically available at `/homio_dashboard/images/Homio/icons/`.
+Bundled icons are seeded into `/config/homio/icons/` on setup and served at `/homio_assets/icons/`. Add custom SVGs there as well (they survive HACS updates).
 
 ### 8. Access the Dashboard
 
