@@ -9,12 +9,13 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.5** (`const.VERSION` — bump when changing registered JS or YAML panel).
+Integration version: **1.0.6** (`const.VERSION` — bump when changing registered JS or YAML panel).
 
 ## Status
 
 - **Daily driver on HA:** Homio YAML panel `/homio_dashboard` (Phase 5 complete — Homio Fixed removed).
 - **Persistent assets:** icons + room JPGs live in `/config/homio/{icons,rooms}/`, served at `/homio_assets/...` (survives HACS; seeded/migrated on setup).
+- **Bundled JS:** served at `/homiofiles/...` (must not share `/homio_dashboard` or hard refresh 404s).
 - **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Historical copy remains in `examples/homio-fixed/`.
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
 - **HACS install:** **`v1.0.3-homio-slider`**. Config entry `01M0KTC6V0X5NKDP7M5Z99NSYZ`.
@@ -35,8 +36,8 @@ Integration version: **1.0.5** (`const.VERSION` — bump when changing registere
 | Resource | Correct type | Notes |
 |----------|--------------|--------|
 | HACS button-card | `module` | Do **not** dual-load Homio’s bundled button-card |
-| layout-card-modified | `js` (IIFE) | `/homio_dashboard/community/layout-card-modified/...` — allowlists `place-*`, `inset`, `overflow*`, etc. |
-| **my-slider-v2** | **`module`** (ES `export`) | Was wrongly `js` → Firefox/Edge `SyntaxError`. Bump `?v=` when changing. |
+| layout-card-modified | `js` (IIFE) | `/homiofiles/community/layout-card-modified/...` — allowlists `place-*`, `inset`, `overflow*`, etc. |
+| **my-slider-v2** | **`module`** (ES `export`) | Was wrongly `js` → Firefox/Edge `SyntaxError`. Bump `?v=` when changing. Path is `/homiofiles/...` (not `/homio_dashboard/...`). |
 | kiosk-mode | `module` | `kiosk_mode.hide_header: true` on views |
 | Google Fonts Hanken Grotesk | `css` | Required for theme font family |
 | `homio-menu-nav.js` | `module` (or inline) | Per-browser menu; path-scoped |
@@ -133,7 +134,7 @@ Visual parity (user-confirmed): layout, nav, rooms, entities match between `/hom
 
 Before switching daily driver to YAML Homio:
 
-1. **Brightness slider** — `my-slider-v2` Lovelace resource `type: module` at `/homio_dashboard/community/light-slider/my-slider-v2.js?v=1.0.3`; integration **1.0.3+** must not `add_extra_js_url` the slider. Hard-refresh after update.
+1. **Brightness slider** — `my-slider-v2` Lovelace resource `type: module` at `/homiofiles/community/light-slider/my-slider-v2.js?v=1.0.6`; integration **1.0.3+** must not `add_extra_js_url` the slider. Hard-refresh after update. **1.0.6+:** bundled JS is served from `/homiofiles` so hard refresh of `/homio_dashboard/<view>` no longer 404s (static mount used to steal that prefix).
 2. **Room JPGs** — `lounge.jpg`, `dining.jpg`, `kitchen.jpg`, `office.jpg`, `bedroom.jpg` under `/config/homio/rooms/` (restore from snapshot `edf057f9` if 404). Setup also migrates any leftover JPGs from the old integration `www/images/Homio/rooms/` path. SSH terminal example:
 
 ```bash

@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN, USER_ASSETS_URL, VERSION
+from .const import DOMAIN, STATIC_URL, USER_ASSETS_URL, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -291,16 +291,18 @@ async def _register_static_resources(hass: HomeAssistant) -> None:
     www_dir = integration_dir / "www"
     data_dir = Path(hass.config.path("homio"))
 
-    # /homio_dashboard -> integration www (JS + community modules)
-    # /homio_assets -> /config/homio (persistent icons + room backgrounds)
+    # Panel SPA stays at /homio_dashboard (url_path=DOMAIN).
+    # Bundled JS must use a different first path segment (/homiofiles) so a
+    # hard refresh of /homio_dashboard/living reaches IndexView instead of
+    # StaticResource 404. Icons/rooms stay on /homio_assets.
     try:
         await hass.http.async_register_static_paths(
             [
-                StaticPathConfig(f"/{DOMAIN}", str(www_dir), cache_headers=False),
+                StaticPathConfig(STATIC_URL, str(www_dir), cache_headers=False),
                 StaticPathConfig(USER_ASSETS_URL, str(data_dir), cache_headers=False),
             ]
         )
-        _LOGGER.info("Registered static path: /%s -> %s", DOMAIN, www_dir)
+        _LOGGER.info("Registered static path: %s -> %s", STATIC_URL, www_dir)
         _LOGGER.info("Registered static path: %s -> %s", USER_ASSETS_URL, data_dir)
     except RuntimeError:
         _LOGGER.debug("Homio static paths already registered")
@@ -327,7 +329,7 @@ async def _register_static_resources(hass: HomeAssistant) -> None:
         full_path = www_dir / file_path
         if full_path.exists():
             # Add to frontend resources with version for cache busting
-            resource_url = f"/{DOMAIN}/{file_path}?v={VERSION}"
+            resource_url = f"{STATIC_URL}/{file_path}?v={VERSION}"
             add_extra_js_url(hass, resource_url, es5=False)
             _LOGGER.info(f"Registered JS resource: {resource_url}")
         else:
