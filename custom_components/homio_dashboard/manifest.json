@@ -4,9 +4,9 @@
   "codeowners": ["@iamtherufus"],
   "config_flow": true,
   "dependencies": ["http"],
+  "after_dependencies": ["lovelace", "frontend"],
   "documentation": "https://github.com/iamtherufus/Homio",
   "iot_class": "calculated",
   "requirements": [],
-  "version": "1.0.7"
+  "version": "1.0.8"
 }
-

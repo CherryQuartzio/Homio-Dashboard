@@ -1,7 +1,7 @@
 """Constants for the Homio Dashboard integration."""
 
 DOMAIN = "homio_dashboard"
-VERSION = "1.0.7"
+VERSION = "1.0.8"
 
 # Bundled JS/community modules. Must NOT share the panel url_path prefix
 # (/homio_dashboard) — a StaticPathConfig there steals hard-refresh GETs
@@ -59,3 +59,6 @@ DOMAIN_ICON_MAP: dict[str, str | None] = {
     "humidifier": "dehumidifier",
 }
 DEFAULT_DEVICE_ICON = "plug"
+
+# One-time YAML→subentry migration gate (entry.data).
+CONF_YAML_MIGRATED = "yaml_migrated"

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import re
 import shutil
 from pathlib import Path
 from typing import Any
@@ -32,6 +31,7 @@ from .const import (
     CONF_SHOW_TEMP,
     CONF_SLUG,
     CONF_TEMP_SENSOR,
+    CONF_YAML_MIGRATED,
     DEFAULT_DEVICE_ICON,
     DEFAULT_IMAGE_POSITION,
     DEFAULT_LOGO_NAME,
@@ -143,7 +143,18 @@ def ordered_rooms(entry: ConfigEntry) -> list[dict[str, Any]]:
         data.setdefault(CONF_NAV_NAME, sub.title)
         rooms.append(data)
 
-    by_slug = {r[CONF_SLUG]: r for r in rooms}
+    by_slug: dict[str, dict[str, Any]] = {}
+    for room in rooms:
+        slug = room[CONF_SLUG]
+        if slug in by_slug:
+            _LOGGER.warning(
+                "Duplicate Homio room slug %s (%s); keeping first room only",
+                slug,
+                room.get(CONF_NAV_NAME),
+            )
+            continue
+        by_slug[slug] = room
+
     nav_order = list(entry.options.get(CONF_NAV_ORDER, []))
     ordered: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -151,26 +162,39 @@ def ordered_rooms(entry: ConfigEntry) -> list[dict[str, Any]]:
         if slug in by_slug and slug not in seen:
             ordered.append(by_slug[slug])
             seen.add(slug)
-    for room in rooms:
-        slug = room[CONF_SLUG]
+    for slug, room in by_slug.items():
         if slug not in seen:
             ordered.append(room)
             seen.add(slug)
     return ordered
 
 
+def collect_friendly_names(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, str]:
+    """Resolve device display names on the event loop (not in an executor)."""
+    names: dict[str, str] = {}
+    for room in ordered_rooms(entry):
+        for device in room.get(CONF_DEVICES) or []:
+            if not isinstance(device, dict):
+                continue
+            entity_id = device.get(CONF_DEVICE_ENTITY)
+            if not entity_id or entity_id in names:
+                continue
+            names[str(entity_id)] = _friendly_name(hass, str(entity_id))
+    return names
+
+
 def _yaml_scalar(value: Any) -> str:
-    """Format a YAML scalar."""
+    """Format a YAML scalar; always quote strings to avoid inject/coerce bugs."""
     if value is None:
         return "null"
     if isinstance(value, bool):
         return "true" if value else "false"
-    if isinstance(value, (int, float)):
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
         return str(value)
-    text = str(value)
-    if re.search(r'[:#\[\]{}\n,"\']', text) or text == "":
-        return yaml.dump(text, default_style="'").strip()
-    return text
+    # Force single-quoted scalar so !, -, @, %, on/off, etc. stay literal text.
+    return yaml.dump(
+        str(value), default_style="'", default_flow_style=True
+    ).strip()
 
 
 def _indent(text: str, spaces: int) -> str:
@@ -182,21 +206,27 @@ def _friendly_name(hass: HomeAssistant, entity_id: str) -> str:
     state = hass.states.get(entity_id)
     if state and state.attributes.get("friendly_name"):
         return str(state.attributes["friendly_name"])
+    return _fallback_entity_name(entity_id)
+
+
+def _fallback_entity_name(entity_id: str) -> str:
     if "." in entity_id:
         return entity_id.split(".", 1)[1].replace("_", " ").title()
     return entity_id
 
 
-def _device_card_yaml(hass: HomeAssistant, device: dict[str, Any]) -> str:
+def _device_card_yaml(
+    device: dict[str, Any], friendly_names: dict[str, str]
+) -> str:
     entity_id = str(device[CONF_DEVICE_ENTITY])
     template = card_template_for_entity(entity_id)
-    name = _friendly_name(hass, entity_id)
+    name = friendly_names.get(entity_id) or _fallback_entity_name(entity_id)
     icon = device.get(CONF_DEVICE_ICON)
     lines = [
         "- type: custom:button-card",
         "  template:",
         f"    - {template}",
-        f"  entity: {entity_id}",
+        f"  entity: {_yaml_scalar(entity_id)}",
         f"  name: {_yaml_scalar(name)}",
     ]
     if template != "homio_thermostat" and icon:
@@ -209,7 +239,11 @@ def _device_card_yaml(hass: HomeAssistant, device: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _room_view_yaml(hass: HomeAssistant, room: dict[str, Any], includes_abs: str) -> str:
+def _room_view_yaml(
+    room: dict[str, Any],
+    includes_abs: str,
+    friendly_names: dict[str, str],
+) -> str:
     slug = room[CONF_SLUG]
     nav_name = room.get(CONF_NAV_NAME, slug)
     display = room.get(CONF_DISPLAY_NAME) or nav_name
@@ -224,7 +258,7 @@ def _room_view_yaml(hass: HomeAssistant, room: dict[str, Any], includes_abs: str
     devices = room.get(CONF_DEVICES) or []
 
     device_blocks = [
-        _indent(_device_card_yaml(hass, d), 16)
+        _indent(_device_card_yaml(d, friendly_names), 16)
         for d in devices
         if isinstance(d, dict) and d.get(CONF_DEVICE_ENTITY)
     ]
@@ -235,7 +269,7 @@ def _room_view_yaml(hass: HomeAssistant, room: dict[str, Any], includes_abs: str
 
     return f"""  - type: custom:grid-layout
     title: {_yaml_scalar(nav_name)}
-    path: {slug}
+    path: {_yaml_scalar(slug)}
     theme: homio
     layout: !include {includes_abs}/homio_screen_layout.yaml
     cards:
@@ -278,7 +312,7 @@ def _navigation_yaml(rooms: list[dict[str, Any]]) -> str:
     path: /{DOMAIN}/{slug}
 """
         )
-    return _GENERATED_HEADER + ("\n".join(blocks) if blocks else "# (no nav rooms)\n")
+    return _GENERATED_HEADER + ("\n".join(blocks) if blocks else "[]\n")
 
 
 def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) -> None:
@@ -368,13 +402,18 @@ def _patch_navigation_include(includes_dir: Path, nav_file_abs: str) -> None:
         dest.write_text(text, encoding="utf-8")
 
 
-def generate_dashboard(hass: HomeAssistant, entry: ConfigEntry) -> Path:
+def generate_dashboard(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    friendly_names: dict[str, str] | None = None,
+) -> Path:
     """Write generated layout files and return sections.yaml path."""
     integration_dir = Path(__file__).parent
     layout = layout_dir(hass)
     gen = generated_root(hass)
     button_cards_dest = gen / "button_cards"
     includes_dest = gen / "includes"
+    names = friendly_names or {}
 
     layout.mkdir(parents=True, exist_ok=True)
 
@@ -400,7 +439,9 @@ def generate_dashboard(hass: HomeAssistant, entry: ConfigEntry) -> Path:
 
     navigation_path(hass).write_text(_navigation_yaml(rooms), encoding="utf-8")
 
-    views = "\n".join(_room_view_yaml(hass, room, includes_abs) for room in rooms)
+    views = "\n".join(
+        _room_view_yaml(room, includes_abs, names) for room in rooms
+    )
     if not views.strip():
         views = """  - type: custom:grid-layout
     title: Home
@@ -544,29 +585,49 @@ def parse_logo_from_templates(integration_dir: Path) -> tuple[str, str | None]:
     return logo_name, home_slug
 
 
-def migrate_rooms_from_yaml(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Create room subentries from bundled/legacy YAML when none exist.
+def _uniquify_room_slugs(rooms: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Ensure unique slugs within a migration batch."""
+    taken: set[str] = set()
+    result: list[dict[str, Any]] = []
+    for room in rooms:
+        slug = str(room.get(CONF_SLUG) or room_slug(str(room.get(CONF_NAV_NAME, "room"))))
+        base = slug
+        n = 2
+        while slug in taken:
+            slug = f"{base}_{n}"
+            n += 1
+        taken.add(slug)
+        room = dict(room)
+        room[CONF_SLUG] = slug
+        result.append(room)
+    return result
 
-    Returns True if subentries were added.
-    """
-    if room_subentries(entry):
-        return False
 
+def read_migration_source(hass: HomeAssistant) -> dict[str, Any]:
+    """Read legacy/bundled YAML off the event loop. Returns a plain payload dict."""
     integration_dir = Path(__file__).parent
+    # Prefer user-owned dashboards before the bundled Daylor seed.
     candidates = [
-        integration_dir / "lovelace" / "homio.yaml",
         Path(hass.config.path("dashboards")) / "homio" / "homio.yaml",
+        Path(hass.config.path("homio")) / "homio.yaml",
+        integration_dir / "lovelace" / "homio.yaml",
     ]
     rooms: list[dict[str, Any]] = []
+    source: str | None = None
     for path in candidates:
-        rooms = parse_rooms_from_homio_yaml(path)
-        if rooms:
-            _LOGGER.info("Migrating Homio rooms from %s", path)
+        parsed = parse_rooms_from_homio_yaml(path)
+        if parsed:
+            rooms = parsed
+            source = str(path)
             break
 
-    logo_name, home_slug = parse_logo_from_templates(integration_dir)
+    # Never pull logo text from bundled templates (may be site-specific).
+    logo_name = DEFAULT_LOGO_NAME
+    home_slug: str | None = None
+    if rooms:
+        home_slug = str(rooms[0].get(CONF_SLUG) or "") or None
+
     if not rooms:
-        # Minimal seed so the UI is usable.
         rooms = [
             {
                 CONF_NAV_NAME: "Living",
@@ -584,7 +645,38 @@ def migrate_rooms_from_yaml(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 CONF_DEVICES: [],
             }
         ]
-        home_slug = home_slug or "living"
+        home_slug = "living"
+        source = None
+
+    rooms = _uniquify_room_slugs(rooms)
+    return {
+        "rooms": rooms,
+        "logo_name": logo_name,
+        "home_slug": home_slug,
+        "source": source,
+    }
+
+
+def apply_migration(hass: HomeAssistant, entry: ConfigEntry, payload: dict[str, Any]) -> bool:
+    """Apply migration payload on the event loop. Returns True if subentries added."""
+    if entry.data.get(CONF_YAML_MIGRATED):
+        return False
+
+    if room_subentries(entry):
+        hass.config_entries.async_update_entry(
+            entry,
+            data={**dict(entry.data), CONF_YAML_MIGRATED: True},
+        )
+        return False
+
+    rooms: list[dict[str, Any]] = list(payload.get("rooms") or [])
+    logo_name = str(payload.get("logo_name") or DEFAULT_LOGO_NAME)
+    home_slug = payload.get("home_slug")
+    source = payload.get("source")
+    if source:
+        _LOGGER.info("Migrating Homio rooms from %s", source)
+    else:
+        _LOGGER.info("Seeding Homio with a minimal Living room")
 
     nav_order = [r[CONF_SLUG] for r in rooms if r.get(CONF_SHOW_IN_NAVIGATION, True)]
     if not home_slug and nav_order:
@@ -602,12 +694,29 @@ def migrate_rooms_from_yaml(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             ),
         )
 
+    options = {
+        **dict(entry.options),
+        CONF_LOGO_NAME: entry.options.get(CONF_LOGO_NAME) or logo_name,
+        CONF_LOGO_HOME_ROOM: entry.options.get(CONF_LOGO_HOME_ROOM) or (home_slug or ""),
+        CONF_NAV_ORDER: entry.options.get(CONF_NAV_ORDER) or nav_order,
+    }
     hass.config_entries.async_update_entry(
         entry,
-        options={
-            CONF_LOGO_NAME: logo_name,
-            CONF_LOGO_HOME_ROOM: home_slug or "",
-            CONF_NAV_ORDER: nav_order,
-        },
+        data={**dict(entry.data), CONF_YAML_MIGRATED: True},
+        options=options,
     )
     return True
+
+
+def migrate_rooms_from_yaml(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Backward-compatible sync migrate (I/O + apply). Prefer split helpers."""
+    if entry.data.get(CONF_YAML_MIGRATED):
+        return False
+    if room_subentries(entry):
+        hass.config_entries.async_update_entry(
+            entry,
+            data={**dict(entry.data), CONF_YAML_MIGRATED: True},
+        )
+        return False
+    payload = read_migration_source(hass)
+    return apply_migration(hass, entry, payload)

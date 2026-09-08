@@ -88,7 +88,7 @@ class HomioConfigFlow(ConfigFlow, domain=DOMAIN):
                 },
             )
 
-        return self.async_show_form(step_id="user")
+        return self.async_show_form(step_id="user", data_schema=vol.Schema({}))
 
     @staticmethod
     @callback
@@ -117,14 +117,27 @@ class HomioOptionsFlow(OptionsFlow):
         nav_rooms = _room_select_options(entry, nav_only=True)
 
         if user_input is not None:
-            nav_order = user_input.get(CONF_NAV_ORDER) or []
-            if isinstance(nav_order, str):
-                nav_order = [nav_order]
+            prev = entry.options
+            logo_name = user_input.get(
+                CONF_LOGO_NAME, prev.get(CONF_LOGO_NAME, DEFAULT_LOGO_NAME)
+            )
+            if not logo_name:
+                logo_name = DEFAULT_LOGO_NAME
+            if CONF_LOGO_HOME_ROOM in user_input:
+                home_room = user_input.get(CONF_LOGO_HOME_ROOM) or ""
+            else:
+                home_room = prev.get(CONF_LOGO_HOME_ROOM, "")
+            if CONF_NAV_ORDER in user_input:
+                nav_order = user_input.get(CONF_NAV_ORDER) or []
+                if isinstance(nav_order, str):
+                    nav_order = [nav_order]
+            else:
+                nav_order = list(prev.get(CONF_NAV_ORDER, []))
             return self.async_create_entry(
                 title="",
                 data={
-                    CONF_LOGO_NAME: user_input.get(CONF_LOGO_NAME) or DEFAULT_LOGO_NAME,
-                    CONF_LOGO_HOME_ROOM: user_input.get(CONF_LOGO_HOME_ROOM) or "",
+                    CONF_LOGO_NAME: logo_name,
+                    CONF_LOGO_HOME_ROOM: home_room,
                     CONF_NAV_ORDER: list(nav_order),
                 },
             )
@@ -161,7 +174,6 @@ class HomioOptionsFlow(OptionsFlow):
                 selector.SelectSelectorConfig(
                     options=nav_rooms,
                     multiple=True,
-                    reorder=True,
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             )
@@ -352,7 +364,9 @@ class RoomSubentryFlow(ConfigSubentryFlow):
         entry = self._get_entry()
 
         if self.source == SOURCE_RECONFIGURE:
-            return self.async_update_reload_and_abort(
+            # Update listener already reloads; async_update_reload_and_abort raises
+            # when update_listeners are registered.
+            return self.async_update_and_abort(
                 entry,
                 self._get_reconfigure_subentry(),
                 title=title,

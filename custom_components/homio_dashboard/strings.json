@@ -23,7 +23,7 @@
         "data_description": {
           "logo_name": "Shown in the Homio header (default HOMIO.).",
           "logo_home_room": "Room opened when tapping the logo. May be a room hidden from the nav list.",
-          "nav_order": "Drag to reorder rooms that appear in the header navigation."
+          "nav_order": "Rooms shown in the header. Selection order is the navigation order (Select does not support drag-reorder)."
         }
       }
     }
@@ -73,6 +73,9 @@
       "abort": {
         "reconfigure_successful": "Room updated.",
         "already_configured": "A room with this path already exists."
+      },
+      "error": {
+        "nav_name_required": "Navigation name is required."
       }
     }
   }

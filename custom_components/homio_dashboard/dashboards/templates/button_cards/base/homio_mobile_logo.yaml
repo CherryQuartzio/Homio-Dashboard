@@ -1,6 +1,6 @@
 homio_mobile_logo:
   # Keep in sync with homio_logo — mobile hamburger uses this separate template.
-  name: Daylor
+  name: HOMIO.
   tap_action:
     action: navigate
     navigation_path: /homio_dashboard/living

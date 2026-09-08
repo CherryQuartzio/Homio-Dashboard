@@ -5,7 +5,7 @@ homio_logo:
     action: navigate
     navigation_path: /homio_dashboard/living
   # Keep in sync with homio_mobile_logo (collapsed hamburger header).
-  name: Daylor
+  name: HOMIO.
   styles:
     name:
       - color: var(--primary-text-color)

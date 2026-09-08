@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import shutil
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from homeassistant.components.frontend import add_extra_js_url, async_remove_panel
@@ -11,11 +12,20 @@ from homeassistant.components.lovelace import _register_panel
 from homeassistant.components.lovelace.dashboard import LovelaceYAML
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN, STATIC_URL, USER_ASSETS_URL, VERSION
-from .dashboard_generator import generate_dashboard, migrate_rooms_from_yaml, sections_path
+from .const import CONF_YAML_MIGRATED, DOMAIN, STATIC_URL, USER_ASSETS_URL, VERSION
+from .dashboard_generator import (
+    apply_migration,
+    collect_friendly_names,
+    generate_dashboard,
+    read_migration_source,
+    room_subentries,
+    sections_path,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await _copy_packages_to_config(hass)
 
     # Create template sensors (no YAML include needed!)
-    await _create_template_sensors(hass)
+    await _create_template_sensors(hass, entry)
 
     # Check if helper entities exist and warn if missing
     await _check_helper_entities(hass)
@@ -50,13 +60,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Persist user icons/rooms under /config/homio (survives HACS updates)
     await _prepare_user_assets(hass)
 
-    # One-time migrate rooms from bundled/legacy YAML into subentries
-    # (must run on the event loop — touches config_entries).
-    migrate_rooms_from_yaml(hass, entry)
+    # One-time migrate: file I/O in executor, config_entries on the loop.
+    if not entry.data.get(CONF_YAML_MIGRATED) and not room_subentries(entry):
+        payload = await hass.async_add_executor_job(read_migration_source, hass)
+        apply_migration(hass, entry, payload)
+    elif not entry.data.get(CONF_YAML_MIGRATED):
+        apply_migration(hass, entry, {"rooms": []})
+
     entry = hass.config_entries.async_get_entry(entry.entry_id) or entry
 
-    # Generate Lovelace YAML under /config/homio/layout from UI config
-    await hass.async_add_executor_job(generate_dashboard, hass, entry)
+    # Resolve entity names on the loop, then generate YAML off-loop.
+    friendly_names = collect_friendly_names(hass, entry)
+    await hass.async_add_executor_job(generate_dashboard, hass, entry, friendly_names)
 
     # Register static paths and resources
     await _register_static_resources(hass)
@@ -165,7 +180,7 @@ async def _copy_packages_to_config(hass: HomeAssistant) -> None:
         _LOGGER.error(f"Failed to copy Homio packages: {e}")
 
 
-async def _create_template_sensors(hass: HomeAssistant) -> None:
+async def _create_template_sensors(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Create Homio template sensors programmatically (no YAML needed!)."""
     try:
         # Create Current Date sensor
@@ -191,7 +206,6 @@ async def _create_template_sensors(hass: HomeAssistant) -> None:
         # Set up periodic updates
         async def update_sensors(now=None):
             """Update the template sensors."""
-            from datetime import datetime
             now = datetime.now()
 
             # Format date: "Monday 29th December 2025"
@@ -208,10 +222,10 @@ async def _create_template_sensors(hass: HomeAssistant) -> None:
         # Update immediately
         await update_sensors()
 
-        # Update every minute
-        from homeassistant.helpers.event import async_track_time_interval
-        from datetime import timedelta
-        async_track_time_interval(hass, update_sensors, timedelta(minutes=1))
+        # Update every minute; unload with the config entry to avoid leaks on reload.
+        entry.async_on_unload(
+            async_track_time_interval(hass, update_sensors, timedelta(minutes=1))
+        )
 
         _LOGGER.info("✅ Homio template sensors created (sensor.homio_current_date, sensor.homio_current_time)")
 
@@ -310,16 +324,30 @@ async def _register_static_resources(hass: HomeAssistant) -> None:
     # Panel SPA stays at /homio_dashboard (url_path=DOMAIN).
     # Bundled JS must use a different first path segment (/homiofiles) so a
     # hard refresh of /homio_dashboard/living reaches IndexView instead of
-    # StaticResource 404. Icons/rooms stay on /homio_assets.
+    # StaticResource 404. Only expose icons/ and rooms/ under /homio_assets —
+    # never the layout/ tree (entity inventory).
     try:
         await hass.http.async_register_static_paths(
             [
                 StaticPathConfig(STATIC_URL, str(www_dir), cache_headers=False),
-                StaticPathConfig(USER_ASSETS_URL, str(data_dir), cache_headers=False),
+                StaticPathConfig(
+                    f"{USER_ASSETS_URL}/icons",
+                    str(data_dir / "icons"),
+                    cache_headers=False,
+                ),
+                StaticPathConfig(
+                    f"{USER_ASSETS_URL}/rooms",
+                    str(data_dir / "rooms"),
+                    cache_headers=False,
+                ),
             ]
         )
         _LOGGER.info("Registered static path: %s -> %s", STATIC_URL, www_dir)
-        _LOGGER.info("Registered static path: %s -> %s", USER_ASSETS_URL, data_dir)
+        _LOGGER.info(
+            "Registered static paths: %s/icons|rooms -> %s",
+            USER_ASSETS_URL,
+            data_dir,
+        )
     except RuntimeError:
         _LOGGER.debug("Homio static paths already registered")
 
@@ -369,8 +397,7 @@ async def _setup_dashboard_panel(hass: HomeAssistant, entry: ConfigEntry) -> Non
     # Get lovelace data
     lovelace_data = hass.data.get("lovelace")
     if not lovelace_data:
-        _LOGGER.error("Lovelace data not available")
-        return
+        raise ConfigEntryNotReady("Lovelace is not ready yet")
 
     # Create the Lovelace YAML dashboard
     dashboard = LovelaceYAML(hass, DOMAIN, dashboard_config)
