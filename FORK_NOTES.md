@@ -9,7 +9,7 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.4** (`const.VERSION` — bump when changing registered JS or YAML panel).
+Integration version: **1.0.5** (`const.VERSION` — bump when changing registered JS or YAML panel).
 
 ## Status
 

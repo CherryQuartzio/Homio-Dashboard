@@ -60,15 +60,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    # Remove the dashboard from lovelace
+    # Drop Lovelace dashboard object first, then remove the sidebar panel.
+    # Leaving the panel registered causes Reload to fail with:
+    # ValueError: Overwriting panel homio_dashboard owned by lovelace
     lovelace_data = hass.data.get("lovelace")
-    if lovelace_data and hasattr(lovelace_data, "dashboards") and DOMAIN in lovelace_data.dashboards:
-        # Remove from dashboards dict
-        if hasattr(lovelace_data, "dashboards"):
-            lovelace_data.dashboards.pop(DOMAIN, None)
-        else:
-            lovelace_data["dashboards"].pop(DOMAIN, None)
+    if lovelace_data is not None:
+        dashboards = getattr(lovelace_data, "dashboards", None)
+        if dashboards is None and isinstance(lovelace_data, dict):
+            dashboards = lovelace_data.get("dashboards")
+        if isinstance(dashboards, dict):
+            dashboards.pop(DOMAIN, None)
 
+    async_remove_panel(hass, DOMAIN)
     return True
 
 
@@ -371,6 +374,11 @@ async def _setup_dashboard_panel(hass: HomeAssistant, entry: ConfigEntry) -> Non
         raise
 
     # Register the panel in the frontend sidebar (this makes the icon show up!)
-    _register_panel(hass, DOMAIN, "yaml", dashboard_config, False)
+    # update=True allows Reload when unload could not clear the panel (or race).
+    try:
+        _register_panel(hass, DOMAIN, "yaml", dashboard_config, False)
+    except ValueError:
+        _LOGGER.debug("Homio panel already registered; updating in place")
+        _register_panel(hass, DOMAIN, "yaml", dashboard_config, True)
 
-    _LOGGER.info(f"Homio Dashboard panel registered successfully")
+    _LOGGER.info("Homio Dashboard panel registered successfully")

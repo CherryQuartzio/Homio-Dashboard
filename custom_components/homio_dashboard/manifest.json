@@ -7,5 +7,6 @@
   "documentation": "https://github.com/iamtherufus/Homio",
   "iot_class": "calculated",
   "requirements": [],
-  "version": "1.0.4"
+  "version": "1.0.5"
 }
+
