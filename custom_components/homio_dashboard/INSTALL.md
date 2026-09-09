@@ -69,7 +69,7 @@ Click the Homio icon (⭐+) in your sidebar to access your dashboard!
 
 Configure Homio from the integration UI (no hand-editing of Lovelace YAML):
 
-1. **Settings → Devices & Services → Homio → Configure** — logo name, logo home room, navigation order
+1. **Settings → Devices & Services → Homio → Configure** — logo name, logo home room, navigation order, clock format / AM/PM / tap action
 2. **Add room** / configure each room — nav name, display name, background stem, sensors, devices
 3. Device icon stems (second step) map to `/config/homio/icons/{stem}.svg` (auto-filled on first add)
 

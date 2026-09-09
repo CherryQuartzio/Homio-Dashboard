@@ -13,6 +13,18 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import slugify as ha_slugify
 
 from .const import (
+    CLOCK_FORMAT_12,
+    CLOCK_FORMAT_24,
+    CLOCK_TAP_MORE_INFO,
+    CLOCK_TAP_NAVIGATE,
+    CLOCK_TAP_NONE,
+    CLOCK_TAP_URL,
+    CONF_CLOCK_FORMAT,
+    CONF_CLOCK_MORE_INFO_ENTITY,
+    CONF_CLOCK_NAVIGATION_PATH,
+    CONF_CLOCK_SHOW_AM_PM,
+    CONF_CLOCK_TAP_ACTION,
+    CONF_CLOCK_URL,
     CONF_DEVICE_ENTITY,
     CONF_DEVICE_ICON,
     CONF_DEVICES,
@@ -32,6 +44,9 @@ from .const import (
     CONF_SLUG,
     CONF_TEMP_SENSOR,
     CONF_YAML_MIGRATED,
+    DEFAULT_CLOCK_FORMAT,
+    DEFAULT_CLOCK_SHOW_AM_PM,
+    DEFAULT_CLOCK_TAP_ACTION,
     DEFAULT_DEVICE_ICON,
     DEFAULT_IMAGE_POSITION,
     DEFAULT_LOGO_NAME,
@@ -315,6 +330,101 @@ def _navigation_yaml(rooms: list[dict[str, Any]]) -> str:
     return _GENERATED_HEADER + ("\n".join(blocks) if blocks else "[]\n")
 
 
+def _clock_tap_action(options: dict[str, Any]) -> dict[str, Any]:
+    """Build button-card tap_action from Homio clock options."""
+    action = str(options.get(CONF_CLOCK_TAP_ACTION) or DEFAULT_CLOCK_TAP_ACTION)
+    if action == CLOCK_TAP_NAVIGATE:
+        path = str(options.get(CONF_CLOCK_NAVIGATION_PATH) or "").strip()
+        if not path:
+            return {"action": CLOCK_TAP_NONE}
+        return {"action": CLOCK_TAP_NAVIGATE, "navigation_path": path}
+    if action == CLOCK_TAP_URL:
+        url = str(options.get(CONF_CLOCK_URL) or "").strip()
+        if not url:
+            return {"action": CLOCK_TAP_NONE}
+        return {"action": CLOCK_TAP_URL, "url_path": url}
+    if action == CLOCK_TAP_MORE_INFO:
+        entity = str(options.get(CONF_CLOCK_MORE_INFO_ENTITY) or "").strip()
+        if not entity:
+            return {"action": CLOCK_TAP_NONE}
+        return {"action": CLOCK_TAP_MORE_INFO, "entity": entity}
+    return {"action": CLOCK_TAP_NONE}
+
+
+def _patch_time_file(button_cards_dir: Path, options: dict[str, Any]) -> None:
+    """Overwrite clock template with format, AM/PM, and tap action."""
+    clock_format = str(options.get(CONF_CLOCK_FORMAT) or DEFAULT_CLOCK_FORMAT)
+    if clock_format not in (CLOCK_FORMAT_12, CLOCK_FORMAT_24):
+        clock_format = DEFAULT_CLOCK_FORMAT
+    show_am_pm = bool(options.get(CONF_CLOCK_SHOW_AM_PM, DEFAULT_CLOCK_SHOW_AM_PM))
+    use_12 = clock_format == CLOCK_FORMAT_12
+    tap = _clock_tap_action(options)
+    tap_yaml = yaml.safe_dump(
+        {"tap_action": tap},
+        default_flow_style=False,
+        allow_unicode=True,
+        sort_keys=False,
+    ).rstrip()
+    tap_yaml = "\n".join(
+        f"  {line}" if line else line for line in tap_yaml.splitlines()
+    )
+
+    # Format client-side so display matches options even when a durable helper
+    # sensor (sensor.homio_current_time_2) has a different string format.
+    time_yaml = f"""homio_time:
+  template:
+    - homio_default
+  show_icon: false
+  show_state: false
+  entity: sensor.homio_current_time
+  triggers_update: all
+{tap_yaml}
+  name: |
+    [[[
+      const use12 = {str(use_12).lower()};
+      const showAmPm = {str(show_am_pm).lower()};
+      const d = new Date();
+      let h = d.getHours();
+      const m = String(d.getMinutes()).padStart(2, '0');
+      if (!use12) {{
+        return String(h).padStart(2, '0') + ':' + m;
+      }}
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      if (h === 0) h = 12;
+      return showAmPm ? (h + ':' + m + ' ' + ampm) : (h + ':' + m);
+    ]]]
+  styles:
+    grid:
+      - grid-template-areas: '"n"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: min-content
+    name:
+      - color: var(--primary-text-color)
+      - letter-spacing: 1px
+      - font-size: 16px
+      - text-transform: uppercase
+      - font-weight: 700
+      - justify-self: start
+    card:
+      - "--ha-card-background": transparent
+      - background: none
+      - background-color: transparent
+      - box-shadow: none
+      - border: none
+      - pointer-events: all
+      - height: auto
+      - min-height: 0
+      - width: auto
+      - padding: 0
+      - margin: 0
+      - animation: none
+"""
+    base = button_cards_dir / "base"
+    base.mkdir(parents=True, exist_ok=True)
+    (base / "homio_time.yaml").write_text(time_yaml, encoding="utf-8")
+
+
 def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) -> None:
     """Overwrite logo templates with configured name and home path."""
     path = f"/{DOMAIN}/{home_slug}" if home_slug else f"/{DOMAIN}"
@@ -436,6 +546,7 @@ def generate_dashboard(
 
     _patch_navigation_include(includes_dest, nav_abs)
     _patch_logo_files(button_cards_dest, logo_name, home_slug)
+    _patch_time_file(button_cards_dest, dict(options))
 
     navigation_path(hass).write_text(_navigation_yaml(rooms), encoding="utf-8")
 
@@ -696,6 +807,16 @@ def apply_migration(hass: HomeAssistant, entry: ConfigEntry, payload: dict[str, 
         CONF_LOGO_NAME: entry.options.get(CONF_LOGO_NAME) or logo_name,
         CONF_LOGO_HOME_ROOM: entry.options.get(CONF_LOGO_HOME_ROOM) or (home_slug or ""),
         CONF_NAV_ORDER: entry.options.get(CONF_NAV_ORDER) or nav_order,
+        CONF_CLOCK_FORMAT: entry.options.get(CONF_CLOCK_FORMAT) or DEFAULT_CLOCK_FORMAT,
+        CONF_CLOCK_SHOW_AM_PM: entry.options.get(
+            CONF_CLOCK_SHOW_AM_PM, DEFAULT_CLOCK_SHOW_AM_PM
+        ),
+        CONF_CLOCK_TAP_ACTION: entry.options.get(
+            CONF_CLOCK_TAP_ACTION, DEFAULT_CLOCK_TAP_ACTION
+        ),
+        CONF_CLOCK_NAVIGATION_PATH: entry.options.get(CONF_CLOCK_NAVIGATION_PATH, ""),
+        CONF_CLOCK_URL: entry.options.get(CONF_CLOCK_URL, ""),
+        CONF_CLOCK_MORE_INFO_ENTITY: entry.options.get(CONF_CLOCK_MORE_INFO_ENTITY, ""),
     }
     hass.config_entries.async_update_entry(
         entry,

@@ -19,6 +19,18 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
+    CLOCK_FORMAT_12,
+    CLOCK_FORMAT_24,
+    CLOCK_TAP_MORE_INFO,
+    CLOCK_TAP_NAVIGATE,
+    CLOCK_TAP_NONE,
+    CLOCK_TAP_URL,
+    CONF_CLOCK_FORMAT,
+    CONF_CLOCK_MORE_INFO_ENTITY,
+    CONF_CLOCK_NAVIGATION_PATH,
+    CONF_CLOCK_SHOW_AM_PM,
+    CONF_CLOCK_TAP_ACTION,
+    CONF_CLOCK_URL,
     CONF_DEVICE_ENTITY,
     CONF_DEVICE_ICON,
     CONF_DEVICES,
@@ -37,6 +49,9 @@ from .const import (
     CONF_SHOW_TEMP,
     CONF_SLUG,
     CONF_TEMP_SENSOR,
+    DEFAULT_CLOCK_FORMAT,
+    DEFAULT_CLOCK_SHOW_AM_PM,
+    DEFAULT_CLOCK_TAP_ACTION,
     DEFAULT_IMAGE_POSITION,
     DEFAULT_LOGO_NAME,
     DOMAIN,
@@ -85,6 +100,12 @@ class HomioConfigFlow(ConfigFlow, domain=DOMAIN):
                     CONF_LOGO_NAME: DEFAULT_LOGO_NAME,
                     CONF_LOGO_HOME_ROOM: "",
                     CONF_NAV_ORDER: [],
+                    CONF_CLOCK_FORMAT: DEFAULT_CLOCK_FORMAT,
+                    CONF_CLOCK_SHOW_AM_PM: DEFAULT_CLOCK_SHOW_AM_PM,
+                    CONF_CLOCK_TAP_ACTION: DEFAULT_CLOCK_TAP_ACTION,
+                    CONF_CLOCK_NAVIGATION_PATH: "",
+                    CONF_CLOCK_URL: "",
+                    CONF_CLOCK_MORE_INFO_ENTITY: "",
                 },
             )
 
@@ -106,7 +127,7 @@ class HomioConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class HomioOptionsFlow(OptionsFlow):
-    """Global Homio options: logo, home room, nav order."""
+    """Global Homio options: logo, home room, nav order, clock."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -115,9 +136,9 @@ class HomioOptionsFlow(OptionsFlow):
         entry = self.config_entry
         rooms = _room_select_options(entry)
         nav_rooms = _room_select_options(entry, nav_only=True)
+        prev = entry.options
 
         if user_input is not None:
-            prev = entry.options
             logo_name = user_input.get(
                 CONF_LOGO_NAME, prev.get(CONF_LOGO_NAME, DEFAULT_LOGO_NAME)
             )
@@ -133,27 +154,66 @@ class HomioOptionsFlow(OptionsFlow):
                     nav_order = [nav_order]
             else:
                 nav_order = list(prev.get(CONF_NAV_ORDER, []))
+
+            clock_format = user_input.get(
+                CONF_CLOCK_FORMAT, prev.get(CONF_CLOCK_FORMAT, DEFAULT_CLOCK_FORMAT)
+            )
+            if clock_format not in (CLOCK_FORMAT_12, CLOCK_FORMAT_24):
+                clock_format = DEFAULT_CLOCK_FORMAT
+            show_am_pm = user_input.get(
+                CONF_CLOCK_SHOW_AM_PM,
+                prev.get(CONF_CLOCK_SHOW_AM_PM, DEFAULT_CLOCK_SHOW_AM_PM),
+            )
+            tap_action = user_input.get(
+                CONF_CLOCK_TAP_ACTION,
+                prev.get(CONF_CLOCK_TAP_ACTION, DEFAULT_CLOCK_TAP_ACTION),
+            )
+            if tap_action not in (
+                CLOCK_TAP_NONE,
+                CLOCK_TAP_NAVIGATE,
+                CLOCK_TAP_URL,
+                CLOCK_TAP_MORE_INFO,
+            ):
+                tap_action = DEFAULT_CLOCK_TAP_ACTION
+
+            nav_path = user_input.get(
+                CONF_CLOCK_NAVIGATION_PATH,
+                prev.get(CONF_CLOCK_NAVIGATION_PATH, ""),
+            ) or ""
+            clock_url = user_input.get(
+                CONF_CLOCK_URL, prev.get(CONF_CLOCK_URL, "")
+            ) or ""
+            more_info = user_input.get(
+                CONF_CLOCK_MORE_INFO_ENTITY,
+                prev.get(CONF_CLOCK_MORE_INFO_ENTITY, ""),
+            ) or ""
+
             return self.async_create_entry(
                 title="",
                 data={
                     CONF_LOGO_NAME: logo_name,
                     CONF_LOGO_HOME_ROOM: home_room,
                     CONF_NAV_ORDER: list(nav_order),
+                    CONF_CLOCK_FORMAT: clock_format,
+                    CONF_CLOCK_SHOW_AM_PM: bool(show_am_pm),
+                    CONF_CLOCK_TAP_ACTION: tap_action,
+                    CONF_CLOCK_NAVIGATION_PATH: str(nav_path),
+                    CONF_CLOCK_URL: str(clock_url),
+                    CONF_CLOCK_MORE_INFO_ENTITY: str(more_info),
                 },
             )
 
         schema: dict[Any, Any] = {
             vol.Optional(
                 CONF_LOGO_NAME,
-                default=entry.options.get(CONF_LOGO_NAME, DEFAULT_LOGO_NAME),
+                default=prev.get(CONF_LOGO_NAME, DEFAULT_LOGO_NAME),
             ): selector.TextSelector(),
         }
         if rooms:
             schema[
                 vol.Optional(
                     CONF_LOGO_HOME_ROOM,
-                    default=entry.options.get(CONF_LOGO_HOME_ROOM)
-                    or rooms[0]["value"],
+                    default=prev.get(CONF_LOGO_HOME_ROOM) or rooms[0]["value"],
                 )
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
@@ -163,7 +223,7 @@ class HomioOptionsFlow(OptionsFlow):
         if nav_rooms:
             current_order = [
                 slug
-                for slug in entry.options.get(CONF_NAV_ORDER, [])
+                for slug in prev.get(CONF_NAV_ORDER, [])
                 if any(o["value"] == slug for o in nav_rooms)
             ]
             if not current_order:
@@ -176,6 +236,69 @@ class HomioOptionsFlow(OptionsFlow):
                     multiple=True,
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
+            )
+
+        schema[
+            vol.Optional(
+                CONF_CLOCK_FORMAT,
+                default=prev.get(CONF_CLOCK_FORMAT, DEFAULT_CLOCK_FORMAT),
+            )
+        ] = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[
+                    {"value": CLOCK_FORMAT_24, "label": "24-hour"},
+                    {"value": CLOCK_FORMAT_12, "label": "12-hour"},
+                ],
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            )
+        )
+        schema[
+            vol.Optional(
+                CONF_CLOCK_SHOW_AM_PM,
+                default=bool(
+                    prev.get(CONF_CLOCK_SHOW_AM_PM, DEFAULT_CLOCK_SHOW_AM_PM)
+                ),
+            )
+        ] = selector.BooleanSelector()
+        schema[
+            vol.Optional(
+                CONF_CLOCK_TAP_ACTION,
+                default=prev.get(CONF_CLOCK_TAP_ACTION, DEFAULT_CLOCK_TAP_ACTION),
+            )
+        ] = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[
+                    {"value": CLOCK_TAP_NONE, "label": "Nothing"},
+                    {"value": CLOCK_TAP_NAVIGATE, "label": "Navigate"},
+                    {"value": CLOCK_TAP_URL, "label": "URL"},
+                    {"value": CLOCK_TAP_MORE_INFO, "label": "More info"},
+                ],
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            )
+        )
+        schema[
+            vol.Optional(
+                CONF_CLOCK_NAVIGATION_PATH,
+                default=prev.get(CONF_CLOCK_NAVIGATION_PATH, "") or "",
+            )
+        ] = selector.TextSelector()
+        schema[
+            vol.Optional(
+                CONF_CLOCK_URL,
+                default=prev.get(CONF_CLOCK_URL, "") or "",
+            )
+        ] = selector.TextSelector()
+        more_info_default = prev.get(CONF_CLOCK_MORE_INFO_ENTITY) or None
+        if more_info_default:
+            schema[
+                vol.Optional(
+                    CONF_CLOCK_MORE_INFO_ENTITY,
+                    default=more_info_default,
+                )
+            ] = selector.EntitySelector()
+        else:
+            schema[vol.Optional(CONF_CLOCK_MORE_INFO_ENTITY)] = (
+                selector.EntitySelector()
             )
 
         return self.async_show_form(step_id="init", data_schema=vol.Schema(schema))

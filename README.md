@@ -42,7 +42,7 @@ Configure Homio from **Settings → Devices & Services → Homio** (no Lovelace 
 
 | Action | What it does |
 |--------|----------------|
-| **Configure** | Logo text, which room the logo opens, navigation order |
+| **Configure** | Logo text, which room the logo opens, navigation order, clock format / AM/PM / tap action |
 | **Add room** | Room name, background stem, optional temp / humidity / motion sensors, and devices |
 
 ### Room backgrounds

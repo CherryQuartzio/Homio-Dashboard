@@ -1,7 +1,7 @@
 """Constants for the Homio Dashboard integration."""
 
 DOMAIN = "homio_dashboard"
-VERSION = "1.0.12"
+VERSION = "1.0.13"
 
 # Bundled JS/community modules. Must NOT share the panel url_path prefix
 # (/homio_dashboard) — a StaticPathConfig there steals hard-refresh GETs
@@ -23,6 +23,26 @@ CONF_LOGO_NAME = "logo_name"
 CONF_LOGO_HOME_ROOM = "logo_home_room"
 CONF_NAV_ORDER = "nav_order"
 
+CONF_CLOCK_FORMAT = "clock_format"
+CONF_CLOCK_SHOW_AM_PM = "clock_show_am_pm"
+CONF_CLOCK_TAP_ACTION = "clock_tap_action"
+CONF_CLOCK_NAVIGATION_PATH = "clock_navigation_path"
+CONF_CLOCK_URL = "clock_url"
+CONF_CLOCK_MORE_INFO_ENTITY = "clock_more_info_entity"
+
+CLOCK_FORMAT_12 = "12"
+CLOCK_FORMAT_24 = "24"
+CLOCK_TAP_NONE = "none"
+CLOCK_TAP_NAVIGATE = "navigate"
+CLOCK_TAP_URL = "url"
+CLOCK_TAP_MORE_INFO = "more-info"
+
+DEFAULT_LOGO_NAME = "HOMIO."
+DEFAULT_IMAGE_POSITION = "center center"
+DEFAULT_CLOCK_FORMAT = CLOCK_FORMAT_24
+DEFAULT_CLOCK_SHOW_AM_PM = True
+DEFAULT_CLOCK_TAP_ACTION = CLOCK_TAP_NONE
+
 CONF_NAV_NAME = "nav_name"
 CONF_SLUG = "slug"
 CONF_DISPLAY_NAME = "display_name"
@@ -40,9 +60,6 @@ CONF_DEVICE_ENTITY = "entity"
 CONF_DEVICE_ICON = "icon"
 
 SUBENTRY_TYPE_ROOM = "room"
-
-DEFAULT_LOGO_NAME = "HOMIO."
-DEFAULT_IMAGE_POSITION = "center center"
 
 # Homio SVG stems under /homio_assets/icons/{stem}.svg
 DOMAIN_ICON_MAP: dict[str, str | None] = {

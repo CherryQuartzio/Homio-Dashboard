@@ -17,16 +17,28 @@
     "step": {
       "init": {
         "title": "Homio options",
-        "description": "Logo text, which room the logo opens, and navigation order. Manage rooms via Add room / Configure on this integration.",
+        "description": "Logo text, logo home room, navigation order, and header clock (format, AM/PM, tap action). Manage rooms via Add room / Configure on this integration.",
         "data": {
           "logo_name": "Logo name",
           "logo_home_room": "Logo home room",
-          "nav_order": "Navigation order"
+          "nav_order": "Navigation order",
+          "clock_format": "Clock format",
+          "clock_show_am_pm": "Show AM/PM",
+          "clock_tap_action": "Clock tap action",
+          "clock_navigation_path": "Clock navigation path",
+          "clock_url": "Clock URL",
+          "clock_more_info_entity": "Clock more-info entity"
         },
         "data_description": {
           "logo_name": "Shown in the Homio header (default HOMIO.).",
           "logo_home_room": "Room opened when tapping the logo. May be a room hidden from the nav list.",
-          "nav_order": "Rooms shown in the header. Selection order is the navigation order (Select does not support drag-reorder)."
+          "nav_order": "Rooms shown in the header. Selection order is the navigation order (Select does not support drag-reorder).",
+          "clock_format": "12-hour or 24-hour clock in the header.",
+          "clock_show_am_pm": "When using 12-hour format, show AM/PM after the time.",
+          "clock_tap_action": "What happens when the clock is tapped (same idea as a Lovelace card tap action).",
+          "clock_navigation_path": "Used when tap action is Navigate (for example /lovelace/home or /homio_dashboard/living).",
+          "clock_url": "Used when tap action is URL (opens in the browser).",
+          "clock_more_info_entity": "Used when tap action is More info. Pick any entity; leave empty to do nothing."
         }
       }
     }
@@ -50,7 +62,7 @@
         },
         "room": {
           "title": "Room details",
-          "description": "Background image stem loads from /homio_assets/rooms/<stem>.jpg (file under /config/homio/rooms/). Pick devices in dashboard order.",
+          "description": "Background image stem loads from /homio_assets/rooms/STEM.jpg (file under /config/homio/rooms/). Pick devices in dashboard order.",
           "data": {
             "nav_name": "Navigation name",
             "display_name": "Display name (optional)",
@@ -74,7 +86,7 @@
         },
         "device_icons": {
           "title": "Device icons",
-          "description": "Icon stem for each device → /homio_assets/icons/<stem>.svg under /config/homio/icons/. New devices are pre-filled from a domain default; existing values are kept."
+          "description": "Icon stem for each device maps to /homio_assets/icons/STEM.svg under /config/homio/icons/. New devices are pre-filled from a domain default; existing values are kept."
         }
       },
       "abort": {

@@ -17,7 +17,18 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CONF_YAML_MIGRATED, DOMAIN, STATIC_URL, USER_ASSETS_URL, VERSION
+from .const import (
+    CLOCK_FORMAT_12,
+    CONF_CLOCK_FORMAT,
+    CONF_CLOCK_SHOW_AM_PM,
+    CONF_YAML_MIGRATED,
+    DEFAULT_CLOCK_FORMAT,
+    DEFAULT_CLOCK_SHOW_AM_PM,
+    DOMAIN,
+    STATIC_URL,
+    USER_ASSETS_URL,
+    VERSION,
+)
 from .dashboard_generator import (
     apply_migration,
     collect_friendly_names,
@@ -182,6 +193,19 @@ async def _copy_packages_to_config(hass: HomeAssistant) -> None:
 
 async def _create_template_sensors(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Create Homio template sensors programmatically (no YAML needed!)."""
+
+    def _format_time(now: datetime) -> str:
+        opts = entry.options
+        fmt = str(opts.get(CONF_CLOCK_FORMAT) or DEFAULT_CLOCK_FORMAT)
+        show_am_pm = bool(opts.get(CONF_CLOCK_SHOW_AM_PM, DEFAULT_CLOCK_SHOW_AM_PM))
+        if fmt == CLOCK_FORMAT_12:
+            hour = now.hour % 12 or 12
+            stamp = f"{hour}:{now.strftime('%M')}"
+            if show_am_pm:
+                stamp = f"{stamp} {now.strftime('%p')}"
+            return stamp
+        return now.strftime("%H:%M")
+
     try:
         # Create Current Date sensor
         hass.states.async_set(
@@ -212,9 +236,7 @@ async def _create_template_sensors(hass: HomeAssistant, entry: ConfigEntry) -> N
             day = now.day
             suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
             date_str = now.strftime(f"%A {day}{suffix} %B %Y")
-
-            # Format time: "14:30"
-            time_str = now.strftime("%H:%M")
+            time_str = _format_time(now)
 
             hass.states.async_set("sensor.homio_current_date", date_str)
             hass.states.async_set("sensor.homio_current_time", time_str)

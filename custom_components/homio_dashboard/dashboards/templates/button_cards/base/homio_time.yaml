@@ -3,17 +3,25 @@ homio_time:
     - homio_default
   show_icon: false
   show_state: false
-  # Durable template helper (Homio's ephemeral async_set sensor does not persist).
-  entity: sensor.homio_current_time_2
+  # Trigger minute updates; tap is configured via Homio options (default: none).
+  entity: sensor.homio_current_time
   triggers_update: all
+  tap_action:
+    action: none
   name: |
     [[[
-      const t = states['sensor.homio_current_time_2'] || states['sensor.homio_current_time'];
-      if (t && t.state && t.state !== 'unknown' && t.state !== 'unavailable') {
-        return t.state;
-      }
+      const use12 = false;
+      const showAmPm = true;
       const d = new Date();
-      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      let h = d.getHours();
+      const m = String(d.getMinutes()).padStart(2, '0');
+      if (!use12) {
+        return String(h).padStart(2, '0') + ':' + m;
+      }
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      if (h === 0) h = 12;
+      return showAmPm ? (h + ':' + m + ' ' + ampm) : (h + ':' + m);
     ]]]
   styles:
     grid:
