@@ -43,6 +43,7 @@ homio_menu_icon:
       - width: 28px
       - min-height: 0
       - overflow: visible
+      - animation: none
     grid:
       - grid-template-areas: '"i"'
       - grid-template-columns: 1fr

@@ -64,16 +64,20 @@ homio_light:
             - border-radius: 0px
             - border: none
             - background: transparent
+            - box-shadow: none
           track:
             - background: hsl(0 0% 98%)
             - border-radius: 20px
+            - box-shadow: none
           container:
             - border-radius: 0
             - overflow: visible
+            - box-shadow: none
           progress:
             - background: hsl(0 0% 75%)
             - border-top-left-radius: 20px
             - border-bottom-left-radius: 20px
+            - box-shadow: none
           thumb:
             - display: block
             - width: 16px
@@ -81,4 +85,5 @@ homio_light:
             - border-radius: 50%
             - background: white
             - transform: translateY(-4px)
-            - box-shadow: none
+            # Knob only — rail/track must stay flat (no elevation).
+            - box-shadow: 2px 0 8px 2px rgba(0, 0, 0, 0.15)

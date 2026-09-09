@@ -39,3 +39,4 @@ homio_time:
       - width: auto
       - padding: 0
       - margin: 0
+      - animation: none

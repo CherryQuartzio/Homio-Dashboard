@@ -64,8 +64,11 @@ homio_entity:
               ]]]
   styles:
     card:
-      - background: "rgba(255,255,255,0.1)"
-      - backdrop-filter: blur(12px)
+      # --homio-entity-* set by www/homio-entity-strip.js: Chromium keeps glass
+      # blur; Firefox/Safari/iOS WebKit drop blur (overflow clip paints a left fringe).
+      - background: "var(--homio-entity-bg, rgba(255,255,255,0.1))"
+      - backdrop-filter: "var(--homio-entity-backdrop, blur(12px))"
+      - "-webkit-backdrop-filter": "var(--homio-entity-backdrop, blur(12px))"
       - height: 170px
       # Match horizontal inset; icon optical nudge stays on img_cell translateX.
       - padding-left: 28px
@@ -81,6 +84,7 @@ homio_entity:
       - -webkit-backface-visibility: hidden
       - backface-visibility: hidden
       - isolation: isolate
+      - transform: translateZ(0)
       - --ha-ripple-hover-opacity: 0.08
       - --ha-ripple-pressed-opacity: 0.12
       - --mdc-ripple-hover-opacity: 0.04

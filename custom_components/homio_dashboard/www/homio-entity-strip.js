@@ -14,6 +14,30 @@
   let nestedRippleRaf = 0;
   let nestedRippleFrames = 0;
 
+  // Firefox + Safari/iOS WebKit paint a dark fringe when backdrop-filter cards
+  // are clipped by the strip overflow. Chromium (incl. Android companion) is fine.
+  function backdropFringesOnClip() {
+    const ua = navigator.userAgent || "";
+    if (/Firefox\//.test(ua)) return true;
+    if (/iP(hone|ad|od)/.test(ua)) return true;
+    // Desktop Safari (and other non-Chromium WebKit): has Safari, not Chrome/Edg.
+    if (/Safari/.test(ua) && !/Chrome|Chromium|Edg\/|OPR\//.test(ua)) return true;
+    return false;
+  }
+
+  function applyEntityGlassVars() {
+    const root = document.documentElement;
+    if (backdropFringesOnClip()) {
+      // Opaque-enough frosted stand-in — no blur, so no left-edge clip fringe.
+      root.style.setProperty("--homio-entity-backdrop", "none");
+      root.style.setProperty("--homio-entity-bg", "rgba(40, 40, 40, 0.62)");
+    } else {
+      root.style.setProperty("--homio-entity-backdrop", "blur(12px)");
+      root.style.setProperty("--homio-entity-bg", "rgba(255, 255, 255, 0.1)");
+    }
+  }
+  applyEntityGlassVars();
+
   function onHomioPath() {
     const path = window.location.pathname || "";
     if (PATH_PREFIXES.some((p) => path === p || path.startsWith(p + "/"))) return true;
@@ -56,15 +80,23 @@
     root.style.setProperty("scrollbar-width", "none", "important");
     root.style.setProperty("-ms-overflow-style", "none", "important");
     const sr = root.getRootNode && root.getRootNode();
-    if (sr && sr instanceof ShadowRoot && !sr.getElementById("homio-strip-scrollbar-hide")) {
-      const style = document.createElement("style");
+    if (!(sr && sr instanceof ShadowRoot)) return;
+    let style = sr.getElementById("homio-strip-scrollbar-hide");
+    if (!style) {
+      style = document.createElement("style");
       style.id = "homio-strip-scrollbar-hide";
-      style.textContent =
-        "#root { scrollbar-width: none !important; -ms-overflow-style: none !important; box-shadow: none !important; }" +
-        "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }" +
-        "#root > * { box-shadow: none !important; filter: none !important; }";
       sr.appendChild(style);
     }
+    // Radial mask is a known Safari/WebKit fix for overflow + filter/backdrop fringe.
+    style.textContent =
+      "#root {" +
+      "scrollbar-width: none !important; -ms-overflow-style: none !important;" +
+      "box-shadow: none !important; isolation: isolate; transform: translateZ(0);" +
+      "-webkit-mask-image: -webkit-radial-gradient(white, black);" +
+      "mask-image: radial-gradient(white, black);" +
+      "}" +
+      "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }" +
+      "#root > * { box-shadow: none !important; filter: none !important; }";
   }
 
   function setPad(root) {

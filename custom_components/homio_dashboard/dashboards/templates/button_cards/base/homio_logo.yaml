@@ -7,6 +7,12 @@ homio_logo:
   # Keep in sync with homio_mobile_logo (collapsed hamburger header).
   name: HOMIO.
   styles:
+    grid:
+      - grid-template-areas: '"n"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      - place-items: center start
+      - height: 100%
     name:
       - color: var(--primary-text-color)
       - letter-spacing: 2px
@@ -14,7 +20,10 @@ homio_logo:
       - font-weight: 700
       - text-transform: uppercase
       - justify-self: start
-      - line-height: 18px
+      - align-self: center
+      - line-height: 1
+      - margin: 0
+      - padding: 0
     card:
       - "--ha-card-background": transparent
       - background: none
@@ -22,7 +31,10 @@ homio_logo:
       - box-shadow: none
       - border: none
       - pointer-events: all
-      - height: 18px
-      - min-height: 0
+      - height: 22px
+      - min-height: 22px
+      - display: grid
+      - align-items: center
       - padding: 0
       - margin: 0
+      - animation: none

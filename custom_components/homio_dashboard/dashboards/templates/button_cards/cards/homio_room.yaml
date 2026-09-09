@@ -88,6 +88,9 @@ homio_room:
       - padding-left: 8vw
       - overflow: hidden
       - box-sizing: border-box
+      # Room+header must not fadeIn — each room is a separate view; fade made the
+      # nav disappear/reappear on every room change.
+      - animation: none
       - pointer-events: var(--homio-room-pointer-events, none)
       # Spaces after rgba(...) required — Chromium rejects )0% color-stops and drops the whole background.
       - background: |

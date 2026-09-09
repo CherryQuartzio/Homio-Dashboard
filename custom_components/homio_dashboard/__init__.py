@@ -361,6 +361,7 @@ async def _register_static_resources(hass: HomeAssistant) -> None:
         "community/layout-card-modified/layout-card-modified.js",
         "homio-menu-nav.js",
         "homio-header-fit.js",
+        "homio-header-persist.js",
         "homio-entity-strip.js",
         "homio-room-text-fit.js",
         "homio-nested-ripple-kill.js",
