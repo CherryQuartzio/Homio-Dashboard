@@ -443,17 +443,34 @@ def generate_dashboard(
         _room_view_yaml(room, includes_abs, names) for room in rooms
     )
     if not views.strip():
-        views = """  - type: custom:grid-layout
-    title: Home
+        views = """  - type: panel
+    title: Welcome
     path: home
     theme: homio
-    layout: !include {includes}/homio_screen_layout.yaml
     cards:
       - type: markdown
-        content: >
-          Configure Homio rooms under
-          **Settings → Devices & Services → Homio → Add room**.
-""".format(includes=includes_abs)
+        content: |
+          # Welcome to Homio
+
+          Homio is ready. Configure your home from the integration UI — you do not need to edit YAML.
+
+          ## 1. Open Homio settings
+          Go to **Settings → Devices & Services → Homio**.
+
+          - **Configure** — logo name, which room the logo opens, navigation order
+          - **Add room** — rooms, backgrounds, sensors, and devices
+
+          ## 2. Add room images
+          Put JPG backgrounds in `/config/homio/rooms/` using the same stem you set on each room
+          (for example `lounge.jpg` for stem `lounge`).
+
+          Custom device icons (SVG) go in `/config/homio/icons/`.
+
+          ## 3. Theme
+          In your profile, select the **Homio** theme.
+
+          After you add rooms, reload Homio (or restart Home Assistant) if the dashboard does not refresh on its own.
+"""
 
     sections = f"""{_GENERATED_HEADER}
 kiosk_mode:
@@ -605,12 +622,11 @@ def _uniquify_room_slugs(rooms: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def read_migration_source(hass: HomeAssistant) -> dict[str, Any]:
     """Read legacy/bundled YAML off the event loop. Returns a plain payload dict."""
-    integration_dir = Path(__file__).parent
-    # Prefer user-owned dashboards before the bundled Daylor seed.
+    # Only migrate user-owned YAML. Do not auto-import the bundled Daylor seed so
+    # a fresh install shows the Welcome view pointing at Configure / Add room.
     candidates = [
         Path(hass.config.path("dashboards")) / "homio" / "homio.yaml",
         Path(hass.config.path("homio")) / "homio.yaml",
-        integration_dir / "lovelace" / "homio.yaml",
     ]
     rooms: list[dict[str, Any]] = []
     source: str | None = None
@@ -626,27 +642,6 @@ def read_migration_source(hass: HomeAssistant) -> dict[str, Any]:
     home_slug: str | None = None
     if rooms:
         home_slug = str(rooms[0].get(CONF_SLUG) or "") or None
-
-    if not rooms:
-        rooms = [
-            {
-                CONF_NAV_NAME: "Living",
-                CONF_SLUG: "living",
-                CONF_DISPLAY_NAME: "Living Room",
-                CONF_SHOW_IN_NAVIGATION: True,
-                CONF_IMAGE: "lounge",
-                CONF_IMAGE_POSITION: DEFAULT_IMAGE_POSITION,
-                CONF_SHOW_TEMP: False,
-                CONF_TEMP_SENSOR: None,
-                CONF_SHOW_HUMID: False,
-                CONF_HUMID_SENSOR: None,
-                CONF_SHOW_MOTION: False,
-                CONF_MOTION_SENSOR: None,
-                CONF_DEVICES: [],
-            }
-        ]
-        home_slug = "living"
-        source = None
 
     rooms = _uniquify_room_slugs(rooms)
     return {
@@ -675,8 +670,10 @@ def apply_migration(hass: HomeAssistant, entry: ConfigEntry, payload: dict[str, 
     source = payload.get("source")
     if source:
         _LOGGER.info("Migrating Homio rooms from %s", source)
+    elif rooms:
+        _LOGGER.info("Seeding Homio rooms from migration payload")
     else:
-        _LOGGER.info("Seeding Homio with a minimal Living room")
+        _LOGGER.info("No rooms yet — Homio welcome view will be shown until Add room")
 
     nav_order = [r[CONF_SLUG] for r in rooms if r.get(CONF_SHOW_IN_NAVIGATION, True)]
     if not home_slug and nav_order:

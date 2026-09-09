@@ -8,6 +8,9 @@
     },
     "abort": {
       "single_instance_allowed": "Only a single instance of Homio Dashboard is allowed."
+    },
+    "create_entry": {
+      "default": "Homio is set up. Open the Homio sidebar item, then go to **Settings → Devices & Services → Homio** to **Configure** the logo and **Add room** for each space. Put room JPGs in `/config/homio/rooms/` and optional icons in `/config/homio/icons/`."
     }
   },
   "options": {

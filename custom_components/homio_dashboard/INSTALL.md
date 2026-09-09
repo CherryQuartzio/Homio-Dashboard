@@ -75,7 +75,7 @@ Configure Homio from the integration UI (no hand-editing of Lovelace YAML):
 
 Room backgrounds go in `/config/homio/rooms/{stem}.jpg`. Generated dashboard files live under `/config/homio/layout/` and are overwritten on reload — do not edit them by hand.
 
-Bundled seed YAML remains at `custom_components/homio_dashboard/lovelace/homio.yaml` for first-run migration only.
+A fresh install shows a **Welcome** dashboard view that points at Configure / Add room. Existing user YAML at `/config/homio/homio.yaml` or `/config/dashboards/homio/homio.yaml` is still migrated once on first setup. The bundled Daylor sample under `lovelace/homio.yaml` is reference only and is not auto-imported.
 
 ## Support
 
