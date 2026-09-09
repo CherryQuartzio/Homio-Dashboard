@@ -1,8 +1,10 @@
+<img width="128" alt="icon" src="https://github.com/user-attachments/assets/90efb1db-7330-420a-aea1-4fe1abb2a96f" />
+
 # Homio
 
 Homio is a clean, minimal Home Assistant dashboard designed for wall tablets, with a layout that also works well on phones. Each room is a full-bleed background with a simple navigation bar and a row of entity cards.
 
-This repository packages Homio as a Home Assistant integration so rooms, logo, navigation, and devices are configured in the UI — no hand-edited Lovelace YAML.
+This repository packages Homio as a Home Assistant integration so rooms, logo, navigation, and devices are easily configured in the UI — no hand-edited Lovelace YAML.
 
 **Design credit:** Homio was created by [Rufus (iamtherufus)](https://github.com/iamtherufus). The original dashboard lives at [iamtherufus/Homio](https://github.com/iamtherufus/Homio).
 
@@ -16,8 +18,6 @@ This repository packages Homio as a Home Assistant integration so rooms, logo, n
 
 <img width="572" alt="Homio mobile view" src="https://github.com/user-attachments/assets/3be316dd-c7a2-4592-979e-6147084c3cc0" />
 <img width="572" alt="Homio mobile drawer" src="https://github.com/user-attachments/assets/5718134e-4ca3-4247-adf0-8a170d70cc6b" />
-
----
 
 ## Installation
 
@@ -36,8 +36,6 @@ This repository packages Homio as a Home Assistant integration so rooms, logo, n
 5. In your profile, select the **Homio** theme.
 6. Open the Homio item in the sidebar. A fresh install shows a Welcome page that points at the integration UI.
 
----
-
 ## Customization
 
 Configure Homio from **Settings → Devices & Services → Homio** (no Lovelace YAML editing):
@@ -55,11 +53,9 @@ Put JPG files in `/config/homio/rooms/`. The filename stem must match the **imag
 
 Bundled SVG icons are seeded into `/config/homio/icons/` on setup. Add your own SVGs there as well. When you add devices to a room, pick an icon stem (for example `lamp`) so Homio loads `/homio_assets/icons/lamp.svg`.
 
-Extra Material icons: [Google Fonts Icons](https://fonts.google.com/icons).
+Extra Material icons: [Google Fonts Icons](https://fonts.google.com/icons). For matching icons, use Material Symbols Style with weight set to 100, grade at 200, and 48px optical size.
 
 Both folders survive HACS updates.
-
----
 
 ## Entity cards
 
