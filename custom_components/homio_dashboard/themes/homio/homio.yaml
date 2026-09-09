@@ -29,6 +29,7 @@ homio:
   ha-card-border-radius: 0px
   ha-card-border-width: 0px
   ha-card-border-color: transparent
+  ha-card-box-shadow: none
   ha-card-background: rgba(10, 10, 10, 0.4)
   paper-card-background-color: var(--ha-card-background)
   stack-card-gap: "0px"

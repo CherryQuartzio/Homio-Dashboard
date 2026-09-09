@@ -60,8 +60,9 @@
       const style = document.createElement("style");
       style.id = "homio-strip-scrollbar-hide";
       style.textContent =
-        "#root { scrollbar-width: none !important; -ms-overflow-style: none !important; }" +
-        "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }";
+        "#root { scrollbar-width: none !important; -ms-overflow-style: none !important; box-shadow: none !important; }" +
+        "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }" +
+        "#root > * { box-shadow: none !important; filter: none !important; }";
       sr.appendChild(style);
     }
   }

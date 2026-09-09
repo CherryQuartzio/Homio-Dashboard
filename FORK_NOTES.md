@@ -9,7 +9,7 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.9** (`const.VERSION`).
+Integration version: **1.0.10** (`const.VERSION`).
 
 ## Status
 
@@ -17,7 +17,7 @@ Integration version: **1.0.9** (`const.VERSION`).
 - **UI config (1.0.7+):** Rooms, logo, nav order, and devices via OptionsFlow + room Config Subentries. Generator writes `/config/homio/layout/`. **1.0.8** fixed Configure/reconfigure/YAML/assets/migration/timer issues. **1.0.9** fixes FormatJS `{stem}` translation crash and missing **Add room** `initiate_flow` label; brand images go in `custom_components/homio_dashboard/brand/`. **1.0.10** fresh install shows a Welcome dashboard that points at Configure / Add room (no auto Daylor/Living seed).
 - **Persistent assets:** icons + room JPGs live in `/config/homio/{icons,rooms}/`, served at `/homio_assets/icons|rooms/...` only (layout/ not public).
 - **Bundled JS:** served at `/homiofiles/...` (must not share `/homio_dashboard` or hard refresh 404s).
-- **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Historical copy remains in `examples/homio-fixed/`.
+- **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Repo `examples/homio-fixed/` removed (temp Fixed snapshot no longer needed).
 - **GitHub fork:** https://github.com/CherryQuartzio/Homio-Dashboard (isFork of clutchthrower).
 - **HACS install:** pin latest release tag (see GitHub Releases).
 - **Phase 1 HA backups:** snapshot `edf057f9` (`Before_Homio_Fork_Swap_Phase1`). Room JPGs: restore from snapshot into `/config/homio/rooms/` if still 404.
@@ -96,13 +96,6 @@ Integration version: **1.0.9** (`const.VERSION`).
 | `layout-card-modified.js` | Extra CSS allowlist for drawer |
 | `www/homio-*.js` | Menu, strip, header/room fit, ripple kill, scroll, theme |
 | `www/images/Homio/icons/menu.svg` | Integer-snapped burger |
-| `examples/homio-fixed/` | Live dashboard + resources inventory |
-
-## Site-specific snapshot
-
-`examples/homio-fixed/dashboard.json` — full Homio Fixed Lovelace config. Reference / re-import only; entity ids and paths are for this HA.
-
-`examples/homio-fixed/resources.json` — resource ids + Phase 1 backup ids.
 
 ## Do not reintroduce
 
@@ -160,5 +153,5 @@ Cutover: pin HACS to fork release, set sidebar default to Homio (YAML), keep `ho
 - Pre-delete edits backup: `dashboard.homio-fixed.20260907_051601.yaml` (last hash `b8556503e641f00f`).
 - Deleted storage dashboard `url_path=homio-fixed` / id `homio_fixed` via Lovelace API.
 - Remaining Homio sidebar entry: YAML panel **Homio** → `/homio_dashboard`.
-- Repo `examples/homio-fixed/` kept as historical reference only (not live).
+- Repo `examples/homio-fixed/` removed after Fixed retirement (no longer maintained).
 - Helper JS path prefixes may still list `/homio-fixed` harmlessly; daily path is `/homio_dashboard` only.

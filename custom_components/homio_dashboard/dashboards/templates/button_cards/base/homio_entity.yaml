@@ -76,6 +76,11 @@ homio_entity:
       - display: var(--homio-entity-when-menu, block)
       - pointer-events: all
       - overflow: hidden
+      - box-shadow: none
+      # Keep glass blur from painting a fringe when the strip clips this card.
+      - -webkit-backface-visibility: hidden
+      - backface-visibility: hidden
+      - isolation: isolate
       - --ha-ripple-hover-opacity: 0.08
       - --ha-ripple-pressed-opacity: 0.12
       - --mdc-ripple-hover-opacity: 0.04
@@ -148,6 +153,8 @@ homio_entity:
   extra_styles: |
     :host {
       scroll-margin-inline: 8vw;
+      box-shadow: none !important;
+      filter: none !important;
       /* Beat button-card inline --button-card-ripple-color (HA light amber). */
       --button-card-ripple-color: rgba(255,255,255,0.45) !important;
       --button-card-ripple-hover-color: rgba(255,255,255,0.45) !important;
@@ -170,6 +177,7 @@ homio_entity:
       --button-card-ripple-color: rgba(255,255,255,0.45) !important;
       filter: none !important;
       -webkit-filter: none !important;
+      box-shadow: none !important;
     }
     /* Sticky :hover after slider/hold — kill filter cast on all pointers. */
     ha-card:hover,
