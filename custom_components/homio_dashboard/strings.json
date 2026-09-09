@@ -31,6 +31,10 @@
   "config_subentries": {
     "room": {
       "entry_type": "Room",
+      "initiate_flow": {
+        "user": "Add room",
+        "reconfigure": "Configure room"
+      },
       "title": "Homio room",
       "step": {
         "user": {
@@ -43,7 +47,7 @@
         },
         "room": {
           "title": "Room details",
-          "description": "Background stem loads /homio_assets/rooms/{stem}.jpg. Pick devices in dashboard order.",
+          "description": "Background image stem loads from /homio_assets/rooms/<stem>.jpg (file under /config/homio/rooms/). Pick devices in dashboard order.",
           "data": {
             "nav_name": "Navigation name",
             "display_name": "Display name (optional)",
@@ -67,7 +71,7 @@
         },
         "device_icons": {
           "title": "Device icons",
-          "description": "Icon stem for each device → /homio_assets/icons/{stem}.svg. New devices are pre-filled from a domain default; existing values are kept."
+          "description": "Icon stem for each device → /homio_assets/icons/<stem>.svg under /config/homio/icons/. New devices are pre-filled from a domain default; existing values are kept."
         }
       },
       "abort": {

@@ -9,12 +9,12 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.8** (`const.VERSION` — bump when changing registered JS or YAML panel).
+Integration version: **1.0.9** (`const.VERSION`).
 
 ## Status
 
 - **Daily driver on HA:** Homio YAML panel `/homio_dashboard` (Phase 5 complete — Homio Fixed removed).
-- **UI config (1.0.7+):** Rooms, logo, nav order, and devices via OptionsFlow + room Config Subentries. Generator writes `/config/homio/layout/`. **1.0.8** fixes Configure/reconfigure crashes, YAML quoting, `/homio_assets` layout leak, migration resurrection, and timer leaks.
+- **UI config (1.0.7+):** Rooms, logo, nav order, and devices via OptionsFlow + room Config Subentries. Generator writes `/config/homio/layout/`. **1.0.8** fixed Configure/reconfigure/YAML/assets/migration/timer issues. **1.0.9** fixes FormatJS `{stem}` translation crash and missing **Add room** `initiate_flow` label; brand images go in `custom_components/homio_dashboard/brand/`.
 - **Persistent assets:** icons + room JPGs live in `/config/homio/{icons,rooms}/`, served at `/homio_assets/icons|rooms/...` only (layout/ not public).
 - **Bundled JS:** served at `/homiofiles/...` (must not share `/homio_dashboard` or hard refresh 404s).
 - **Homio Fixed:** deleted from HA (2026-09-07). Pre-delete edits backup `dashboard.homio-fixed.20260907_051601.yaml`; last live `config_hash=b8556503e641f00f`. Historical copy remains in `examples/homio-fixed/`.
