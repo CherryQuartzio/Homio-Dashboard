@@ -1,7 +1,7 @@
 """Constants for the Homio Dashboard integration."""
 
 DOMAIN = "homio_dashboard"
-VERSION = "1.0.14"
+VERSION = "1.0.16"
 
 # Bundled JS/community modules. Must NOT share the panel url_path prefix
 # (/homio_dashboard) — a StaticPathConfig there steals hard-refresh GETs
@@ -58,6 +58,8 @@ CONF_MOTION_SENSOR = "motion_sensor"
 CONF_DEVICES = "devices"
 CONF_DEVICE_ENTITY = "entity"
 CONF_DEVICE_ICON = "icon"
+# Optional card label override; None/blank → HA friendly name at generate time.
+CONF_DEVICE_NAME = "name"
 
 SUBENTRY_TYPE_ROOM = "room"
 

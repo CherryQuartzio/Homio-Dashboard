@@ -16,6 +16,7 @@ from homeassistant.config_entries import (
     SubentryFlowResult,
 )
 from homeassistant.core import callback
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 
 from .const import (
@@ -33,6 +34,7 @@ from .const import (
     CONF_CLOCK_URL,
     CONF_DEVICE_ENTITY,
     CONF_DEVICE_ICON,
+    CONF_DEVICE_NAME,
     CONF_DEVICES,
     CONF_DISPLAY_NAME,
     CONF_HUMID_SENSOR,
@@ -58,11 +60,18 @@ from .const import (
     SUBENTRY_TYPE_ROOM,
 )
 from .dashboard_generator import (
+    friendly_entity_name,
     icon_for_entity,
     merge_devices,
     room_slug,
     room_subentries,
 )
+
+# Form field keys for device_icons sections. HA falls back to the schema key
+# when section translations are missing (dynamic section titles), so these must
+# already read as UI labels.
+_FIELD_DISPLAY_NAME = "Display name"
+_FIELD_ICON = "Icon"
 
 
 def _room_select_options(entry: ConfigEntry, *, nav_only: bool = False) -> list[dict[str, str]]:
@@ -311,6 +320,8 @@ class RoomSubentryFlow(ConfigSubentryFlow):
         """Initialize scratch state for multi-step room flow."""
         self._room_input: dict[str, Any] = {}
         self._devices: list[dict[str, Any]] = []
+        # entity_id → section label ("Friendly (entity_id)") for device_icons
+        self._device_section_keys: dict[str, str] = {}
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -328,6 +339,11 @@ class RoomSubentryFlow(ConfigSubentryFlow):
         if self.source != SOURCE_RECONFIGURE:
             return {}
         return dict(self._get_reconfigure_subentry().data)
+
+    def _device_section_label(self, entity_id: str) -> str:
+        """Section header: current device name (entity_id)."""
+        friendly = friendly_entity_name(self.hass, entity_id)
+        return f"{friendly} ({entity_id})"
 
     async def async_step_room(
         self, user_input: dict[str, Any] | None = None
@@ -440,37 +456,76 @@ class RoomSubentryFlow(ConfigSubentryFlow):
     async def async_step_device_icons(
         self, user_input: dict[str, Any] | None = None
     ) -> SubentryFlowResult:
-        """Per-device Homio icon stems (TextSelector); auto-mapped on first add."""
+        """Per-device display name + icon stem customization."""
         if user_input is not None:
             devices: list[dict[str, Any]] = []
             for device in self._devices:
-                entity_id = device[CONF_DEVICE_ENTITY]
-                if entity_id.startswith("climate."):
-                    devices.append(
-                        {CONF_DEVICE_ENTITY: entity_id, CONF_DEVICE_ICON: None}
-                    )
-                    continue
-                raw = user_input.get(entity_id)
-                if raw is None or str(raw).strip() == "":
-                    icon = icon_for_entity(entity_id)
+                entity_id = str(device[CONF_DEVICE_ENTITY])
+                section_key = self._device_section_keys.get(
+                    entity_id
+                ) or self._device_section_label(entity_id)
+                block = user_input.get(section_key)
+                if not isinstance(block, dict):
+                    block = {}
+
+                friendly = friendly_entity_name(self.hass, entity_id)
+                raw_name = block.get(_FIELD_DISPLAY_NAME)
+                if (
+                    raw_name is None
+                    or str(raw_name).strip() == ""
+                    or str(raw_name).strip() == friendly
+                ):
+                    custom_name = None
                 else:
-                    icon = str(raw).strip()
-                devices.append({CONF_DEVICE_ENTITY: entity_id, CONF_DEVICE_ICON: icon})
+                    custom_name = str(raw_name).strip()
+
+                entry: dict[str, Any] = {CONF_DEVICE_ENTITY: entity_id}
+                if custom_name:
+                    entry[CONF_DEVICE_NAME] = custom_name
+
+                if entity_id.startswith("climate."):
+                    entry[CONF_DEVICE_ICON] = None
+                else:
+                    raw_icon = block.get(_FIELD_ICON)
+                    if raw_icon is None or str(raw_icon).strip() == "":
+                        entry[CONF_DEVICE_ICON] = icon_for_entity(entity_id)
+                    else:
+                        entry[CONF_DEVICE_ICON] = str(raw_icon).strip()
+
+                devices.append(entry)
             return self._finish_room(devices)
+
+        if not self._devices:
+            return self._finish_room(self._devices)
 
         schema_dict: dict[Any, Any] = {}
         suggested: dict[str, Any] = {}
+        self._device_section_keys = {}
         for device in self._devices:
-            entity_id = device[CONF_DEVICE_ENTITY]
-            if entity_id.startswith("climate."):
-                continue
-            schema_dict[vol.Optional(entity_id)] = selector.TextSelector()
-            suggested[entity_id] = device.get(CONF_DEVICE_ICON) or icon_for_entity(
-                entity_id
+            entity_id = str(device[CONF_DEVICE_ENTITY])
+            section_key = self._device_section_label(entity_id)
+            self._device_section_keys[entity_id] = section_key
+
+            fields: dict[Any, Any] = {
+                vol.Optional(_FIELD_DISPLAY_NAME): selector.TextSelector(),
+            }
+            if not entity_id.startswith("climate."):
+                fields[vol.Optional(_FIELD_ICON)] = selector.TextSelector()
+
+            schema_dict[vol.Required(section_key)] = section(
+                vol.Schema(fields),
+                {"collapsed": False},
             )
 
-        if not schema_dict:
-            return self._finish_room(self._devices)
+            block_suggested: dict[str, Any] = {
+                _FIELD_DISPLAY_NAME: device.get(CONF_DEVICE_NAME)
+                or friendly_entity_name(self.hass, entity_id),
+            }
+            if not entity_id.startswith("climate."):
+                block_suggested[_FIELD_ICON] = device.get(
+                    CONF_DEVICE_ICON
+                ) or icon_for_entity(entity_id)
+            suggested[section_key] = block_suggested
 
         return self.async_show_form(
             step_id="device_icons",

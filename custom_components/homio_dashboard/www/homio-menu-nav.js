@@ -47,10 +47,10 @@
     const compactDisp =
       getComputedStyle(root).getPropertyValue("--homio-compact-ui-display").trim() ||
       "none";
-    root.style.setProperty(
-      "--homio-mobile-logo-display",
-      open ? "none" : compactDisp
-    );
+    // flex (not block) so the 23px band can vertically center the logo text.
+    const mobileLogoDisp =
+      open || compactDisp === "none" ? "none" : "flex";
+    root.style.setProperty("--homio-mobile-logo-display", mobileLogoDisp);
   }
 
   function schedule() {

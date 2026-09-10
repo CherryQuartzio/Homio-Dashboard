@@ -68,14 +68,12 @@
       style.id = "homio-strip-scrollbar-hide";
       sr.appendChild(style);
     }
-    // Soft clip mask for Safari/WebKit overflow fringe. Avoid isolation/transform
-    // on cards (breaks backdrop-filter glass).
+    // Scrollbar hide only. Do NOT set mask-image / isolation / transform on
+    // #root — those create a backdrop root and kill entity-card acrylic glass.
     style.textContent =
       "#root {" +
       "scrollbar-width: none !important; -ms-overflow-style: none !important;" +
       "box-shadow: none !important;" +
-      "-webkit-mask-image: -webkit-radial-gradient(white, black);" +
-      "mask-image: radial-gradient(white, black);" +
       "}" +
       "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }" +
       "#root > * { box-shadow: none !important; }";

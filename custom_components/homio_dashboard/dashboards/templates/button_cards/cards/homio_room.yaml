@@ -64,13 +64,13 @@ homio_room:
       left: 8vw !important;
       height: 23px !important;
       z-index: 999 !important;
-      display: flex !important;
+      /* Must honor hide-when-full-header — do NOT force flex here. */
+      display: var(--homio-mobile-logo-display, none) !important;
       align-items: center !important;
     }
     #mobile_logo button-card,
     #mobile_logo > * {
       height: 23px !important;
-      display: flex !important;
       align-items: center !important;
     }
     #mobile_menu_icon {

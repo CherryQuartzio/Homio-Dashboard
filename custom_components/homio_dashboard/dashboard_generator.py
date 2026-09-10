@@ -27,6 +27,7 @@ from .const import (
     CONF_CLOCK_URL,
     CONF_DEVICE_ENTITY,
     CONF_DEVICE_ICON,
+    CONF_DEVICE_NAME,
     CONF_DEVICES,
     CONF_DISPLAY_NAME,
     CONF_HUMID_SENSOR,
@@ -116,7 +117,7 @@ def merge_devices(
     entity_ids: list[str],
     previous: list[dict[str, Any]] | None,
 ) -> list[dict[str, Any]]:
-    """Build ordered device dicts; preserve icons; auto-map new entities."""
+    """Build ordered device dicts; preserve icons/names; auto-map new entities."""
     prev_by_entity = {
         str(item.get(CONF_DEVICE_ENTITY)): item
         for item in (previous or [])
@@ -129,7 +130,14 @@ def merge_devices(
         if entity_id in prev_by_entity:
             prev = prev_by_entity[entity_id]
             icon = prev.get(CONF_DEVICE_ICON)
-            result.append({CONF_DEVICE_ENTITY: entity_id, CONF_DEVICE_ICON: icon})
+            name = prev.get(CONF_DEVICE_NAME)
+            entry: dict[str, Any] = {
+                CONF_DEVICE_ENTITY: entity_id,
+                CONF_DEVICE_ICON: icon,
+            }
+            if name:
+                entry[CONF_DEVICE_NAME] = name
+            result.append(entry)
         else:
             result.append(
                 {
@@ -138,6 +146,11 @@ def merge_devices(
                 }
             )
     return result
+
+
+def friendly_entity_name(hass: HomeAssistant, entity_id: str) -> str:
+    """Public wrapper for HA friendly name (or entity-id fallback)."""
+    return _friendly_name(hass, entity_id)
 
 
 def room_subentries(entry: ConfigEntry) -> list[ConfigSubentry]:
@@ -235,7 +248,11 @@ def _device_card_yaml(
 ) -> str:
     entity_id = str(device[CONF_DEVICE_ENTITY])
     template = card_template_for_entity(entity_id)
-    name = friendly_names.get(entity_id) or _fallback_entity_name(entity_id)
+    custom_name = device.get(CONF_DEVICE_NAME)
+    if isinstance(custom_name, str) and custom_name.strip():
+        name = custom_name.strip()
+    else:
+        name = friendly_names.get(entity_id) or _fallback_entity_name(entity_id)
     icon = device.get(CONF_DEVICE_ICON)
     lines = [
         "- type: custom:button-card",
@@ -663,9 +680,14 @@ def parse_rooms_from_homio_yaml(path: Path) -> list[dict[str, Any]]:
             icon = (device_card.get("variables") or {}).get("icon")
             if icon is None:
                 icon = icon_for_entity(str(entity_id))
-            devices.append(
-                {CONF_DEVICE_ENTITY: str(entity_id), CONF_DEVICE_ICON: icon}
-            )
+            entry: dict[str, Any] = {
+                CONF_DEVICE_ENTITY: str(entity_id),
+                CONF_DEVICE_ICON: icon,
+            }
+            card_name = device_card.get("name")
+            if isinstance(card_name, str) and card_name.strip():
+                entry[CONF_DEVICE_NAME] = card_name.strip()
+            devices.append(entry)
         rooms.append(
             {
                 CONF_NAV_NAME: str(title),

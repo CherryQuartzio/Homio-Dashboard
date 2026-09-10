@@ -65,8 +65,8 @@ homio_entity:
   styles:
     card:
       - background: "rgba(255,255,255,0.1)"
-      - backdrop-filter: blur(12px)
-      - "-webkit-backdrop-filter": blur(12px)
+      - backdrop-filter: "blur(12px)"
+      - "-webkit-backdrop-filter": "blur(12px)"
       - height: 170px
       # Match horizontal inset; icon optical nudge stays on img_cell translateX.
       - padding-left: 28px
@@ -76,10 +76,10 @@ homio_entity:
       # Hidden while this browser's menu drawer is open (homio-menu-nav.js).
       - display: var(--homio-entity-when-menu, block)
       - pointer-events: all
+      # overflow:hidden clips slider/thumb chrome; keep glass sampling the room
+      # (no mask/isolation/transform on ancestors — see homio-entity-strip.js).
       - overflow: hidden
       - box-shadow: none
-      # Do not set isolation/transform here — they create a backdrop root and
-      # flatten the glass (backdrop-filter stops sampling the room photo).
       - --ha-ripple-hover-opacity: 0.08
       - --ha-ripple-pressed-opacity: 0.12
       - --mdc-ripple-hover-opacity: 0.04
@@ -177,6 +177,8 @@ homio_entity:
       filter: none !important;
       -webkit-filter: none !important;
       box-shadow: none !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      backdrop-filter: blur(12px) !important;
     }
     /* Sticky :hover after slider/hold — kill filter cast on all pointers. */
     ha-card:hover,
