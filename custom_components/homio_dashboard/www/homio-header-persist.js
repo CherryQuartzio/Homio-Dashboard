@@ -1,18 +1,18 @@
 /** Keep the Homio logo painted across room view swaps.
  *
- * SAFE: paints a light-DOM text clone only. Never reparents Lit/Lovelace nodes
- * (that approach in 1.0.12 crashed the panel).
+ * SAFE: light-DOM text overlay only — never reparent Lit/Lovelace nodes.
  *
- * While the hold is up, live logo cards are opacity:0 via --homio-logo-live-opacity
- * so they cannot fade in underneath the clone.
+ * Strategy: while on a Homio path the overlay is the only visible logo. Live
+ * logo cards stay at opacity 0 (still receive taps). That way room remounts
+ * cannot run fadeIn on the painted logo.
  */
 (() => {
   const PATH_RE = /^\/(homio-fixed|homio_dashboard)(\/|$)/;
   const HOLD_ID = "homio-logo-hold";
-  const MAX_HOLD_MS = 2500;
   let hold = null;
-  let releaseTimer = 0;
+  let syncTimer = 0;
   let observer = null;
+  let active = false;
 
   function onHomioPath(path) {
     return PATH_RE.test(path || location.pathname || "");
@@ -31,7 +31,6 @@
     if (!t || t.length > 24) return false;
     if (/[°%]/.test(t) || /^\d/.test(t)) return false;
     if (/^\d{1,2}:\d{2}/.test(t)) return false;
-    // Brand word (HOMIO / HOME / DAYLOR / custom), optional trailing period.
     return /^[A-Za-z][A-Za-z0-9 .'-]{0,22}\.?$/.test(t);
   }
 
@@ -41,7 +40,6 @@
     let bestScore = -1;
     for (let i = 0; i < cards.length; i++) {
       const card = cards[i];
-      if (hold && hold.contains(card)) continue;
       const root = card.shadowRoot;
       if (!root) continue;
       const name = root.querySelector("#name");
@@ -49,14 +47,13 @@
       const text = (name.textContent || "").trim();
       if (!isLogoName(text)) continue;
       const rect = card.getBoundingClientRect();
+      // Opacity-0 cards still have geometry; require a real box.
       if (rect.width < 2 || rect.height < 2) continue;
-      // Prefer cards that look like the header logo (top band, not room title).
       let score = 0;
-      if (rect.top >= 40 && rect.top <= 90) score += 5;
+      if (rect.top >= 40 && rect.top <= 100) score += 5;
       if (rect.height <= 40) score += 3;
-      if (rect.left < window.innerWidth * 0.35) score += 2;
+      if (rect.left < window.innerWidth * 0.4) score += 2;
       if (/homio|home|daylor/i.test(text)) score += 4;
-      // Skip huge room titles.
       if (rect.height > 50 || rect.width > window.innerWidth * 0.55) continue;
       if (score > bestScore) {
         bestScore = score;
@@ -66,6 +63,65 @@
     return best;
   }
 
+  function ensureHold() {
+    if (hold && hold.isConnected) return hold;
+    const el = document.createElement("div");
+    el.id = HOLD_ID;
+    el.setAttribute("aria-hidden", "true");
+    el.style.cssText = [
+      "position:fixed",
+      "z-index:10000",
+      "pointer-events:none",
+      "margin:0",
+      "padding:0",
+      "white-space:nowrap",
+      "line-height:1",
+      "display:flex",
+      "align-items:center",
+      "opacity:1",
+      "transition:none",
+      "animation:none",
+    ].join(";");
+    document.body.appendChild(el);
+    hold = el;
+    return hold;
+  }
+
+  function paintHold(logo) {
+    const el = ensureHold();
+    const { name, text, rect } = logo;
+    const cs = window.getComputedStyle(name);
+    el.textContent = text;
+    el.style.color = cs.color || "#fff";
+    el.style.fontFamily = cs.fontFamily || "inherit";
+    el.style.fontSize = cs.fontSize || "18px";
+    el.style.fontWeight = cs.fontWeight || "700";
+    el.style.letterSpacing = cs.letterSpacing || "2px";
+    el.style.textTransform = cs.textTransform || "uppercase";
+    el.style.left = rect.left + "px";
+    el.style.top = rect.top + "px";
+    el.style.height = Math.max(rect.height, 22) + "px";
+    el.style.width = Math.ceil(rect.width) + "px";
+    el.style.opacity = "1";
+    el.style.visibility = "visible";
+  }
+
+  function syncFromLive() {
+    if (!active) return;
+    const logo = findLogoCard();
+    if (!logo) return;
+    paintHold(logo);
+    setLiveLogoOpacity(false);
+  }
+
+  function scheduleSync() {
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+      syncTimer = 0;
+      syncFromLive();
+    }, 50);
+  }
+
   function clearObserver() {
     if (observer) {
       observer.disconnect();
@@ -73,9 +129,34 @@
     }
   }
 
-  function releaseHold() {
-    clearTimeout(releaseTimer);
-    releaseTimer = 0;
+  function armObserver() {
+    clearObserver();
+    observer = new MutationObserver(() => scheduleSync());
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function activate() {
+    if (active) {
+      scheduleSync();
+      return;
+    }
+    active = true;
+    setLiveLogoOpacity(false);
+    armObserver();
+    syncFromLive();
+    // Remounts can lag a few frames after navigation.
+    requestAnimationFrame(() => {
+      syncFromLive();
+      requestAnimationFrame(syncFromLive);
+    });
+    setTimeout(syncFromLive, 120);
+    setTimeout(syncFromLive, 350);
+  }
+
+  function deactivate() {
+    active = false;
+    clearTimeout(syncTimer);
+    syncTimer = 0;
     clearObserver();
     if (hold) {
       try {
@@ -88,151 +169,26 @@
     setLiveLogoOpacity(true);
   }
 
-  function armReleaseWatch() {
-    clearTimeout(releaseTimer);
-    releaseTimer = setTimeout(releaseHold, MAX_HOLD_MS);
-    clearObserver();
-    observer = new MutationObserver(() => {
-      const live = findLogoCard();
-      if (!live) return;
-      // Wait two frames so the new logo paints at full opacity before we drop
-      // the clone (avoids a visible fade under the hold).
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => releaseHold());
-      });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
-
-  function captureLogoHold() {
-    if (hold) return;
-    const logo = findLogoCard();
-    if (!logo) return;
-    const { name, text, rect } = logo;
-    const cs = window.getComputedStyle(name);
-
-    const el = document.createElement("div");
-    el.id = HOLD_ID;
-    el.setAttribute("aria-hidden", "true");
-    el.textContent = text;
-    el.style.cssText = [
-      "position:fixed",
-      "z-index:10000",
-      "pointer-events:none",
-      "margin:0",
-      "padding:0",
-      "white-space:nowrap",
-      "color:" + (cs.color || "#fff"),
-      "font-family:" + (cs.fontFamily || "inherit"),
-      "font-size:" + (cs.fontSize || "18px"),
-      "font-weight:" + (cs.fontWeight || "700"),
-      "letter-spacing:" + (cs.letterSpacing || "2px"),
-      "text-transform:" + (cs.textTransform || "uppercase"),
-      "line-height:1",
-      "display:flex",
-      "align-items:center",
-      "left:" + rect.left + "px",
-      "top:" + rect.top + "px",
-      "height:" + Math.max(rect.height, 22) + "px",
-      "width:" + Math.ceil(rect.width) + "px",
-    ].join(";");
-
-    document.body.appendChild(el);
-    hold = el;
-    setLiveLogoOpacity(false);
-    armReleaseWatch();
-  }
-
-  function pathFromClick(ev) {
-    const nodes =
-      typeof ev.composedPath === "function" ? ev.composedPath() : [];
-    for (let i = 0; i < nodes.length; i++) {
-      const n = nodes[i];
-      if (!n || n.nodeType !== 1) continue;
-      if (n.tagName !== "BUTTON-CARD") continue;
-      const cfg = n.config || n._config;
-      const tap = cfg && cfg.tap_action;
-      if (
-        tap &&
-        tap.action === "navigate" &&
-        typeof tap.navigation_path === "string"
-      ) {
-        return tap.navigation_path;
-      }
-      const vars = cfg && cfg.variables;
-      if (vars && typeof vars.path === "string" && onHomioPath(vars.path)) {
-        return vars.path;
-      }
-    }
-    return null;
-  }
-
-  function clickInHeaderChrome(ev) {
-    const nodes =
-      typeof ev.composedPath === "function" ? ev.composedPath() : [];
-    for (let i = 0; i < nodes.length; i++) {
-      const n = nodes[i];
-      if (!n || n.nodeType !== 1) continue;
-      const id = n.id;
-      if (
-        id === "navigation" ||
-        id === "mobile_logo" ||
-        id === "mobile_menu_icon"
-      ) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function onNavigating(toPath) {
-    if (!onHomioPath(location.pathname)) return;
-    if (!onHomioPath(toPath)) return;
-    if (toPath === location.pathname) return;
-    captureLogoHold();
-  }
-
-  document.addEventListener(
-    "click",
-    (ev) => {
-      if (!onHomioPath()) return;
-      const navPath = pathFromClick(ev);
-      if (navPath) {
-        onNavigating(navPath);
-        return;
-      }
-      if (clickInHeaderChrome(ev)) {
-        const from = location.pathname;
-        captureLogoHold();
-        setTimeout(() => {
-          if (hold && location.pathname === from) releaseHold();
-        }, 400);
-      }
-    },
-    true
-  );
-
   function onLocation() {
-    if (!onHomioPath()) {
-      releaseHold();
-      return;
-    }
-    if (hold) armReleaseWatch();
+    if (onHomioPath()) activate();
+    else deactivate();
   }
 
   window.addEventListener("location-changed", onLocation);
   window.addEventListener("popstate", onLocation);
+  window.addEventListener("resize", () => {
+    if (active) scheduleSync();
+  });
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (active) scheduleSync();
+    },
+    true
+  );
 
   const push = history.pushState.bind(history);
   history.pushState = (...args) => {
-    const url = args[2];
-    if (typeof url === "string") {
-      try {
-        onNavigating(new URL(url, location.origin).pathname);
-      } catch (e) {
-        /* ignore */
-      }
-    }
     push(...args);
     onLocation();
   };
@@ -241,4 +197,19 @@
     replace(...args);
     onLocation();
   };
+
+  // Header compact/full swaps which logo card is visible.
+  const ro =
+    typeof ResizeObserver === "function"
+      ? new ResizeObserver(() => {
+          if (active) scheduleSync();
+        })
+      : null;
+  if (ro) ro.observe(document.documentElement);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", onLocation);
+  } else {
+    onLocation();
+  }
 })();

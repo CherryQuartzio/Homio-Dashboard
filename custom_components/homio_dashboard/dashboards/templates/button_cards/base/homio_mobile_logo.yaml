@@ -42,18 +42,27 @@ homio_mobile_logo:
       - padding: 0
       - margin: 0
       - animation: none
-      # Hidden while logo hold clone is painted (homio-header-persist.js).
+      - transition: none
+      # Overlay paints the logo (homio-header-persist.js); keep hit-target only.
       - opacity: var(--homio-logo-live-opacity, 1)
   extra_styles: |
+    :host,
+    ha-card,
+    .button-card-main {
+      animation: none !important;
+      transition: none !important;
+      opacity: var(--homio-logo-live-opacity, 1) !important;
+      display: grid !important;
+      align-items: center !important;
+      height: 23px !important;
+      min-height: 23px !important;
+    }
     #name {
       align-self: center !important;
       line-height: 1 !important;
       margin: 0 !important;
       padding: 0 !important;
-    }
-    ha-card, .button-card-main {
-      display: grid !important;
-      align-items: center !important;
-      height: 23px !important;
-      min-height: 23px !important;
+      animation: none !important;
+      transition: none !important;
+      opacity: 1 !important;
     }

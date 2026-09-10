@@ -38,5 +38,19 @@ homio_logo:
       - padding: 0
       - margin: 0
       - animation: none
-      # Hidden while logo hold clone is painted (homio-header-persist.js).
+      - transition: none
+      # Overlay paints the logo (homio-header-persist.js); keep hit-target only.
       - opacity: var(--homio-logo-live-opacity, 1)
+  extra_styles: |
+    :host,
+    ha-card,
+    .button-card-main {
+      animation: none !important;
+      transition: none !important;
+      opacity: var(--homio-logo-live-opacity, 1) !important;
+    }
+    #name {
+      animation: none !important;
+      transition: none !important;
+      opacity: 1 !important;
+    }

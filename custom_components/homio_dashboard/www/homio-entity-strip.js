@@ -14,10 +14,9 @@
   let nestedRippleRaf = 0;
   let nestedRippleFrames = 0;
 
-  // Firefox + Safari/iOS WebKit paint a dark fringe when backdrop-filter cards
-  // are clipped by the strip overflow. Do NOT set isolation/transform on the
-  // entity cards themselves — that creates a backdrop root and kills glass.
-  // Strip-level mask below is the safe mitigation; keep Chromium glass intact.
+  // Keep the overflow/backdrop fringe on the strip edges — do not mask it away
+  // (mask/isolation on #root kills acrylic glass). Paint matching dark edge
+  // fades on BOTH sides so the left artifact and the right edge read the same.
 
   function onHomioPath() {
     const path = window.location.pathname || "";
@@ -57,6 +56,49 @@
     });
   }
 
+  function ensureEdgeFades(root) {
+    const sr = root.getRootNode && root.getRootNode();
+    if (!(sr && sr instanceof ShadowRoot)) return;
+    let style = sr.getElementById("homio-strip-edge-fade");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "homio-strip-edge-fade";
+      sr.appendChild(style);
+    }
+    // Same vignette on left and right — matches the natural clip fringe.
+    style.textContent =
+      ".homio-strip-edge {" +
+      "position:absolute;top:0;bottom:0;width:28px;z-index:6;" +
+      "pointer-events:none;transition:none;animation:none;" +
+      "}" +
+      ".homio-strip-edge-left {" +
+      "left:0;" +
+      "background:linear-gradient(to right, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0) 100%);" +
+      "}" +
+      ".homio-strip-edge-right {" +
+      "right:0;" +
+      "background:linear-gradient(to left, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0) 100%);" +
+      "}";
+
+    const host = sr.host;
+    if (host && host.style) {
+      const pos = window.getComputedStyle(host).position;
+      if (pos === "static") host.style.setProperty("position", "relative");
+    }
+
+    ["left", "right"].forEach((side) => {
+      const id = "homio-strip-edge-" + side;
+      let el = sr.getElementById(id);
+      if (!el) {
+        el = document.createElement("div");
+        el.id = id;
+        el.className = "homio-strip-edge homio-strip-edge-" + side;
+        el.setAttribute("aria-hidden", "true");
+        sr.appendChild(el);
+      }
+    });
+  }
+
   function hideScrollbar(root) {
     root.style.setProperty("scrollbar-width", "none", "important");
     root.style.setProperty("-ms-overflow-style", "none", "important");
@@ -77,6 +119,7 @@
       "}" +
       "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }" +
       "#root > * { box-shadow: none !important; }";
+    ensureEdgeFades(root);
   }
 
   function setPad(root) {
