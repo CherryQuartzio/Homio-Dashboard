@@ -9,7 +9,7 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.12** (`const.VERSION`).
+Integration version: **1.0.14** (`const.VERSION`).
 
 ## Status
 
@@ -44,7 +44,7 @@ Integration version: **1.0.12** (`const.VERSION`).
 | `homio-menu-nav.js` | `module` (or inline) | Per-browser menu; path-scoped |
 | `homio-entity-strip.js` | `module` (or inline) | Pan-vs-tap, chrome-drag, sticky hover clear |
 | `homio-header-fit.js` | `module` (or inline) | Per-browser compact header CSS vars |
-| `homio-header-persist.js` | classic/`add_extra_js_url` | Hold room+header across room view navigations |
+| `homio-header-persist.js` | classic/`add_extra_js_url` | Light-DOM logo clone during room nav (never reparent Lit nodes) |
 | `homio-room-text-fit.js` | `module` (or inline) | Lift room text when colliding with entity strip |
 | `homio-nested-ripple-kill.js` | `module` (or inline) | Kill nested chrome ripples (touch) |
 | `homio-scroll-lock.js` | `module` (or inline) | Lightweight CSS clamp — no full shadow walks |

@@ -1,5 +1,7 @@
 homio_mobile_logo:
   # Keep in sync with homio_logo — mobile hamburger uses this separate template.
+  template:
+    - homio_default
   name: HOMIO.
   tap_action:
     action: navigate
@@ -11,6 +13,7 @@ homio_mobile_logo:
       - grid-template-rows: 1fr
       - place-items: center start
       - height: 100%
+      - width: 100%
     name:
       - color: var(--primary-text-color)
       - letter-spacing: 2px
@@ -29,10 +32,26 @@ homio_mobile_logo:
       - box-shadow: none
       - border: none
       - pointer-events: all
-      - height: 22px
-      - min-height: 22px
+      # Fill the 23px mobile header band; text centered via grid.
+      - height: 23px
+      - min-height: 23px
+      - width: auto
       - display: grid
       - align-items: center
+      - place-content: center start
       - padding: 0
       - margin: 0
       - animation: none
+  extra_styles: |
+    #name {
+      align-self: center !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    ha-card, .button-card-main {
+      display: grid !important;
+      align-items: center !important;
+      height: 23px !important;
+      min-height: 23px !important;
+    }

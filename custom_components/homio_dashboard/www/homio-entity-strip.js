@@ -15,28 +15,9 @@
   let nestedRippleFrames = 0;
 
   // Firefox + Safari/iOS WebKit paint a dark fringe when backdrop-filter cards
-  // are clipped by the strip overflow. Chromium (incl. Android companion) is fine.
-  function backdropFringesOnClip() {
-    const ua = navigator.userAgent || "";
-    if (/Firefox\//.test(ua)) return true;
-    if (/iP(hone|ad|od)/.test(ua)) return true;
-    // Desktop Safari (and other non-Chromium WebKit): has Safari, not Chrome/Edg.
-    if (/Safari/.test(ua) && !/Chrome|Chromium|Edg\/|OPR\//.test(ua)) return true;
-    return false;
-  }
-
-  function applyEntityGlassVars() {
-    const root = document.documentElement;
-    if (backdropFringesOnClip()) {
-      // Opaque-enough frosted stand-in — no blur, so no left-edge clip fringe.
-      root.style.setProperty("--homio-entity-backdrop", "none");
-      root.style.setProperty("--homio-entity-bg", "rgba(40, 40, 40, 0.62)");
-    } else {
-      root.style.setProperty("--homio-entity-backdrop", "blur(12px)");
-      root.style.setProperty("--homio-entity-bg", "rgba(255, 255, 255, 0.1)");
-    }
-  }
-  applyEntityGlassVars();
+  // are clipped by the strip overflow. Do NOT set isolation/transform on the
+  // entity cards themselves — that creates a backdrop root and kills glass.
+  // Strip-level mask below is the safe mitigation; keep Chromium glass intact.
 
   function onHomioPath() {
     const path = window.location.pathname || "";
@@ -87,16 +68,17 @@
       style.id = "homio-strip-scrollbar-hide";
       sr.appendChild(style);
     }
-    // Radial mask is a known Safari/WebKit fix for overflow + filter/backdrop fringe.
+    // Soft clip mask for Safari/WebKit overflow fringe. Avoid isolation/transform
+    // on cards (breaks backdrop-filter glass).
     style.textContent =
       "#root {" +
       "scrollbar-width: none !important; -ms-overflow-style: none !important;" +
-      "box-shadow: none !important; isolation: isolate; transform: translateZ(0);" +
+      "box-shadow: none !important;" +
       "-webkit-mask-image: -webkit-radial-gradient(white, black);" +
       "mask-image: radial-gradient(white, black);" +
       "}" +
       "#root::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }" +
-      "#root > * { box-shadow: none !important; filter: none !important; }";
+      "#root > * { box-shadow: none !important; }";
   }
 
   function setPad(root) {

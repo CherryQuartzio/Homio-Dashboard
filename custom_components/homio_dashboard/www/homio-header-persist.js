@@ -1,46 +1,59 @@
-/** Keep Homio header visible across room view swaps.
+/** Keep the Homio logo painted across room view swaps.
  *
- * Each room is a separate Lovelace view, so navigate destroys the room card
- * (and its nested nav). We move the live room host into a fixed hold overlay
- * for the gap, then drop it once the next room's #navigation is connected.
+ * SAFE: paints a light-DOM text clone only. Never reparents Lit/Lovelace nodes
+ * (that approach in 1.0.12 crashed the panel).
  */
 (() => {
   const PATH_RE = /^\/(homio-fixed|homio_dashboard)(\/|$)/;
-  const HOLD_ID = "homio-view-hold";
+  const HOLD_ID = "homio-logo-hold";
   const MAX_HOLD_MS = 2500;
   let hold = null;
   let releaseTimer = 0;
   let observer = null;
-  let pathAtHold = null;
 
   function onHomioPath(path) {
     return PATH_RE.test(path || location.pathname || "");
   }
 
-  function findRoomHosts() {
-    const out = [];
-    const visit = (node) => {
-      if (!node) return;
-      if (node.nodeType === 1) {
-        if (node.tagName === "BUTTON-CARD" && node.shadowRoot) {
-          if (node.shadowRoot.querySelector("#navigation")) out.push(node);
-        }
-        if (node.shadowRoot) visit(node.shadowRoot);
-        const kids = node.children;
-        if (kids) for (let i = 0; i < kids.length; i++) visit(kids[i]);
-      } else if (node instanceof ShadowRoot) {
-        const kids = node.children;
-        if (kids) for (let i = 0; i < kids.length; i++) visit(kids[i]);
-      }
-    };
-    visit(document.body);
-    return out;
+  function isLogoName(text) {
+    if (!text) return false;
+    const t = text.trim();
+    if (!t || t.length > 24) return false;
+    if (/[°%]/.test(t) || /^\d/.test(t)) return false;
+    if (/^\d{1,2}:\d{2}/.test(t)) return false;
+    // Brand word (HOMIO / HOME / DAYLOR / custom), optional trailing period.
+    return /^[A-Za-z][A-Za-z0-9 .'-]{0,22}\.?$/.test(t);
   }
 
-  function liveRoomHost() {
-    return (
-      findRoomHosts().filter((r) => !hold || !hold.contains(r))[0] || null
-    );
+  function findLogoCard() {
+    const cards = document.querySelectorAll("button-card");
+    let best = null;
+    let bestScore = -1;
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      if (hold && hold.contains(card)) continue;
+      const root = card.shadowRoot;
+      if (!root) continue;
+      const name = root.querySelector("#name");
+      if (!name) continue;
+      const text = (name.textContent || "").trim();
+      if (!isLogoName(text)) continue;
+      const rect = card.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) continue;
+      // Prefer cards that look like the header logo (top band, not room title).
+      let score = 0;
+      if (rect.top >= 40 && rect.top <= 90) score += 5;
+      if (rect.height <= 40) score += 3;
+      if (rect.left < window.innerWidth * 0.35) score += 2;
+      if (/homio|home|daylor/i.test(text)) score += 4;
+      // Skip huge room titles.
+      if (rect.height > 50 || rect.width > window.innerWidth * 0.55) continue;
+      if (score > bestScore) {
+        bestScore = score;
+        best = { card, name, text, rect };
+      }
+    }
+    return best;
   }
 
   function clearObserver() {
@@ -54,7 +67,6 @@
     clearTimeout(releaseTimer);
     releaseTimer = 0;
     clearObserver();
-    pathAtHold = null;
     if (hold) {
       try {
         hold.remove();
@@ -70,35 +82,49 @@
     releaseTimer = setTimeout(releaseHold, MAX_HOLD_MS);
     clearObserver();
     observer = new MutationObserver(() => {
-      if (!liveRoomHost()) return;
+      const live = findLogoCard();
+      if (!live) return;
+      // New logo is on screen — drop the clone next frame.
       requestAnimationFrame(() => releaseHold());
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  function captureHold() {
+  function captureLogoHold() {
     if (hold) return;
-    const room = liveRoomHost();
-    if (!room || !room.isConnected) return;
-    const rect = room.getBoundingClientRect();
-    if (rect.width < 8 || rect.height < 8) return;
+    const logo = findLogoCard();
+    if (!logo) return;
+    const { name, text, rect } = logo;
+    const cs = window.getComputedStyle(name);
 
-    const wrap = document.createElement("div");
-    wrap.id = HOLD_ID;
-    wrap.setAttribute("aria-hidden", "true");
-    wrap.style.cssText =
-      "position:fixed;z-index:6;pointer-events:none;overflow:hidden;contain:strict;";
-    wrap.style.left = rect.left + "px";
-    wrap.style.top = rect.top + "px";
-    wrap.style.width = rect.width + "px";
-    wrap.style.height = rect.height + "px";
+    const el = document.createElement("div");
+    el.id = HOLD_ID;
+    el.setAttribute("aria-hidden", "true");
+    el.textContent = text;
+    el.style.cssText = [
+      "position:fixed",
+      "z-index:10000",
+      "pointer-events:none",
+      "margin:0",
+      "padding:0",
+      "white-space:nowrap",
+      "color:" + (cs.color || "#fff"),
+      "font-family:" + (cs.fontFamily || "inherit"),
+      "font-size:" + (cs.fontSize || "18px"),
+      "font-weight:" + (cs.fontWeight || "700"),
+      "letter-spacing:" + (cs.letterSpacing || "2px"),
+      "text-transform:" + (cs.textTransform || "uppercase"),
+      "line-height:1",
+      "display:flex",
+      "align-items:center",
+      "left:" + rect.left + "px",
+      "top:" + rect.top + "px",
+      "height:" + Math.max(rect.height, 22) + "px",
+      "width:" + Math.ceil(rect.width) + "px",
+    ].join(";");
 
-    // Move (not clone) so shadow DOM / live header stay painted.
-    wrap.appendChild(room);
-    room.style.setProperty("pointer-events", "none", "important");
-    document.body.appendChild(wrap);
-    hold = wrap;
-    pathAtHold = location.pathname || "";
+    document.body.appendChild(el);
+    hold = el;
     armReleaseWatch();
   }
 
@@ -111,7 +137,11 @@
       if (n.tagName !== "BUTTON-CARD") continue;
       const cfg = n.config || n._config;
       const tap = cfg && cfg.tap_action;
-      if (tap && tap.action === "navigate" && typeof tap.navigation_path === "string") {
+      if (
+        tap &&
+        tap.action === "navigate" &&
+        typeof tap.navigation_path === "string"
+      ) {
         return tap.navigation_path;
       }
       const vars = cfg && cfg.variables;
@@ -144,10 +174,9 @@
     if (!onHomioPath(location.pathname)) return;
     if (!onHomioPath(toPath)) return;
     if (toPath === location.pathname) return;
-    captureHold();
+    captureLogoHold();
   }
 
-  // Capture-phase: hold before HA tears down the view.
   document.addEventListener(
     "click",
     (ev) => {
@@ -157,11 +186,9 @@
         onNavigating(navPath);
         return;
       }
-      // Fallback: any click in the header chrome that may navigate.
       if (clickInHeaderChrome(ev)) {
         const from = location.pathname;
-        captureHold();
-        // If path did not change, drop the hold (e.g. menu toggle).
+        captureLogoHold();
         setTimeout(() => {
           if (hold && location.pathname === from) releaseHold();
         }, 400);

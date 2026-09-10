@@ -59,13 +59,23 @@ homio_room:
        apply; without absolute, place-content:center dumps the menu mid-screen. */
     #mobile_logo {
       position: absolute !important;
-      top: 60px !important;
+      /* Match burger band: 23px tall @ 57.5px so logo text centers with the icon. */
+      top: 57.5px !important;
       left: 8vw !important;
+      height: 23px !important;
       z-index: 999 !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+    #mobile_logo button-card,
+    #mobile_logo > * {
+      height: 23px !important;
+      display: flex !important;
+      align-items: center !important;
     }
     #mobile_menu_icon {
       position: absolute !important;
-      /* 28×23 burger; centers on DAYLOR 18px @ 60px → 57.5px */
+      /* 28×23 burger; shared center line with mobile logo @ 57.5 + 11.5 = 69px */
       top: 57.5px !important;
       right: 8vw !important;
       z-index: 999 !important;
@@ -178,14 +188,15 @@ homio_room:
         - opacity: 0.9
       mobile_logo:
         - position: absolute
-        - top: 60px
+        - top: 57.5px
         - left: 8vw
+        - height: 23px
         - z-index: 999
         # Compact + menu-closed only (homio-menu-nav.js).
         - display: var(--homio-mobile-logo-display, none)
       mobile_menu_icon:
         - position: absolute
-        # 28×23 burger; top centers on DAYLOR 18px @ 60px → 57.5px.
+        # Shared vertical band with mobile_logo (23px @ 57.5px).
         - top: 57.5px
         - right: 8vw
         - z-index: 999
