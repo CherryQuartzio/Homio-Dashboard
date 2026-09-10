@@ -7,16 +7,35 @@ homio_thermostat:
   label: |
     [[[
       if (!entity || !entity.attributes) return '';
+      const ht = window.homioTemp;
+      if (ht) {
+        const { value, unit } = ht.fromClimate(hass, entity, 'current_temperature');
+        if (isNaN(value)) return '';
+        return 'Actual ' + ht.format(value, 1) + unit;
+      }
       const t = entity.attributes.current_temperature;
-      return (t == null) ? '' : ('Actual ' + t + '°');
+      const unit = (hass.config && hass.config.unit_system && hass.config.unit_system.temperature) || '°';
+      return (t == null) ? '' : ('Actual ' + t + unit);
     ]]]
   state_display: |
     [[[
       if (!entity) return '';
-      const tgt = entity.attributes && entity.attributes.temperature;
-      if (entity.state === 'heat') return 'Heating to ' + tgt + '°';
-      if (entity.state === 'cool') return 'Cooling to ' + tgt + '°';
-      if (entity.state === 'heat_cool') return 'Auto ' + tgt + '°';
+      const ht = window.homioTemp;
+      let tgt;
+      let unit = '°';
+      if (ht) {
+        const converted = ht.fromClimate(hass, entity, 'temperature');
+        tgt = converted.value;
+        unit = converted.unit;
+        if (isNaN(tgt)) tgt = null;
+        else tgt = ht.format(tgt, 1);
+      } else {
+        tgt = entity.attributes && entity.attributes.temperature;
+        unit = (hass.config && hass.config.unit_system && hass.config.unit_system.temperature) || '°';
+      }
+      if (entity.state === 'heat') return 'Heating to ' + tgt + unit;
+      if (entity.state === 'cool') return 'Cooling to ' + tgt + unit;
+      if (entity.state === 'heat_cool') return 'Auto ' + tgt + unit;
       return 'Off';
     ]]]
   tap_action:
@@ -273,7 +292,16 @@ homio_thermostat:
         name: Target Temp
         state_display: |
           [[[
-            return states['input_number.homio_thermostat_target_temperature'].state + "°"
+            const helper = states['input_number.homio_thermostat_target_temperature'];
+            const raw = helper && helper.state;
+            const ht = window.homioTemp;
+            if (ht) {
+              const { value, unit } = ht.fromHelperC(hass, raw);
+              if (isNaN(value)) return '';
+              return ht.format(value, 1) + unit;
+            }
+            const unit = (hass.config && hass.config.unit_system && hass.config.unit_system.temperature) || '°';
+            return raw + unit;
           ]]]
         tap_action:
           action: call-service
@@ -410,7 +438,10 @@ homio_thermostat:
                         ]]]
                       temperature: |
                         [[[
-                          return parseFloat(states['input_number.homio_thermostat_target_temperature'].state);
+                          const raw = parseFloat(states['input_number.homio_thermostat_target_temperature'].state);
+                          const ht = window.homioTemp;
+                          if (ht) return ht.helperCToClimate(entity, raw);
+                          return raw;
                         ]]]
                   styles:
                     card:

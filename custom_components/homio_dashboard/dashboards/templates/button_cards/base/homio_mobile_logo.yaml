@@ -42,6 +42,8 @@ homio_mobile_logo:
       - padding: 0
       - margin: 0
       - animation: none
+      # Hidden while logo hold clone is painted (homio-header-persist.js).
+      - opacity: var(--homio-logo-live-opacity, 1)
   extra_styles: |
     #name {
       align-self: center !important;

@@ -14,6 +14,14 @@ homio_room:
     action: fire-dom-event
     homio_action: menu_toggle
   extra_styles: |
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes homioRoomBgFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     /* Always fill the relative view. Do not toggle absolute only under 1249px —
        that flashed gray at the header swap; leaving flow without fill shrink-wrapped
        the room to ~half width. Never use position:fixed (viewport, ignores HA rail). */
@@ -31,13 +39,29 @@ homio_room:
       max-width: none !important;
       height: 100% !important;
       box-sizing: border-box !important;
+      position: relative !important;
+      z-index: 1 !important;
+    }
+    /* Background fades on its own layer so nav/logo/entities are unaffected. */
+    ha-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: var(--homio-room-surface);
+      animation: homioRoomBgFade 0.2s ease-out forwards;
     }
     /* Full vs compact header is per-browser via CSS vars from homio-header-fit.js
        (never a shared input_boolean — that synced every client). */
-    /* Room text lift: var set on documentElement by homio-room-text-fit.js */
+    /* Room text lift: var set on documentElement by homio-room-text-fit.js.
+       Title + sensors fade like entity cards; logo/nav stay still. */
     #temperature,
     #name,
     #humidity {
+      position: relative !important;
+      z-index: 2 !important;
+      animation: fadeIn 0.3s ease-in forwards !important;
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
       transform: translateY(calc(-1 * var(--homio-room-text-lift, 0px))) !important;
     }
@@ -67,6 +91,8 @@ homio_room:
       /* Must honor hide-when-full-header — do NOT force flex here. */
       display: var(--homio-mobile-logo-display, none) !important;
       align-items: center !important;
+      /* Hold clone paints the logo during room swaps (homio-header-persist.js). */
+      opacity: var(--homio-logo-live-opacity, 1) !important;
     }
     #mobile_logo button-card,
     #mobile_logo > * {
@@ -98,12 +124,15 @@ homio_room:
       - padding-left: 8vw
       - overflow: hidden
       - box-sizing: border-box
-      # Room+header must not fadeIn — each room is a separate view; fade made the
-      # nav disappear/reappear on every room change.
+      # Room chrome must not fadeIn — nav/logo stay still. Background fades via
+      # ha-card::before; title/temp/humidity fade via #name/#temperature/#humidity.
       - animation: none
+      # Solid base while the photo layer fades in (avoids a blank flash).
+      - background: "rgb(51, 51, 51)"
+      - background-color: "rgb(51, 51, 51)"
       - pointer-events: var(--homio-room-pointer-events, none)
       # Spaces after rgba(...) required — Chromium rejects )0% color-stops and drops the whole background.
-      - background: |
+      - "--homio-room-surface": |
           [[[
             const img = variables.image || 'lounge';
             const pos = variables.image_position || 'center center';
@@ -236,31 +265,38 @@ homio_room:
         if (!variables.show_temp || !variables.temp_sensor || !states[variables.temp_sensor]) return '';
         const eid = variables.temp_sensor;
         const st = states[eid];
-        const isClimate = String(eid).indexOf('climate.') === 0;
+        const ht = window.homioTemp;
         let temperatureValue;
         let unit;
-        if (isClimate) {
-          temperatureValue = parseFloat(st.attributes && st.attributes.current_temperature);
-          unit = '°C';
+        if (ht) {
+          const isClimate = String(eid).indexOf('climate.') === 0;
+          const converted = isClimate
+            ? ht.fromClimate(hass, st, 'current_temperature')
+            : ht.fromSensor(hass, st);
+          temperatureValue = converted.value;
+          unit = converted.unit;
         } else {
-          temperatureValue = parseFloat(st.state);
-          unit = (st.attributes && st.attributes.unit_of_measurement) ? st.attributes.unit_of_measurement : '°';
+          // Fallback if homio-temp.js has not loaded yet.
+          const isClimate = String(eid).indexOf('climate.') === 0;
+          if (isClimate) {
+            temperatureValue = parseFloat(st.attributes && st.attributes.current_temperature);
+            unit = (hass.config && hass.config.unit_system && hass.config.unit_system.temperature)
+              || (st.attributes && st.attributes.temperature_unit)
+              || '°C';
+          } else {
+            temperatureValue = parseFloat(st.state);
+            unit = (st.attributes && st.attributes.unit_of_measurement)
+              || (hass.config && hass.config.unit_system && hass.config.unit_system.temperature)
+              || '°';
+          }
         }
         if (isNaN(temperatureValue)) return '';
         const temperature = temperatureValue.toFixed(1);
-        const isF = String(unit).indexOf('F') !== -1;
-        let label = '';
-        if (isF) {
-          if (temperatureValue <= 60) label = 'Very Cold';
-          else if (temperatureValue <= 67) label = 'Cool';
-          else if (temperatureValue <= 74) label = 'Comfortable';
-          else label = 'Very Hot';
-        } else {
-          if (temperatureValue <= 15.99) label = 'Very Cold';
-          else if (temperatureValue <= 17.99) label = 'Cool';
-          else if (temperatureValue <= 20.99) label = 'Comfortable';
-          else label = 'Very Hot';
-        }
+        const label = ht
+          ? ht.comfortLabel(temperatureValue, unit)
+          : (String(unit).indexOf('F') !== -1
+              ? (temperatureValue <= 60 ? 'Very Cold' : temperatureValue <= 67 ? 'Cool' : temperatureValue <= 74 ? 'Comfortable' : 'Very Hot')
+              : (temperatureValue <= 15.99 ? 'Very Cold' : temperatureValue <= 17.99 ? 'Cool' : temperatureValue <= 20.99 ? 'Comfortable' : 'Very Hot'));
         return temperature + unit + ' - ' + label;
       ]]]
     humidity: |

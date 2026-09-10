@@ -1,7 +1,7 @@
 """Constants for the Homio Dashboard integration."""
 
 DOMAIN = "homio_dashboard"
-VERSION = "1.0.16"
+VERSION = "1.0.17"
 
 # Bundled JS/community modules. Must NOT share the panel url_path prefix
 # (/homio_dashboard) — a StaticPathConfig there steals hard-refresh GETs

@@ -85,8 +85,8 @@
           }
         },
         "device_icons": {
-          "title": "Device customization",
-          "description": "Set a custom display name and icon for each device. Leave display name as the current name to keep the Home Assistant friendly name. Icon stem maps to /homio_assets/icons/STEM.svg under /config/homio/icons/."
+          "title": "Entity cards configuration",
+          "description": "Set a custom display name and icon for each entity card. Leave display name as the current name to keep the Home Assistant friendly name. Icon stem maps to /homio_assets/icons/STEM.svg under /config/homio/icons/."
         }
       },
       "abort": {

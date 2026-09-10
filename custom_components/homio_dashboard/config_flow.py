@@ -456,7 +456,7 @@ class RoomSubentryFlow(ConfigSubentryFlow):
     async def async_step_device_icons(
         self, user_input: dict[str, Any] | None = None
     ) -> SubentryFlowResult:
-        """Per-device display name + icon stem customization."""
+        """Per-device display name + icon stem (Entity cards configuration step)."""
         if user_input is not None:
             devices: list[dict[str, Any]] = []
             for device in self._devices:

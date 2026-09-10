@@ -2,6 +2,9 @@
  *
  * SAFE: paints a light-DOM text clone only. Never reparents Lit/Lovelace nodes
  * (that approach in 1.0.12 crashed the panel).
+ *
+ * While the hold is up, live logo cards are opacity:0 via --homio-logo-live-opacity
+ * so they cannot fade in underneath the clone.
  */
 (() => {
   const PATH_RE = /^\/(homio-fixed|homio_dashboard)(\/|$)/;
@@ -13,6 +16,13 @@
 
   function onHomioPath(path) {
     return PATH_RE.test(path || location.pathname || "");
+  }
+
+  function setLiveLogoOpacity(visible) {
+    document.documentElement.style.setProperty(
+      "--homio-logo-live-opacity",
+      visible ? "1" : "0"
+    );
   }
 
   function isLogoName(text) {
@@ -75,6 +85,7 @@
       }
     }
     hold = null;
+    setLiveLogoOpacity(true);
   }
 
   function armReleaseWatch() {
@@ -84,8 +95,11 @@
     observer = new MutationObserver(() => {
       const live = findLogoCard();
       if (!live) return;
-      // New logo is on screen — drop the clone next frame.
-      requestAnimationFrame(() => releaseHold());
+      // Wait two frames so the new logo paints at full opacity before we drop
+      // the clone (avoids a visible fade under the hold).
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => releaseHold());
+      });
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
@@ -125,6 +139,7 @@
 
     document.body.appendChild(el);
     hold = el;
+    setLiveLogoOpacity(false);
     armReleaseWatch();
   }
 
