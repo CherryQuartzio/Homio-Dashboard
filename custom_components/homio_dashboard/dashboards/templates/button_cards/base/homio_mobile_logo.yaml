@@ -1,6 +1,6 @@
 homio_mobile_logo:
   # Keep in sync with homio_logo — mobile hamburger uses this separate template.
-  # Do not template homio_default — its fadeIn fights logo persist.
+  # Do not template homio_default — its fadeIn makes the logo flash on room swap.
   name: HOMIO.
   tap_action:
     action: navigate
@@ -46,15 +46,14 @@ homio_mobile_logo:
       - margin: 0
       - animation: none
       - transition: none
-      # Invisible hit-target; www/homio-header-persist.js paints the visible logo.
-      - opacity: 0
+      - opacity: 1
   extra_styles: |
     :host,
     ha-card,
     .button-card-main {
       animation: none !important;
       transition: none !important;
-      opacity: 0 !important;
+      opacity: 1 !important;
       display: grid !important;
       align-items: center !important;
       height: 23px !important;
@@ -67,4 +66,5 @@ homio_mobile_logo:
       padding: 0 !important;
       animation: none !important;
       transition: none !important;
+      opacity: 1 !important;
     }

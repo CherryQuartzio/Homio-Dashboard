@@ -55,24 +55,39 @@ homio_room:
     /* Full vs compact header is per-browser via CSS vars from homio-header-fit.js
        (never a shared input_boolean — that synced every client). */
     /* Room text lift: var set on documentElement by homio-room-text-fit.js.
-       Title + sensors fade like entity cards. Logo is isolated (overlay only). */
+       Title + sensors fade like entity cards. Must sit ABOVE #navigation
+       (full-bleed inset:0 @ z-index 20) or an opaque layout shell hides them. */
     #temperature,
     #name,
     #humidity {
       position: relative !important;
-      z-index: 2 !important;
+      z-index: 25 !important;
       opacity: 1 !important;
+      visibility: visible !important;
       animation: fadeIn 0.3s ease-in !important;
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
       transform: translateY(calc(-1 * var(--homio-room-text-lift, 0px))) !important;
     }
-    /* Entity strip + chrome must stay above the photo layer and never inherit
-       logo-hold opacity tricks. */
-    #entities,
-    #navigation,
+    /* Entity strip above the photo + above the full-bleed nav shell. */
+    #entities {
+      opacity: 1 !important;
+      visibility: visible !important;
+      animation: none !important;
+      z-index: 25 !important;
+      background: transparent !important;
+    }
+    /* Header chrome: transparent shell so center title / entities show through. */
+    #navigation {
+      opacity: 1 !important;
+      visibility: visible !important;
+      animation: none !important;
+      background: transparent !important;
+      z-index: 20 !important;
+    }
     #mobile_menu_icon,
     #motion_detection {
       opacity: 1 !important;
+      visibility: visible !important;
       animation: none !important;
     }
     ha-ripple,
@@ -101,7 +116,6 @@ homio_room:
       /* Must honor hide-when-full-header — do NOT force flex here. */
       display: var(--homio-mobile-logo-display, none) !important;
       align-items: center !important;
-      /* Live logo card is opacity:0; persist overlay paints the visible mark. */
       transition: none !important;
       animation: none !important;
     }
@@ -247,21 +261,24 @@ homio_room:
         - inset: 0
         - z-index: 20
         - pointer-events: none
+        - background: transparent
       entities:
         # Full-room overlay (stock Homio). Inner layout-card uses bottom inset.
         # iOS touch-pan is enabled on layout #root by homio-entity-strip.js —
         # do not switch this to a bottom band (button-card can pin that to top).
+        # z-index must beat #navigation (20) or the nav shell can hide the strip.
         - position: absolute
         - inset: 0
         - pointer-events: none
-        - z-index: 5
+        - z-index: 25
+        - background: transparent
 
   custom_fields:
     mobile_logo:
       card:
         type: "custom:button-card"
+        # No homio_default — fadeIn fights still header chrome.
         template:
-          - homio_default
           - homio_mobile_logo
     mobile_menu_icon:
       card:

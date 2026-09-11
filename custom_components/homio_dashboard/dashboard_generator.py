@@ -445,8 +445,8 @@ def _patch_time_file(button_cards_dir: Path, options: dict[str, Any]) -> None:
 def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) -> None:
     """Overwrite logo templates with configured name and home path.
 
-    Do not template homio_default (fadeIn). Cards stay opacity 0 hit-targets;
-    www/homio-header-persist.js paints the visible logo overlay.
+    Do not template homio_default (fadeIn). Keep logos fully visible with
+    animation:none — same approach as nav/clock. Never emit opacity:0.
     """
     path = f"/{DOMAIN}/{home_slug}" if home_slug else f"/{DOMAIN}"
     name = _yaml_scalar(logo_name)
@@ -492,18 +492,19 @@ def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) ->
       - margin: 0
       - animation: none
       - transition: none
-      - opacity: 0
+      - opacity: 1
   extra_styles: |
     :host,
     ha-card,
     .button-card-main {{
       animation: none !important;
       transition: none !important;
-      opacity: 0 !important;
+      opacity: 1 !important;
     }}
     #name {{
       animation: none !important;
       transition: none !important;
+      opacity: 1 !important;
     }}
 """
     mobile_yaml = f"""homio_mobile_logo:
@@ -551,14 +552,14 @@ def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) ->
       - margin: 0
       - animation: none
       - transition: none
-      - opacity: 0
+      - opacity: 1
   extra_styles: |
     :host,
     ha-card,
     .button-card-main {{
       animation: none !important;
       transition: none !important;
-      opacity: 0 !important;
+      opacity: 1 !important;
       display: grid !important;
       align-items: center !important;
       height: 23px !important;
@@ -571,6 +572,7 @@ def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) ->
       padding: 0 !important;
       animation: none !important;
       transition: none !important;
+      opacity: 1 !important;
     }}
 """
     base = button_cards_dir / "base"
