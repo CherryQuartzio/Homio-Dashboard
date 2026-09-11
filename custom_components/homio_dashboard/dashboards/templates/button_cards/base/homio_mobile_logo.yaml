@@ -1,7 +1,6 @@
 homio_mobile_logo:
   # Keep in sync with homio_logo — mobile hamburger uses this separate template.
-  template:
-    - homio_default
+  # Do not template homio_default — its fadeIn fights logo persist.
   name: HOMIO.
   tap_action:
     action: navigate
@@ -26,11 +25,15 @@ homio_mobile_logo:
       - margin: 0
       - padding: 0
     card:
+      - "--mdc-ripple-color": transparent
+      - "-webkit-tap-highlight-color": transparent
       - "--ha-card-background": transparent
       - background: none
       - background-color: transparent
       - box-shadow: none
       - border: none
+      - border-radius: 0
+      - position: relative
       - pointer-events: all
       # Fill the 23px mobile header band; text centered via grid.
       - height: 23px
@@ -43,15 +46,15 @@ homio_mobile_logo:
       - margin: 0
       - animation: none
       - transition: none
-      # Overlay paints the logo (homio-header-persist.js); keep hit-target only.
-      - opacity: var(--homio-logo-live-opacity, 1)
+      # Invisible hit-target; www/homio-header-persist.js paints the visible logo.
+      - opacity: 0
   extra_styles: |
     :host,
     ha-card,
     .button-card-main {
       animation: none !important;
       transition: none !important;
-      opacity: var(--homio-logo-live-opacity, 1) !important;
+      opacity: 0 !important;
       display: grid !important;
       align-items: center !important;
       height: 23px !important;
@@ -64,5 +67,4 @@ homio_mobile_logo:
       padding: 0 !important;
       animation: none !important;
       transition: none !important;
-      opacity: 1 !important;
     }
