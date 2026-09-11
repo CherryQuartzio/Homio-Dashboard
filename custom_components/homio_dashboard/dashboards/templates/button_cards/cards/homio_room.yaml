@@ -18,10 +18,6 @@ homio_room:
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    @keyframes homioRoomBgFade {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
     /* Always fill the relative view. Do not toggle absolute only under 1249px —
        that flashed gray at the header swap; leaving flow without fill shrink-wrapped
        the room to ~half width. Never use position:fixed (viewport, ignores HA rail). */
@@ -42,47 +38,43 @@ homio_room:
       position: relative !important;
       z-index: 1 !important;
     }
-    /* Background fades on its own layer so nav/logo/entities are unaffected. */
-    ha-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: var(--homio-room-surface);
-      animation: homioRoomBgFade 0.2s ease-out forwards;
-    }
     /* Full vs compact header is per-browser via CSS vars from homio-header-fit.js
        (never a shared input_boolean — that synced every client). */
     /* Room text lift: var set on documentElement by homio-room-text-fit.js.
-       Title + sensors fade like entity cards. Must sit ABOVE #navigation
-       (full-bleed inset:0 @ z-index 20) or an opaque layout shell hides them. */
+       Title + sensors fade like entity cards. Keep below header; lift is capped. */
     #temperature,
     #name,
     #humidity {
       position: relative !important;
-      z-index: 25 !important;
+      z-index: 30 !important;
       opacity: 1 !important;
       visibility: visible !important;
-      animation: fadeIn 0.3s ease-in !important;
+      animation: fadeIn 0.3s ease-in forwards !important;
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
       transform: translateY(calc(-1 * var(--homio-room-text-lift, 0px))) !important;
     }
-    /* Entity strip above the photo + above the full-bleed nav shell. */
+    /* Entity strip: above photo; above empty nav shell; must stay visible. */
     #entities {
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 30 !important;
       opacity: 1 !important;
       visibility: visible !important;
       animation: none !important;
-      z-index: 25 !important;
       background: transparent !important;
+      pointer-events: none !important;
+      overflow: visible !important;
     }
-    /* Header chrome: transparent shell so center title / entities show through. */
+    /* Header chrome: transparent full-bleed shell (drawer needs inset:0). */
     #navigation {
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 20 !important;
       opacity: 1 !important;
       visibility: visible !important;
       animation: none !important;
       background: transparent !important;
-      z-index: 20 !important;
+      pointer-events: none !important;
     }
     #mobile_menu_icon,
     #motion_detection {
@@ -149,15 +141,13 @@ homio_room:
       - padding-left: 8vw
       - overflow: hidden
       - box-sizing: border-box
-      # Room chrome must not fadeIn — nav/logo stay still. Background fades via
-      # ha-card::before; title/temp/humidity fade via #name/#temperature/#humidity.
+      # Room chrome must not fadeIn — nav/logo stay still. Title fades via #name.
+      # Photo lives on the card itself (not a ::before layer) — gray base + fading
+      # ::before read darker and could restart on triggers_update: all.
       - animation: none
-      # Solid base while the photo layer fades in (avoids a blank flash).
-      - background: "rgb(51, 51, 51)"
-      - background-color: "rgb(51, 51, 51)"
       - pointer-events: var(--homio-room-pointer-events, none)
       # Spaces after rgba(...) required — Chromium rejects )0% color-stops and drops the whole background.
-      - "--homio-room-surface": |
+      - background: |
           [[[
             const img = variables.image || 'lounge';
             const pos = variables.image_position || 'center center';
@@ -266,12 +256,13 @@ homio_room:
         # Full-room overlay (stock Homio). Inner layout-card uses bottom inset.
         # iOS touch-pan is enabled on layout #root by homio-entity-strip.js —
         # do not switch this to a bottom band (button-card can pin that to top).
-        # z-index must beat #navigation (20) or the nav shell can hide the strip.
+        # z-index above #navigation (20) so the nav shell cannot cover the strip.
         - position: absolute
         - inset: 0
         - pointer-events: none
-        - z-index: 25
+        - z-index: 30
         - background: transparent
+        - overflow: visible
 
   custom_fields:
     mobile_logo:

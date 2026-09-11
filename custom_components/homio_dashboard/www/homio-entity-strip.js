@@ -589,11 +589,37 @@
 
   function guardStripCards(root) {
     if (!root) return;
-    root.querySelectorAll("button-card").forEach(guardCard);
+    const showEntities =
+      document.documentElement.dataset.homioMenu !== "open" ||
+      document.documentElement.dataset.homioHeader !== "compact";
+    const visit = (card) => {
+      guardCard(card);
+      try {
+        // Recover from leftover opacity:0 / display:none from older persist builds.
+        card.style.removeProperty("opacity");
+        card.style.removeProperty("visibility");
+        if (showEntities) {
+          const disp = getComputedStyle(card).display;
+          if (disp === "none") {
+            card.style.setProperty("display", "block", "important");
+          }
+        }
+        const sr = card.shadowRoot;
+        if (!sr) return;
+        const ha = sr.querySelector("ha-card");
+        if (ha) {
+          ha.style.removeProperty("opacity");
+          ha.style.removeProperty("visibility");
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    };
+    root.querySelectorAll("button-card").forEach(visit);
     root.querySelectorAll("*").forEach((el) => {
-      if (el.localName === "button-card") guardCard(el);
+      if (el.localName === "button-card") visit(el);
       if (el.shadowRoot) {
-        el.shadowRoot.querySelectorAll("button-card").forEach(guardCard);
+        el.shadowRoot.querySelectorAll("button-card").forEach(visit);
       }
     });
   }

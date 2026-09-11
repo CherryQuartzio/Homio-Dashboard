@@ -9,12 +9,13 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.22** (`const.VERSION`).
+Integration version: **1.0.23** (`const.VERSION`).
 
 ## Status
 
 - **Daily driver on HA:** Homio YAML panel `/homio_dashboard` (Phase 5 complete — Homio Fixed removed).
-- **1.0.22:** Drop logo opacity:0 + overlay (it hid the logo when the clone missed nested cards). Logos use animation:none only. Raise room title/entities above full-bleed `#navigation` so they cannot be covered. Persist JS is cleanup-only.
+- **1.0.23:** Cap room-title lift (reject bogus upper-half strip hits); restore room photo on the card (remove gray + fading `::before` that read darker); harden entity-strip visibility.
+- **1.0.22:** Drop logo opacity:0 + overlay (it hid the logo when the clone missed nested cards). Logos use animation:none only. Raise room title/entities above full-bleed `#navigation`. Persist JS is cleanup-only.
 - **UI config (1.0.7+):** Rooms, logo, nav order, and devices via OptionsFlow + room Config Subentries. Generator writes `/config/homio/layout/`. **1.0.8** fixed Configure/reconfigure/YAML/assets/migration/timer issues. **1.0.9** fixes FormatJS `{stem}` translation crash and missing **Add room** `initiate_flow` label; brand images go in `custom_components/homio_dashboard/brand/`. **1.0.10** fresh install shows a Welcome dashboard that points at Configure / Add room (no auto Daylor/Living seed). **1.0.13** removes FormatJS `<stem>` (`UNCLOSED_TAG`) from room/device icon descriptions; ships `brand/logo.png` too; header clock options (12/24, AM/PM, tap action). HACS store icons for local `brand/` remain a HACS frontend gap on HA 2026.3+ (Devices & Services uses `/api/brands/...`). **1.0.16** device customization (display name + icon) on the room subflow; mobile logo hide when full header; entity acrylic (no strip `#root` mask).
 - **Persistent assets:** icons + room JPGs live in `/config/homio/{icons,rooms}/`, served at `/homio_assets/icons|rooms/...` only (layout/ not public).
 - **Bundled JS:** served at `/homiofiles/...` (must not share `/homio_dashboard` or hard refresh 404s).

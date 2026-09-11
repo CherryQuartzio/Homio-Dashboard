@@ -72,6 +72,18 @@
   /** Undo opacity damage from prior persist builds; never hide anything. */
   function repairVisibility() {
     removeObsoleteOverlay();
+    // Stale lift from a bad strip measurement shoves the title off-screen.
+    document.documentElement.style.removeProperty("--homio-room-text-lift");
+    // Menu-open hides entity cards; if compact menu isn't open, force visible.
+    const menuOpen =
+      document.documentElement.dataset.homioMenu === "open" &&
+      document.documentElement.dataset.homioHeader === "compact";
+    if (!menuOpen) {
+      document.documentElement.style.setProperty(
+        "--homio-entity-when-menu",
+        "block"
+      );
+    }
     allButtonCards().forEach((card) => {
       try {
         card.removeAttribute(LOGO_ATTR);
@@ -88,6 +100,12 @@
           const el = root.querySelector(sel);
           clearInlineOpacity(el);
         });
+        const entities = root.querySelector("#entities");
+        if (entities) {
+          entities.style.setProperty("opacity", "1", "important");
+          entities.style.setProperty("visibility", "visible", "important");
+          entities.style.setProperty("background", "transparent", "important");
+        }
       } catch (e) {
         /* ignore */
       }
