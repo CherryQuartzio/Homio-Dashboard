@@ -9,7 +9,7 @@ Branch: `port/homio-fixed-fixes`
 Remotes: `origin` → `https://github.com/CherryQuartzio/Homio-Dashboard.git`,  
 `upstream` → `https://github.com/clutchthrower/Homio-Dashboard.git`
 
-Integration version: **1.0.20** (`const.VERSION`).
+Integration version: **1.0.21** (`const.VERSION`).
 
 ## Status
 

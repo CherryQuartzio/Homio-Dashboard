@@ -1,19 +1,20 @@
-/** Keep the Homio logo painted across room view swaps.
+/** Homio brand-logo overlay — isolated from the rest of the dashboard.
  *
- * SAFE: light-DOM text overlay only — never reparent Lit/Lovelace nodes.
- *
- * Live logo cards are opacity:0 hit-targets (no homio_default fadeIn). This
- * overlay is the only painted logo and stays mounted for the whole Homio
- * session so room remounts cannot fade it.
+ * SAFE: light-DOM text overlay only. Never reparents Lit nodes.
+ * NEVER sets opacity/animation on room, entity, nav, or clock cards.
+ * Only reads geometry from cards that are clearly the brand logo
+ * (template homio_logo / homio_mobile_logo, or #mobile_logo slot).
  */
 (() => {
   const PATH_RE = /^\/(homio-fixed|homio_dashboard)(\/|$)/;
   const HOLD_ID = "homio-logo-hold";
   const STYLE_ID = "homio-logo-hold-style";
+  const LOGO_ATTR = "data-homio-brand-logo";
   let hold = null;
   let syncTimer = 0;
   let observer = null;
   let active = false;
+  let repaired = false;
   let lastPaint = { text: "", left: 0, top: 0, width: 0, height: 0 };
 
   function onHomioPath(path) {
@@ -32,24 +33,132 @@
       "white-space:nowrap;line-height:1;display:flex;align-items:center;" +
       "opacity:1!important;visibility:visible!important;" +
       "transition:none!important;animation:none!important;" +
+      "}" +
+      /* Only brand-logo hit-targets we mark — never other dashboard cards. */
+      "button-card[" +
+      LOGO_ATTR +
+      "]{" +
+      "opacity:0!important;animation:none!important;transition:none!important;" +
       "}";
     document.documentElement.appendChild(style);
   }
 
-  function isLogoName(text) {
-    if (!text) return false;
-    const t = text.trim();
-    if (!t || t.length > 24) return false;
-    if (/[°%]/.test(t) || /^\d/.test(t)) return false;
-    if (/^\d{1,2}:\d{2}/.test(t)) return false;
-    return /^[A-Za-z][A-Za-z0-9 .'-]{0,22}\.?$/.test(t);
+  /** Undo damage from older persist builds that zeroed arbitrary button-cards. */
+  function repairNonLogoCards() {
+    document.querySelectorAll("button-card").forEach((card) => {
+      if (card.hasAttribute(LOGO_ATTR)) return;
+      try {
+        card.style.removeProperty("opacity");
+        card.style.removeProperty("animation");
+        card.style.removeProperty("transition");
+        const root = card.shadowRoot;
+        if (!root) return;
+        ["ha-card", ".button-card-main"].forEach((sel) => {
+          const el = root.querySelector(sel);
+          if (!el || !el.style) return;
+          el.style.removeProperty("opacity");
+          el.style.removeProperty("animation");
+          el.style.removeProperty("transition");
+        });
+      } catch (e) {
+        /* ignore */
+      }
+    });
   }
 
-  function suppressCard(card) {
-    if (!card || !card.style) return;
-    card.style.setProperty("opacity", "0", "important");
-    card.style.setProperty("animation", "none", "important");
-    card.style.setProperty("transition", "none", "important");
+  function cardTemplates(card) {
+    const cfg = card.config || card._config || {};
+    const t = cfg.template;
+    if (Array.isArray(t)) return t.map(String);
+    if (t != null) return [String(t)];
+    return [];
+  }
+
+  function isBrandLogoTemplate(card) {
+    const templates = cardTemplates(card);
+    return (
+      templates.indexOf("homio_logo") !== -1 ||
+      templates.indexOf("homio_mobile_logo") !== -1
+    );
+  }
+
+  function deepButtonCards(node, out) {
+    if (!node) return;
+    if (node.localName === "button-card") out.push(node);
+    const root = node.shadowRoot;
+    if (root) {
+      root.querySelectorAll("button-card").forEach((c) => out.push(c));
+      root.querySelectorAll("*").forEach((el) => {
+        if (el.shadowRoot) deepButtonCards(el, out);
+      });
+    }
+    if (node.querySelectorAll) {
+      node.querySelectorAll("button-card").forEach((c) => out.push(c));
+    }
+  }
+
+  /** Logo slots only: #mobile_logo and brand templates under #navigation. */
+  function findBrandLogoCard() {
+    const candidates = [];
+    document.querySelectorAll("button-card").forEach((room) => {
+      const sr = room.shadowRoot;
+      if (!sr) return;
+      const mobile = sr.getElementById("mobile_logo");
+      if (mobile) {
+        const list = [];
+        deepButtonCards(mobile, list);
+        list.forEach((c) => candidates.push(c));
+      }
+      const nav = sr.getElementById("navigation");
+      if (nav) {
+        const list = [];
+        deepButtonCards(nav, list);
+        list.forEach((c) => {
+          if (isBrandLogoTemplate(c)) candidates.push(c);
+        });
+      }
+    });
+
+    // Fallback: any card that still exposes the brand logo template.
+    if (!candidates.length) {
+      document.querySelectorAll("button-card").forEach((c) => {
+        if (isBrandLogoTemplate(c)) candidates.push(c);
+      });
+    }
+
+    let best = null;
+    let bestScore = -1;
+    const seen = new Set();
+    for (let i = 0; i < candidates.length; i++) {
+      const card = candidates[i];
+      if (seen.has(card)) continue;
+      seen.add(card);
+      const root = card.shadowRoot;
+      if (!root) continue;
+      const name = root.querySelector("#name");
+      if (!name) continue;
+      const text = (name.textContent || "").trim();
+      if (!text) continue;
+      const rect = card.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) continue;
+      // Brand logo is a small header chip, never a room/entity card.
+      if (rect.height > 40 || rect.width > window.innerWidth * 0.4) continue;
+      let score = 0;
+      if (isBrandLogoTemplate(card)) score += 10;
+      if (rect.top >= 40 && rect.top <= 100) score += 3;
+      if (rect.left < window.innerWidth * 0.35) score += 2;
+      if (score > bestScore) {
+        bestScore = score;
+        best = { card, name, text, rect };
+      }
+    }
+    return best;
+  }
+
+  function markLogoOnly(card) {
+    if (!card) return;
+    card.setAttribute(LOGO_ATTR, "1");
+    // Keep hit-target; do not touch any other cards.
     const root = card.shadowRoot;
     if (!root) return;
     const ha = root.querySelector("ha-card");
@@ -58,41 +167,6 @@
       ha.style.setProperty("animation", "none", "important");
       ha.style.setProperty("transition", "none", "important");
     }
-    const main = root.querySelector(".button-card-main");
-    if (main) {
-      main.style.setProperty("opacity", "0", "important");
-      main.style.setProperty("animation", "none", "important");
-      main.style.setProperty("transition", "none", "important");
-    }
-  }
-
-  function findLogoCard() {
-    const cards = document.querySelectorAll("button-card");
-    let best = null;
-    let bestScore = -1;
-    for (let i = 0; i < cards.length; i++) {
-      const card = cards[i];
-      const root = card.shadowRoot;
-      if (!root) continue;
-      const name = root.querySelector("#name");
-      if (!name) continue;
-      const text = (name.textContent || "").trim();
-      if (!isLogoName(text)) continue;
-      const rect = card.getBoundingClientRect();
-      if (rect.width < 2 || rect.height < 2) continue;
-      let score = 0;
-      if (rect.top >= 40 && rect.top <= 100) score += 5;
-      if (rect.height <= 40) score += 3;
-      if (rect.left < window.innerWidth * 0.4) score += 2;
-      if (/homio|home|daylor/i.test(text)) score += 4;
-      if (rect.height > 50 || rect.width > window.innerWidth * 0.55) continue;
-      suppressCard(card);
-      if (score > bestScore) {
-        bestScore = score;
-        best = { card, name, text, rect };
-      }
-    }
-    return best;
   }
 
   function ensureHold() {
@@ -116,8 +190,7 @@
     const left = rect.left;
     const top = rect.top;
     const height = Math.max(rect.height, 22);
-    const width = Math.ceil(rect.width);
-    // Avoid rewriting DOM text every mutation (can flicker).
+    const width = Math.max(Math.ceil(rect.width), 8);
     if (lastPaint.text !== text) {
       el.textContent = text;
       lastPaint.text = text;
@@ -143,26 +216,27 @@
       lastPaint.width = width;
       lastPaint.height = height;
     }
-    el.style.opacity = "1";
-    el.style.visibility = "visible";
   }
 
   function syncFromLive() {
     if (!active) return;
+    if (!repaired) {
+      repairNonLogoCards();
+      repaired = true;
+    }
     ensureHold();
-    const logo = findLogoCard();
+    const logo = findBrandLogoCard();
     if (!logo) return;
+    markLogoOnly(logo.card);
     paintHold(logo);
   }
 
   function scheduleSync() {
-    // Suppress logos immediately; debounce geometry sync only.
-    findLogoCard();
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => {
       syncTimer = 0;
       syncFromLive();
-    }, 32);
+    }, 48);
   }
 
   function clearObserver() {
@@ -181,6 +255,9 @@
   function activate() {
     ensureGlobalStyle();
     ensureHold();
+    repaired = false;
+    repairNonLogoCards();
+    repaired = true;
     if (active) {
       scheduleSync();
       return;
@@ -188,19 +265,21 @@
     active = true;
     armObserver();
     syncFromLive();
-    requestAnimationFrame(() => {
-      syncFromLive();
-      requestAnimationFrame(syncFromLive);
-    });
-    setTimeout(syncFromLive, 100);
-    setTimeout(syncFromLive, 300);
+    requestAnimationFrame(() => syncFromLive());
+    setTimeout(syncFromLive, 120);
+    setTimeout(syncFromLive, 400);
   }
 
   function deactivate() {
     active = false;
+    repaired = false;
     clearTimeout(syncTimer);
     syncTimer = 0;
     clearObserver();
+    document.querySelectorAll("button-card[" + LOGO_ATTR + "]").forEach((c) => {
+      c.removeAttribute(LOGO_ATTR);
+    });
+    repairNonLogoCards();
     if (hold) {
       try {
         hold.remove();
@@ -217,7 +296,6 @@
     else deactivate();
   }
 
-  // Paint/hold BEFORE the view tears down on Homio→Homio navigation.
   document.addEventListener(
     "click",
     (ev) => {
@@ -251,13 +329,6 @@
   window.addEventListener("resize", () => {
     if (active) scheduleSync();
   });
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (active) scheduleSync();
-    },
-    true
-  );
 
   const push = history.pushState.bind(history);
   history.pushState = (...args) => {
@@ -270,12 +341,6 @@
     replace(...args);
     onLocation();
   };
-
-  if (typeof ResizeObserver === "function") {
-    new ResizeObserver(() => {
-      if (active) scheduleSync();
-    }).observe(document.documentElement);
-  }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", onLocation);

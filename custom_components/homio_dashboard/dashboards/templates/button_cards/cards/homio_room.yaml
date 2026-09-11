@@ -55,15 +55,25 @@ homio_room:
     /* Full vs compact header is per-browser via CSS vars from homio-header-fit.js
        (never a shared input_boolean — that synced every client). */
     /* Room text lift: var set on documentElement by homio-room-text-fit.js.
-       Title + sensors fade like entity cards; logo/nav stay still. */
+       Title + sensors fade like entity cards. Logo is isolated (overlay only). */
     #temperature,
     #name,
     #humidity {
       position: relative !important;
       z-index: 2 !important;
-      animation: fadeIn 0.3s ease-in forwards !important;
+      opacity: 1 !important;
+      animation: fadeIn 0.3s ease-in !important;
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
       transform: translateY(calc(-1 * var(--homio-room-text-lift, 0px))) !important;
+    }
+    /* Entity strip + chrome must stay above the photo layer and never inherit
+       logo-hold opacity tricks. */
+    #entities,
+    #navigation,
+    #mobile_menu_icon,
+    #motion_detection {
+      opacity: 1 !important;
+      animation: none !important;
     }
     ha-ripple,
     .mdc-ripple-surface::before,
