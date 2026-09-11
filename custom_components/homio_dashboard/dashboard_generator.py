@@ -443,16 +443,25 @@ def _patch_time_file(button_cards_dir: Path, options: dict[str, Any]) -> None:
 
 
 def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) -> None:
-    """Overwrite logo templates with configured name and home path."""
+    """Overwrite logo templates with configured name and home path.
+
+    Do not template homio_default (fadeIn). Cards stay opacity 0 hit-targets;
+    www/homio-header-persist.js paints the visible logo overlay.
+    """
     path = f"/{DOMAIN}/{home_slug}" if home_slug else f"/{DOMAIN}"
+    name = _yaml_scalar(logo_name)
     logo_yaml = f"""homio_logo:
-  template:
-    - homio_default
   tap_action:
     action: navigate
     navigation_path: {path}
-  name: {_yaml_scalar(logo_name)}
+  name: {name}
   styles:
+    grid:
+      - grid-template-areas: '"n"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      - place-items: center start
+      - height: 100%
     name:
       - color: var(--primary-text-color)
       - letter-spacing: 2px
@@ -460,25 +469,56 @@ def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) ->
       - font-weight: 700
       - text-transform: uppercase
       - justify-self: start
-      - line-height: 18px
+      - align-self: center
+      - line-height: 1
+      - margin: 0
+      - padding: 0
     card:
+      - "--mdc-ripple-color": transparent
+      - "-webkit-tap-highlight-color": transparent
       - "--ha-card-background": transparent
       - background: none
       - background-color: transparent
       - box-shadow: none
       - border: none
+      - border-radius: 0
+      - position: relative
       - pointer-events: all
-      - height: 18px
-      - min-height: 0
+      - height: 22px
+      - min-height: 22px
+      - display: grid
+      - align-items: center
       - padding: 0
       - margin: 0
+      - animation: none
+      - transition: none
+      - opacity: 0
+  extra_styles: |
+    :host,
+    ha-card,
+    .button-card-main {{
+      animation: none !important;
+      transition: none !important;
+      opacity: 0 !important;
+    }}
+    #name {{
+      animation: none !important;
+      transition: none !important;
+    }}
 """
     mobile_yaml = f"""homio_mobile_logo:
-  name: {_yaml_scalar(logo_name)}
+  name: {name}
   tap_action:
     action: navigate
     navigation_path: {path}
   styles:
+    grid:
+      - grid-template-areas: '"n"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      - place-items: center start
+      - height: 100%
+      - width: 100%
     name:
       - color: var(--primary-text-color)
       - letter-spacing: 2px
@@ -486,18 +526,52 @@ def _patch_logo_files(button_cards_dir: Path, logo_name: str, home_slug: str) ->
       - font-weight: 700
       - text-transform: uppercase
       - justify-self: start
-      - line-height: 18px
+      - align-self: center
+      - line-height: 1
+      - margin: 0
+      - padding: 0
     card:
+      - "--mdc-ripple-color": transparent
+      - "-webkit-tap-highlight-color": transparent
       - "--ha-card-background": transparent
       - background: none
       - background-color: transparent
       - box-shadow: none
       - border: none
+      - border-radius: 0
+      - position: relative
       - pointer-events: all
-      - height: 18px
-      - min-height: 0
+      - height: 23px
+      - min-height: 23px
+      - width: auto
+      - display: grid
+      - align-items: center
+      - place-content: center start
       - padding: 0
       - margin: 0
+      - animation: none
+      - transition: none
+      - opacity: 0
+  extra_styles: |
+    :host,
+    ha-card,
+    .button-card-main {{
+      animation: none !important;
+      transition: none !important;
+      opacity: 0 !important;
+      display: grid !important;
+      align-items: center !important;
+      height: 23px !important;
+      min-height: 23px !important;
+    }}
+    #name {{
+      align-self: center !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      animation: none !important;
+      transition: none !important;
+    }}
 """
     base = button_cards_dir / "base"
     base.mkdir(parents=True, exist_ok=True)
